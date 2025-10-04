@@ -15,13 +15,10 @@ public class JwtUtil {
 	@Value("${jwt.expiration}")
 	private Long exp;
 	
-	@Value("${jwt.secret}")
-	private String secret;
-	
 	private Algorithm algorithm;
 	private JWTVerifier jwt;
 	
-	public JwtUtil() {
+	public JwtUtil(@Value("${jwt.secret}") String secret ) {
 		this.algorithm = Algorithm.HMAC256(secret);
 		this.jwt = JWT.require(algorithm).build();
 	}

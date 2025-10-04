@@ -3,7 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Auth">
-	<select id="login" resultType="com.kedu.project.dto.AuthDTO">
+	<select id="login" resultType="com.kedu.study.DTO.AuthDTO">
 		select * from auth where id=#{id} and pw=#{pw}
 	</select>
 		<insert id="insert">
@@ -15,7 +15,7 @@
 		delete from auth where id = #{id}
 	</delete>
 	
-	<select id="myPage" resultType="com.kedu.project.dto.AuthDTO">
+	<select id="myPage" resultType="com.kedu.study.DTO.AuthDTO">
 		select * from auth where id=#{id}
 	</select>
 	
