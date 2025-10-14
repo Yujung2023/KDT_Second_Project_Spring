@@ -28,7 +28,8 @@ import com.google.cloud.storage.Storage;
 @RequestMapping("/files")
 public class FileController {
 
-
+// 아무거나
+	//아무거나
    @Autowired
    private Storage storage;
 
