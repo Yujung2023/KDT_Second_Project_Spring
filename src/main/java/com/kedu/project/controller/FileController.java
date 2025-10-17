@@ -41,7 +41,7 @@ public class FileController {
    public ResponseEntity<Void> upload(String message , MultipartFile[] files) throws Exception{
 
       System.out.println(message);
-
+      if (files != null) {// null 체크 추가
       for( MultipartFile file : files) {
 
          if(!file.isEmpty()) {   
@@ -57,7 +57,7 @@ public class FileController {
             }
          }
       }
-
+      }
       return ResponseEntity.ok().build();
    }
    
@@ -73,6 +73,9 @@ public class FileController {
      
          return ResponseEntity.ok(fileNames);
    }
+ 
+   
+   
    @GetMapping("/{sysname}")
    public ResponseEntity<byte[]> download(@PathVariable String sysname) throws Exception {
 	   
