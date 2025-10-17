@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Contacts">
+	
+	<insert id="insert" >
+		insert into contacts 
+		(seq , user_id , name, phone , email, type , team , jobRank) 
+		values(contacts_seq.nextval , #{user_id} , #{name}, #{phone} , 
+		#{email},#{type},#{team}, #{jobRank}) 
+
+	</insert>
+	
+	<select id="SelectContactsList" resultType="com.kedu.project.dto.ContactsDTO">
+		select * from contacts order by name asc
+	</select>	
+	
+	
+	<select id="selectSoloList" resultType="com.kedu.project.dto.ContactsDTO">
+    SELECT * FROM contacts WHERE type = 'solo' order by name asc
+	</select>
+
+	<select id="selectMultiList" resultType="com.kedu.project.dto.ContactsDTO">
+    SELECT * FROM contacts WHERE type = 'multi' order by name asc
+	</select>
+	
+	
+	<select id="searchName" resultType="com.kedu.project.dto.ContactsDTO">
+	select * from contacts where name like  '%' || #{name} || '%'
+	</select>
+	
+	<delete id="deleteContacts">
+	delete from contacts where seq in
+	<foreach item="seq" collection="collection" open="(" separator="," close=")">
+    #{seq}</foreach>
+	</delete>
+	
+	<update id="updateContactsTypeMulti" parameterType="map">
+    UPDATE contacts
+   SET type = #{type}
+    WHERE seq IN
+    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq}
+    </foreach>
+    </update>
+    
+    <update id="updateContactsTypeSingle" parameterType="map">
+    UPDATE contacts	
+   SET type = #{type}	
+    WHERE seq IN
+    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq}
+    </foreach>
+    
+    
+</update>
+
+	
+</mapper>
