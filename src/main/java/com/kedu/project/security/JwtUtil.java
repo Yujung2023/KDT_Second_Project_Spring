@@ -26,7 +26,7 @@ public class JwtUtil {
 	public String createToken(String id) {
 		return JWT.create().
 			   withSubject(id).
-			   withClaim("name","tom").
+			   //withClaim("name","tom").
 			   withIssuedAt(new Date()).withExpiresAt(new Date(System.currentTimeMillis()+exp)).
 			   sign(this.algorithm);
 	}
