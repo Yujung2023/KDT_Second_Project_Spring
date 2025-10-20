@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class MailDTO {
 
-	private int seq;
+	private long  seq;
 	private String user_id;
 	private String senderId;
 	private String recipientId;
@@ -33,10 +33,10 @@ public class MailDTO {
 
 
 
-	public int getSeq() {
+	public long  getSeq() {
 		return seq;
 	}
-	public void setSeq(int seq) {
+	public void setSeq(long  seq) {
 		this.seq = seq;
 	}
 	public String getUser_id() {
