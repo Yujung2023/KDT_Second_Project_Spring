@@ -37,7 +37,6 @@ public class JwtInterceptor implements HandlerInterceptor {
 		}
 
 
-
 		String authHeader = request.getHeader("Authorization");
 
 		if(authHeader == null )

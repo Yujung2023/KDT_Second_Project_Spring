@@ -1,6 +1,7 @@
 package com.kedu.project.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +19,33 @@ public class MailDAO {
 		
 		return mybatis.insert("Mail.SendMail",dto);
 	}
-
-	public List<MailDTO> SelectMailList() {
+	
+	public List<MailDTO> SelectrecipientMailList(String loginId) {
 		
-		return mybatis.selectList("Mail.SelectMailList");
+		return mybatis.selectList("Mail.SelectrecipientMailList" , loginId);
+	}
+
+	public List<MailDTO> SelectSendMailList(String loginId) {
+		
+		return mybatis.selectList("Mail.SelectSendMailList" , loginId);
 	}
 
 	public Object deleteMail(List<Long> seqList) {
 		
 		return mybatis.delete("Mail.deleteMail", seqList);
 	}
+
+	public List<MailDTO> searchName(Map<String , String> param) {
+		
+		return mybatis.selectList("Mail.searchName", param);
+	}
+	
+	public List<MailDTO> searchsendName(Map<String , String> param) {
+		
+		return mybatis.selectList("Mail.searchsendName", param);
+	}
+	
+	
 	
 	
 	
