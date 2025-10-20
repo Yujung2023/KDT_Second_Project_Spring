@@ -37,5 +37,4 @@ lyrical-caster-472605-e1-2ea7b2f8501c.json
 
 src/main/resources/application.properties
 
- src/main/resources/application.properties
 src/main/java/com/kedu/project/config/CORSConfig.java
