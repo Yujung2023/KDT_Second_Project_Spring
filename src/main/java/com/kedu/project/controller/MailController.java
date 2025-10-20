@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.kedu.project.dto.ContactsDTO;
 import com.kedu.project.dto.MailDTO;
 import com.kedu.project.service.MailService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/mail")
@@ -23,21 +26,44 @@ public class MailController {
 
 	@Autowired
 	private MailService MServ;
-	
-	@PostMapping // 메일 작성 (DB insert)
-	public ResponseEntity<Void> sendMail(@RequestBody MailDTO dto) {
 
+	@PostMapping // 메일 작성 (DB insert)
+	public ResponseEntity<Long> sendMail(@RequestBody MailDTO dto, HttpServletRequest request) {
+
+		String loginId = (String) request.getAttribute("loginID");
+
+		// dto에 로그인한 아이디 넣기
+		dto.setUser_id(loginId);
+		dto.setSenderId(loginId);
 		MServ.SendMail(dto);
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(dto.getSeq());
 	}
-	
-	
-	@GetMapping // 메일 리스트 출력
-	public ResponseEntity<List<MailDTO>> SelectMailList() {
-		
-		List<MailDTO> list = MServ.SelectMailList();
-		
+
+
+	@GetMapping // 받은 메일 리스트 출력
+	public ResponseEntity<List<MailDTO>> SelectrecipientMailList(@RequestParam(required = false) String name ,  HttpServletRequest request) {
+		 String loginId = (String) request.getAttribute("loginID");
+		List<MailDTO> list;
+		if (name != null && !name.isEmpty()) { // 안적으면 검색기능 나오게(수정필요)
+			list = MServ.searchName(name,loginId);
+
+		}else {
+			list = MServ.SelectrecipientMailList(loginId);
+		}
+		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping ("/send")// 보낸 메일 리스트 출력
+	public ResponseEntity<List<MailDTO>> SelectSendMailList(@RequestParam(required = false) String name ,  HttpServletRequest request) {
+		 String loginId = (String) request.getAttribute("loginID");
+		List<MailDTO> list;
+		if (name != null && !name.isEmpty()) { // 안적으면 검색기능 나오게(수정필요)
+			list = MServ.searchsendName(name,loginId);
+
+		}else {
+			list = MServ.SelectSendMailList(loginId);
+		}
 		return ResponseEntity.ok(list);
 	}
 	
@@ -47,8 +73,9 @@ public class MailController {
 		MServ.deleteMail(seqList);
 		return ResponseEntity.ok().build();
 	}
-	
-	
-	
+
+
+
+
 }
 
