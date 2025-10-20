@@ -1,0 +1,50 @@
+package com.kedu.project.controller;
+
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kedu.project.dto.MemberDTO;
+import com.kedu.project.security.JwtUtil;
+import com.kedu.project.service.MemberService;
+
+
+@RestController
+@RequestMapping("/member")
+public class MemberController {
+
+	@Autowired
+	private JwtUtil jwt;
+	
+	
+	@Autowired
+	private MemberService memberService;
+	
+	//회원가입
+	@PostMapping
+	public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO){
+		System.out.println("id: " + memberDTO.getId() + ": pw: " + memberDTO.getPassword() );
+		System.out.println("name: " + memberDTO.getName() + ": pw: " + memberDTO.getEnglishName() );
+		System.out.println("employmentType : " + memberDTO.getEmploymentType () + ": pw: " + memberDTO.getHire_date() );
+		System.out.println("id: " + memberDTO.getDept_code() + ": Rank_: " + memberDTO.getRank_code() );
+		System.out.println("id: " + memberDTO.getJob_code() + ": Personal: " + memberDTO.getPersonalEmail() );
+		System.out.println("id: " + memberDTO.getOfficePhone() + ": Mobile: " + memberDTO.getMobilePhone() );
+		System.out.println("id: " + memberDTO.getBirthDate() + ": Cal: " + memberDTO.getCalendarType() );
+		System.out.println("id: " + memberDTO.getZip_code() + ": getAddr: " + memberDTO.getAddress_line1() );
+		System.out.println("id: " + memberDTO.getAddress_line2());
+		
+		return ResponseEntity.ok("");
+	}
+
+	@PostMapping("/checkId")
+	public int checkId(@RequestBody Map<String,String> param) {
+	    String id = param.get("id");
+	    return memberService.checkId(id);
+	}
+
+}
