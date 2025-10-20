@@ -27,7 +27,7 @@ public class JwtUtil {
 		return JWT.create().
 			   withSubject(id).
 			   //withClaim("name","tom").
-			   withIssuedAt(new Date()).withExpiresAt(new Date(System.currentTimeMillis()+exp)).
+			   withIssuedAt(new Date()).withExpiresAt(new Date(System.currentTimeMillis()+ exp * 1000)).
 			   sign(this.algorithm);
 	}
 	
