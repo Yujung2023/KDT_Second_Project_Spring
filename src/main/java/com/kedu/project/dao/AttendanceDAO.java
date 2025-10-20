@@ -18,4 +18,7 @@ public class AttendanceDAO {
 	{
 		return mybatis.selectList("attendance.CountSelect");
 	}
+	
+	
+
 }
