@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kedu.project.dto.AttendanceDTO;
 import com.kedu.project.service.AttendanceService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/attendance")
 public class AttendanceController {
@@ -24,4 +26,6 @@ public class AttendanceController {
 		List<AttendanceDTO> list=attendanceService.countSelect();
 		return ResponseEntity.ok(list);
 	}
+
+
 }

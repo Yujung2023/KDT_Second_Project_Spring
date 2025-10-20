@@ -7,4 +7,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="CountSelect" resultType="com.kedu.project.dto.AttendanceDTO" >
 select status,count(*) as cnt from attendance group by status
 </select>
+
+<select id="leaveSelect" parameterType="String" resultType="com.kedu.project.dto.AttendanceDTO">
+select leave_count from leave_request where member_id=#{member_id}
+</select>
+
+
 </mapper>
