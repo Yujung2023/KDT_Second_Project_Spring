@@ -9,11 +9,14 @@
         SELECT mail_seq.NEXTVAL FROM dual
     </selectKey>
 		insert into mail 
-		(seq , user_id , senderId, recipientId , title, fileContent , content ) 
+		(seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
 		values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
-		#{fileContent,jdbcType=VARCHAR}, #{content} ) 
+		#{senderName}, #{recipientName}, #{content} ) 
 	</insert>
 	
+	 <select id="getNameById" resultType="string">
+        SELECT name FROM contacts  WHERE email = #{userId}
+    </select>
 
 	
 	<select id="SelectrecipientMailList" resultType="com.kedu.project.dto.MailDTO">
