@@ -10,7 +10,7 @@ public class CORSConfig implements WebMvcConfigurer{
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**") // 서버의 어떤 url 로 요청을 하든
-		.allowedOrigins("http://10.5.5.11:3000") // 모든 출처가 아닌 정해진 곳에서만 허락.
+		.allowedOrigins("http://10.5.5.12:3000") // 모든 출처가 아닌 정해진 곳에서만 허락.
 		.allowedMethods("*")	   // 모든 요청 방식
 		.allowedHeaders("*")	   // 모든 요청 헤더에 대해 전부 허가 하겠음.
 		.allowCredentials(true);	// 작업 증명(setCookie) 을 허용하겠다.
