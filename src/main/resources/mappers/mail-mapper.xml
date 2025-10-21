@@ -32,7 +32,7 @@
 	
 	<select id="searchName" parameterType="map" resultType="com.kedu.project.dto.MailDTO">
     SELECT * 
-    FROM mail
+    FROM mail	
     WHERE recipientId = #{loginId}
      AND senderId LIKE '%' || #{name} || '%'
     ORDER BY sendDate ASC

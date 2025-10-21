@@ -1,5 +1,6 @@
 package com.kedu.project.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,21 +44,38 @@ public class ContactsDAO {
 
 		return mybatis.selectList("Contacts.searchName", name);
 	}
-	
+
+	public List<ContactsDTO> searchByNameAndType(Map<String, Object> param) {
+
+		return mybatis.selectList("Contacts.searchByNameAndType", param);
+	}
+
 	public int deleteContacts(List<Long> seqList) {
-		
+
 		return mybatis.delete("Contacts.deleteContacts", seqList);
 	}
 
+	public void updateContact(Integer seq, Map<String, String> dto) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("seq", seq);
+		params.put("dto", dto);
+		mybatis.update("Contacts.updateContacts", params);
+	}
+
+
 	public Object updateContactsTypeMulti(Map<String , Object> param) {
-		
+
 		return mybatis.update("Contacts.updateContactsTypeMulti", param);
 	}
 
 	public Object updateContactsTypeSingle(Map<String, Object> param) {
-		
+
 		return mybatis.update("Contacts.updateContactsTypeSingle", param);
 	}
+
+
+
+
 
 
 }
