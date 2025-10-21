@@ -27,4 +27,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	  
 	  select * from approval_doc where seq=#{seq}
 	  </select>
+	  
+	  <select id="findTempByWriter" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
+		select * from approval_doc where writer=#{writerId} and status='temp'
+		</select>
+		
+		<update id="tempUpdate" parameterType="com.kedu.project.dto.ApprovalDTO">
+		update approval_doc set title=#{title},comments=#{comments},writeDate=SYSDATE where seq=#{seq} and status='temp'
+		</update>
+
 </mapper>

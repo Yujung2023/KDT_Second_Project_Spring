@@ -28,5 +28,9 @@ public class MemberDAO {
         return members; 
     }
 	
+	public MemberDTO findById(String id) {
+	    return mybatis.selectOne("Member.findById", id);
+	}
+	
 }
 

@@ -36,5 +36,19 @@ public class ApprovalService {
 		return dao.getDetail(seq);
 	}
 	
+	public void saveTemp(ApprovalDTO dto) {
+		ApprovalDTO temp=dao.findTempByWriter(dto.getWriter());
+		if(temp==null) {
+			dao.tempinsert(dto);
+		}else {
+			dto.setSeq(temp.getSeq());
+			dao.tempUpdate(dto);
+		}
+	}
+	
+	public ApprovalDTO getTemp(String writerId) {
+		return dao.findTempByWriter(writerId);
+	}
+	
 	
 }
