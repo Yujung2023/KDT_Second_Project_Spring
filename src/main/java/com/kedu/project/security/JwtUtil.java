@@ -23,10 +23,10 @@ public class JwtUtil {
 		this.jwt = JWT.require(algorithm).build();
 	}
 	
-	public String createToken(String id) {
+	public String createToken(String id,String name) {
 		return JWT.create().
 			   withSubject(id).
-			   //withClaim("name","tom").
+			   withClaim("name",name). //이름 추가했어요
 			   withIssuedAt(new Date()).withExpiresAt(new Date(System.currentTimeMillis()+ exp * 1000)).
 			   sign(this.algorithm);
 	}

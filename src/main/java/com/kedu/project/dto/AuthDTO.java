@@ -3,6 +3,7 @@ package com.kedu.project.dto;
 public class AuthDTO {
 	private String id;
 	private String pw;
+	
 	public AuthDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -12,6 +13,7 @@ public class AuthDTO {
 		this.id = id;
 		this.pw = pw;
 	}
+	
 	public String getId() {
 		return id;
 	}

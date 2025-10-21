@@ -41,6 +41,11 @@ public class MemberService {
         List<MemberDTO> members = memberDao.getAllMembers(); // 서비스에서 리스트 조회
         return members; 
     }
+	
+	
+	public MemberDTO findById(String id) {
+	    return memberDao.findById(id); //찾기 
+	}
 
 
 }

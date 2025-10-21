@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.AuthDTO;
+import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.security.JwtUtil;
+import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -20,19 +22,23 @@ public class AuthController {
 
 	@Autowired
 	private JwtUtil jwt;
+	
+	
+	@Autowired
+	private MemberService memberService;
 
 	@PostMapping
 	public ResponseEntity<String> login(@RequestBody AuthDTO authDTO){
-		System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw() );
-		
-		if(true) { //로그인에 성공했을 경우  우선 회원가입 만들기 전 까지 다 성공으로 처리
-			String token = jwt.createToken(authDTO.getId());
-			return ResponseEntity.ok(token);
-			//토큰 생성
-		}
+	    System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw());
 
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login Incorrect");
+	    MemberDTO member = memberService.findById(authDTO.getId());
+	    String name = (member != null) ? member.getName() : "누구세요"; // null방지용
+
+	    String token = jwt.createToken(authDTO.getId(), name);
+	    return ResponseEntity.ok(token);
 	}
+
+
 
 	@GetMapping
 	public ResponseEntity<String> test(HttpServletRequest request){

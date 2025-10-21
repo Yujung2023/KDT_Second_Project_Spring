@@ -64,5 +64,8 @@ public class MemberController {
         System.out.println("여기까지옴");
         return ResponseEntity.ok(members); // 200 OK와 함께 리스트 반환
     }
+	
+
+
 
 }
