@@ -15,8 +15,11 @@ public class AttendanceService {
 	@Autowired
 	private AttendanceDAO dao;
 	
-	
+	//근태 현황
 	public List<AttendanceDTO> countSelect(){
 		return dao.CountSelect();	
 		}
+	
+
+
 }

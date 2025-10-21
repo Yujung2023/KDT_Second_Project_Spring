@@ -58,7 +58,7 @@ public class ApprovalController {
 	public ResponseEntity<Void> tempSave(@RequestBody ApprovalDTO dto){
 		System.out.println("임시저장 할게용");
 		dto.setStatus("TEMP");
-		approvalservice.tempinsert(dto);
+		approvalservice.saveTemp(dto); //insert or update 자동 처리해줄거야 
 		return ResponseEntity.ok().build();
 	}
 	
@@ -67,6 +67,14 @@ public class ApprovalController {
 		ApprovalDTO dto=approvalservice.getDetail(seq);
 		return ResponseEntity.ok(dto);
 		
+	}
+	
+	
+	//임시저장 데이터 불러오기
+	@GetMapping("/temp/{writerId}")
+	public ResponseEntity<ApprovalDTO> getTemp(@PathVariable String writerId){
+		ApprovalDTO dto=approvalservice.getTemp(writerId);
+		return ResponseEntity.ok(dto);
 	}
 	
 	
