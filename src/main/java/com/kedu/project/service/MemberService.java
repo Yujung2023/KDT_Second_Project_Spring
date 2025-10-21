@@ -1,7 +1,10 @@
 package com.kedu.project.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.kedu.project.dao.MemberDAO;
@@ -33,5 +36,11 @@ public class MemberService {
             return 0;
         }
     }
+	
+	public List<MemberDTO> getAllMembers() {
+        List<MemberDTO> members = memberDao.getAllMembers(); // 서비스에서 리스트 조회
+        return members; 
+    }
+
 
 }

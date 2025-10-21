@@ -1,9 +1,11 @@
 package com.kedu.project.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +56,13 @@ public class MemberController {
 	    String id = param.get("id");
 	    return memberService.checkId(id);
 	}
+	
+	@GetMapping
+    public ResponseEntity<List<MemberDTO>> getAllMembers() {
+		System.out.println("여기까지옴");
+		List<MemberDTO> members = memberService.getAllMembers(); // 서비스에서 리스트 조회
+        System.out.println("여기까지옴");
+        return ResponseEntity.ok(members); // 200 OK와 함께 리스트 반환
+    }
 
 }
