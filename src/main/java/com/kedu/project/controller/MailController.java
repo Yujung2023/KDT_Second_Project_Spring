@@ -35,6 +35,10 @@ public class MailController {
 		// dto에 로그인한 아이디 넣기
 		dto.setUser_id(loginId);
 		dto.setSenderId(loginId);
+		// 주소록에 있는 발신자 이름 조회
+	    String senderName = MServ.getNameById(loginId);
+		dto.setSenderName(senderName);
+		
 		MServ.SendMail(dto);
 
 		return ResponseEntity.ok(dto.getSeq());

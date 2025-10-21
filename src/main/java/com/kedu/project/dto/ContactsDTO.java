@@ -8,15 +8,15 @@ public class ContactsDTO {
 	private	String phone;
 	private	String email;
 	private	String type;
-	private	String team;
-	private	String jobRank;
+	private	String job_code;
+	private	String rank_code;
 	
 
 
 	public ContactsDTO() {}
 
-	public ContactsDTO(int seq, String user_id, String name, String phone, String email, String type, String team,
-			String jobRank) {
+	public ContactsDTO(int seq, String user_id, String name, String phone, String email, String type, String job_code,
+			String rank_code) {
 		super();
 		this.seq = seq;
 		this.user_id = user_id;
@@ -24,8 +24,8 @@ public class ContactsDTO {
 		this.phone = phone;
 		this.email = email;
 		this.type = type;
-		this.team = team;
-		this.jobRank = jobRank;
+		this.job_code = job_code;
+		this.rank_code = rank_code;
 	}
 
 
@@ -105,26 +105,26 @@ public class ContactsDTO {
 
 
 
-	public String getTeam() {
-		return team;
+	public String getJob_code() {
+		return job_code;
 	}
 
 
 
-	public void setTeam(String team) {
-		this.team = team;
+	public void setJob_code(String job_code) {
+		this.job_code = job_code;
 	}
 
 
 
-	public String getJobRank() {
-		return jobRank;
+	public String getRank_code() {
+		return rank_code;
 	}
 
 
 
-	public void setJobRank(String jobRank) {
-		this.jobRank = jobRank;
+	public void setRank_code(String rank_code) {
+		this.rank_code = rank_code;
 	}
 
 
