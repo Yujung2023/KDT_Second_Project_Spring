@@ -9,7 +9,8 @@ public class MailDTO {
 	private String senderId;
 	private String recipientId;
 	private String title;
-	private String fileContent;
+	private String senderName;
+	private String recipientName;
 	private String content;
 	private Timestamp sendDate;
 	private String sendDateStr;
@@ -19,14 +20,15 @@ public class MailDTO {
 	public MailDTO() {}
 
 	public MailDTO(int seq, String user_id, String senderId, 
-			String recipientId, String title, String fileContent,String content, Timestamp sendDate) {
+			String recipientId, String title, String senderName, String recipientName , String content, Timestamp sendDate) {
 		super();
 		this.seq = seq;
 		this.user_id = user_id;
 		this.senderId = senderId;
 		this.recipientId = recipientId;
 		this.title = title;
-		this.fileContent = fileContent;
+		this.senderName = senderName;
+		this.recipientName = recipientName;
 		this.content = content;
 		this.sendDate = sendDate;
 	}
@@ -63,12 +65,25 @@ public class MailDTO {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public String getFileContent() {
-		return fileContent;
+
+
+
+	public String getSenderName() {
+		return senderName;
 	}
-	public void setFileContent(String fileContent) {
-		this.fileContent = fileContent;
+
+	public void setSenderName(String senderName) {
+		this.senderName = senderName;
 	}
+
+	public String getRecipientName() {
+		return recipientName;
+	}
+
+	public void setRecipientName(String recipientName) {
+		this.recipientName = recipientName;
+	}
+
 	public String getContent() {
 		return content;
 	}

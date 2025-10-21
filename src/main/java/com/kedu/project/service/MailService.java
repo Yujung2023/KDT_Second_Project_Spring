@@ -22,6 +22,11 @@ public class MailService {
 		
 		return dao.SendMail(dto);
 	}
+	
+	// 로그인 ID로 이름 조회
+    public String getNameById(String userId) {
+        return dao.getNameById(userId); // DB에서 이름 가져오기
+    }
 
 	public List<MailDTO> SelectrecipientMailList(String loginId) {
 	    List<MailDTO> mailList = dao.SelectrecipientMailList(loginId);
