@@ -29,16 +29,24 @@ public class MemberController {
 	@PostMapping
 	public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO){
 		System.out.println("id: " + memberDTO.getId() + ": pw: " + memberDTO.getPassword() );
-		System.out.println("name: " + memberDTO.getName() + ": pw: " + memberDTO.getEnglishName() );
-		System.out.println("employmentType : " + memberDTO.getEmploymentType () + ": pw: " + memberDTO.getHire_date() );
-		System.out.println("id: " + memberDTO.getDept_code() + ": Rank_: " + memberDTO.getRank_code() );
-		System.out.println("id: " + memberDTO.getJob_code() + ": Personal: " + memberDTO.getPersonalEmail() );
-		System.out.println("id: " + memberDTO.getOfficePhone() + ": Mobile: " + memberDTO.getMobilePhone() );
-		System.out.println("id: " + memberDTO.getBirthDate() + ": Cal: " + memberDTO.getCalendarType() );
-		System.out.println("id: " + memberDTO.getZip_code() + ": getAddr: " + memberDTO.getAddress_line1() );
-		System.out.println("id: " + memberDTO.getAddress_line2());
+		System.out.println("name: " + memberDTO.getName() + ": EnglishN: " + memberDTO.getEnglishName() );
+		System.out.println("employmentType : " + memberDTO.getEmploymentType () + ": Hire_d: " + memberDTO.getHire_date() );
+		System.out.println("Dept: " + memberDTO.getDept_code() + ": Rank_: " + memberDTO.getRank_code() );
+		System.out.println("Job: " + memberDTO.getJob_code() + ": Personal: " + memberDTO.getPersonalEmail() );
+		System.out.println("OfficeP: " + memberDTO.getOfficePhone() + ": Mobile: " + memberDTO.getMobilePhone() );
+		System.out.println("BirthD: " + memberDTO.getBirthDate() + ": Cal: " + memberDTO.getCalendarType() );
+		System.out.println("Zip_c: " + memberDTO.getZip_code() + ": getAddr: " + memberDTO.getAddress_line1() );
+		System.out.println("Address_line2: " + memberDTO.getAddress_line2());
 		
-		return ResponseEntity.ok("");
+		int result = memberService.register(memberDTO);
+		
+		if (result == 0) {
+	        // 400 Bad Request 반환
+	        return ResponseEntity.badRequest().body("사용자 등록 실패");
+	    }
+
+	    // 성공 시 200 OK 반환
+	    return ResponseEntity.ok("사용자 등록 성공");
 	}
 
 	@PostMapping("/checkId")

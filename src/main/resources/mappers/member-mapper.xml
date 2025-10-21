@@ -8,9 +8,27 @@
 	</select>
 	
 	
-	<insert id="insert">
-		insert into auth (id, pw, name)
-    	values (#{id}, #{pw}, #{name})
+	<insert id="register" parameterType="com.kedu.project.dto.MemberDTO">
+	    INSERT INTO Member (
+	        id, password, name, englishName, employmentType, hire_date,
+	        dept_code, rank_code, job_code, officeEmail, personalEmail,
+	        officePhone, mobilePhone, birthDate, calendarType,
+	        zip_code, address_line1, address_line2,
+	        employee_no, status, created_time
+	    )
+	    VALUES (
+	        #{id}, #{password}, #{name}, #{englishName}, #{employmentType},
+	        #{hire_date, jdbcType=TIMESTAMP},
+	        #{dept_code}, #{rank_code}, #{job_code},
+	        #{officeEmail, jdbcType=VARCHAR}, #{personalEmail, jdbcType=VARCHAR},
+	        #{officePhone, jdbcType=VARCHAR}, #{mobilePhone, jdbcType=VARCHAR},
+	        #{birthDate, jdbcType=TIMESTAMP},
+	        #{calendarType},
+	        #{zip_code, jdbcType=VARCHAR}, #{address_line1, jdbcType=VARCHAR}, #{address_line2, jdbcType=VARCHAR},
+	        'E' || LPAD(member_seq.NEXTVAL, 5, '0'),
+	        'active',
+	        sysdate
+	    )
 	</insert>
 	
 	<delete id="delete">
