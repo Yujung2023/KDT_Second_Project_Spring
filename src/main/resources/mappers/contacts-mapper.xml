@@ -74,9 +74,7 @@
     <foreach collection="seqList" item="seq" open="(" separator="," close=")">
         #{seq}
     </foreach>
-    
-    
-</update>
+	</update>
 
 	
 </mapper>
