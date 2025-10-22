@@ -22,13 +22,13 @@
 	<select id="SelectrecipientMailList" resultType="com.kedu.project.dto.MailDTO">
    select * from mail 
    where recipientId = #{value, jdbcType=VARCHAR} 
-   order by sendDate asc
+   order by sendDate desc
 	</select>
 	
 	<select id="SelectSendMailList" resultType="com.kedu.project.dto.MailDTO">
    select * from mail 
    where senderId = #{value, jdbcType=VARCHAR} 
-   order by sendDate asc
+   order by sendDate desc
 	</select>
 	
 	

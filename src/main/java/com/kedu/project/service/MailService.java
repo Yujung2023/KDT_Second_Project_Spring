@@ -38,7 +38,7 @@ public class MailService {
 	        }
 	    });
 
-	    return mailList;  // ← 수정: 포맷팅된 mailList 반환
+	    return mailList;  
 	}
 	
 	public List<MailDTO> SelectSendMailList(String loginId) {
@@ -51,7 +51,7 @@ public class MailService {
 	        }
 	    });
 
-	    return mailList;  // ← 수정: 포맷팅된 mailList 반환
+	    return mailList;  
 	}
 	
 
