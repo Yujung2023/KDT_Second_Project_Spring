@@ -4,13 +4,77 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="attendance">
 
-<select id="CountSelect" resultType="com.kedu.project.dto.AttendanceDTO" >
-select status,count(*) as cnt from attendance group by status
+<select id="CountSelect" parameterType="string" resultType="map">
+    SELECT start_status AS status, COUNT(*) AS cnt
+    FROM attendance
+    WHERE member_id = #{value}
+      AND start_status IS NOT NULL
+    GROUP BY start_status
+
+    UNION ALL
+
+    SELECT end_status AS status, COUNT(*) AS cnt
+    FROM attendance
+    WHERE member_id = #{value}
+      AND end_status IS NOT NULL
+    GROUP BY end_status
+    
 </select>
 
-<select id="leaveSelect" parameterType="String" resultType="com.kedu.project.dto.AttendanceDTO">
-select leave_count from leave_request where member_id=#{member_id}
+
+<select id="getToday" parameterType="string" resultType="map">
+  SELECT *
+    FROM (
+        SELECT
+            start_status AS startStatus,
+            end_status AS endStatus,
+            TO_CHAR(start_time, 'HH24:MI') AS startTime,
+            TO_CHAR(end_time, 'HH24:MI') AS endTime
+        FROM attendance
+        WHERE member_id = #{value}
+          AND TRUNC(start_time) = TRUNC(SYSDATE)
+        ORDER BY start_time DESC
+    )
+    WHERE ROWNUM = 1
+
 </select>
 
+
+<insert id="autoAbsence">
+    INSERT into attendance (seq, member_id, start_time,start_status)
+    VALUES (attendance_seq.nextval, #{member_id}, SYSTIMESTAMP, 'absence')
+</insert>
+    
+
+<insert id="insertCheckIn">
+Insert into attendance(seq,member_id,start_time,start_status)
+values (attendance_seq.nextval,#{member_id},SYSTIMESTAMP,#{start_status})
+</insert>
+
+<update id="exitCheckIn">
+UPDATE attendance
+SET end_time = SYSTIMESTAMP,
+    end_status = #{end_status}
+WHERE member_id = #{member_id}
+  AND end_time IS NULL
+</update>
+
+<update id="autoNoCheck">
+update attendance set end_time=SYSTIMESTAMP,
+end_status='nocheck'
+where end_time is null
+and start_time is not null
+</update>
+
+
+   <update id="updateCheckIn" parameterType="map">
+        UPDATE attendance
+        SET start_time = SYSTIMESTAMP,
+            start_status = #{status},
+            status = 'normal'
+        WHERE member_id = #{member_id}
+        AND TRUNC(start_time) = TRUNC(SYSDATE)
+        AND status = 'absence'
+    </update>
 
 </mapper>

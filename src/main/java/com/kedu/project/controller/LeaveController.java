@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.LeaveRequestService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/leave")
@@ -16,11 +19,17 @@ public class LeaveController {
 	@Autowired
 	private LeaveRequestService leaveservice;
 	
+	 @Autowired
+	 private JwtUtil jwtUtil;
+
+	
 	
 	@GetMapping("/count")
-	public ResponseEntity<Integer> getRemainLeave() {
-        int cnt = leaveservice.getRemainLeave("user1"); // 로그인 후 교체 예정
-        return ResponseEntity.ok(cnt);
-    }
+	public ResponseEntity<Integer> getRemainLeave(HttpServletRequest request) {
+	    String empId = jwtUtil.extractUserId(request); // JWT에서 추출
+	    int cnt = leaveservice.getRemainLeave(empId);
+	    return ResponseEntity.ok(cnt);
+	}
+
 
 }
