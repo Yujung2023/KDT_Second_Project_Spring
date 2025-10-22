@@ -22,8 +22,7 @@ public class AttendanceController {
 	@Autowired
 	private AttendanceService attendanceService;
 	
-	@Autowired
-	private JwtUtil jwtUtil;
+
 	
 	@GetMapping("/count")
 	public List<Map<String, Object>> CountSelect(HttpServletRequest request) {

@@ -19,8 +19,7 @@ public class LeaveController {
 	@Autowired
 	private LeaveRequestService leaveservice;
 	
-	 @Autowired
-	 private JwtUtil jwtUtil;
+
 
 	
 	
