@@ -1,6 +1,7 @@
 package com.kedu.project.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class MemberDAO {
 		return mybatis.insert("Member.register",memberDto);
 	}
 	
-	public List<MemberDTO> getAllMembers() {
-        List<MemberDTO> members = mybatis.selectList("Member.getAllMembers");
+	public List<MemberDTO> getMembers(Map<String , Object> param) {
+        List<MemberDTO> members = mybatis.selectList("Member.getMembers",param);
         return members; 
     }
 	
