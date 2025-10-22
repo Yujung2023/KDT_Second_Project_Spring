@@ -26,8 +26,9 @@ public class LeaveController {
 	
 	@GetMapping("/count")
 	public ResponseEntity<Integer> getRemainLeave(HttpServletRequest request) {
-	    String empId = jwtUtil.extractUserId(request); // JWT에서 추출
-	    int cnt = leaveservice.getRemainLeave(empId);
+		String loginid = (String) request.getAttribute("loginID");
+	    //String empId = jwtUtil.extractUserId(request); // JWT에서 추출
+	    int cnt = leaveservice.getRemainLeave(loginid);
 	    return ResponseEntity.ok(cnt);
 	}
 

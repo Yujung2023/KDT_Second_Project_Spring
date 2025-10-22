@@ -27,28 +27,33 @@ public class AttendanceController {
 	
 	@GetMapping("/count")
 	public List<Map<String, Object>> CountSelect(HttpServletRequest request) {
-	    String member_id = jwtUtil.extractUserId(request);
-	    return attendanceService.countSelect(member_id);
+		String loginid = (String) request.getAttribute("loginID");
+	   //String member_id = jwtUtil.extractUserId(request);
+	    return attendanceService.countSelect(loginid);
 	}
 	
 	@PostMapping("checkin")
 	public ResponseEntity<String> checkIn(HttpServletRequest request){
-		String member_id=jwtUtil.extractUserId(request);
-		attendanceService.CheckIn(member_id);
+		String loginid = (String) request.getAttribute("loginID");
+		//String member_id=jwtUtil.extractUserId(request);
+		attendanceService.CheckIn(loginid);
 		return ResponseEntity.ok("출근 처리 완료");
 	}
 	
 	@PostMapping("checkout")
-	public ResponseEntity<String> checkout(HttpServletRequest reqeust){
-		String member_id=jwtUtil.extractUserId(reqeust);
-		attendanceService.CheckOut(member_id);
+	public ResponseEntity<String> checkout(HttpServletRequest request){
+		String loginid = (String) request.getAttribute("loginID");
+		
+		//String member_id=jwtUtil.extractUserId(reqeust);
+		attendanceService.CheckOut(loginid);
 		return ResponseEntity.ok("퇴근 처리 완료");
 	}
 	
 	@GetMapping("today")
 	public Map<String, Object> getToday(HttpServletRequest request){
-		String member_id=jwtUtil.extractUserId(request);
-		return attendanceService.getToday(member_id);
+		String loginid = (String) request.getAttribute("loginID");
+		//String member_id=jwtUtil.extractUserId(request);
+		return attendanceService.getToday(loginid);
 	}
 
 

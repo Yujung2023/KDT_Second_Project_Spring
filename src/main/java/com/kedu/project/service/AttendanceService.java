@@ -55,7 +55,7 @@ public class AttendanceService {
 		}
 		
 		
-		@Scheduled(cron="0 04 16 * * *")
+		@Scheduled(cron="0 19 16 * * *")
 		public void autoAbsence() {
 		    dao.autoAbsence();
 		    System.out.println("결근 자동 처리 완료");

@@ -37,31 +37,6 @@ public class JwtUtil {
 		return jwt.verify(token);
 	}
 	
-    // JWT에서 userId(subject) 꺼내는 메서드 추가
-    public String getUserId(String token) {
-        DecodedJWT decoded = verifyToken(token);
-        return decoded.getSubject();  
-    }
-
-    // Request 헤더에서 Bearer 토큰 꺼내는 메서드 추가
-    public String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        if (bearer != null && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
-        }
-        return null;
-    }
-
- // ✅ 토큰에서 UserId(sub) 추출
-    public String extractUserId(String token) {
-        DecodedJWT decoded = verifyToken(token);
-        return decoded.getSubject();
-    }
-
-    // ✅ Request에서 UserId 추출 (컨트롤러는 이 메서드만 쓰면 됨)
-    public String extractUserId(HttpServletRequest request) {
-        String token = resolveToken(request);
-        return extractUserId(token);
-    }
+    
 }
 
