@@ -5,10 +5,8 @@
 <mapper namespace="Board">
 
 	<insert id="insert">
-		insert into board (boardId,categoryId,title,content,writerId,
-		noticeYn,hit,createdAt) 
-		values(board_seq.nextval,#{categoryId},#{title}, #{content},
-		 #{writerId},#{noticeYn},0, sysdate)
+		insert into board values(board_seq.nextval,#{category_id},#{title}, #{content},
+		 #{writer_id},#{noticeYn},0, sysdate,null)
 	</insert>
 	
 </mapper>
