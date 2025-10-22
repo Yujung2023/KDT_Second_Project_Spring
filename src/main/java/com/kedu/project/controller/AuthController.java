@@ -1,7 +1,6 @@
 package com.kedu.project.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +21,7 @@ public class AuthController {
 
 	@Autowired
 	private JwtUtil jwt;
-	
-	
+
 	@Autowired
 	private MemberService memberService;
 
@@ -46,5 +44,18 @@ public class AuthController {
 		
 		return ResponseEntity.ok("인증자 전용 데이터");
 	}
-
 }
+
+	
+//	
+//	@PostMapping
+//	public ResponseEntity<String> login(@RequestBody AuthDTO dto){
+//		
+//		if(true) { // 로그인에 성공했을 경우
+//			String token = jwt.createToken(dto.getId()); //토큰 생성 위치
+//			 
+//			return ResponseEntity.ok(token);
+//		}
+//		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login Incorrect");
+//	}
+//
