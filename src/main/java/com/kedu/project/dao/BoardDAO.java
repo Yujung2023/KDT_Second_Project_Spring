@@ -1,5 +1,7 @@
 package com.kedu.project.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,10 +14,15 @@ public class BoardDAO {
 	@Autowired
 	private SqlSession myBatis;
 	
+	// insert
 	public int writeBoard (BoardDTO boardDTO) {
 		
 		int result = myBatis.insert("Board.insert",boardDTO);
 		
 		return result;
+	}
+	
+	public List<BoardDTO> getBoardsByCategory(int category_id) {
+	    return myBatis.selectList("Board.selectByCategory", category_id);
 	}
 }
