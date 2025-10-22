@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Member">
+
+	<select id="getAllMembers" resultType="com.kedu.project.dto.MemberDTO">
+		select name,id,employee_no,employmentType,dept_code,rank_code,job_code,hire_date from member
+	</select>	
+	
+	<select id="checkId" resultType="int">
+		select count(*) from member where id=#{id}
+	</select>
+	
+	
+	<insert id="register" parameterType="com.kedu.project.dto.MemberDTO">
+	    INSERT INTO Member (
+	        id, password, name, englishName, employmentType, hire_date,
+	        dept_code, rank_code, job_code, officeEmail, personalEmail,
+	        officePhone, mobilePhone, birthDate, calendarType,
+	        zip_code, address_line1, address_line2,
+	        employee_no, status, created_time
+	    )
+	    VALUES (
+	        #{id}, #{password}, #{name}, #{englishName}, #{employmentType},
+	        #{hire_date, jdbcType=TIMESTAMP},
+	        #{dept_code}, #{rank_code}, #{job_code},
+	        #{officeEmail, jdbcType=VARCHAR}, #{personalEmail, jdbcType=VARCHAR},
+	        #{officePhone, jdbcType=VARCHAR}, #{mobilePhone, jdbcType=VARCHAR},
+	        #{birthDate, jdbcType=TIMESTAMP},
+	        #{calendarType},
+	        #{zip_code, jdbcType=VARCHAR}, #{address_line1, jdbcType=VARCHAR}, #{address_line2, jdbcType=VARCHAR},
+	        'E' || LPAD(member_seq.NEXTVAL, 5, '0'),
+	        'active',
+	        sysdate
+	    )
+	</insert>
+	
+	<delete id="delete">
+		delete from auth where id = #{id}
+	</delete>
+	
+	<select id="myPage" resultType="com.kedu.project.dto.AuthDTO">
+		select * from auth where id=#{id}
+	</select>
+	
+	<select id="findById" parameterType="String" resultType="com.kedu.project.dto.MemberDTO">
+		select id,password,name,rank_code from member where id=#{id}
+	</select>
+	
+	<update id="update">
+		update auth set name=#{name} where id=#{id}
+	</update>
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Contacts">
+	
+	<insert id="insert" >
+		insert into contacts 
+		(seq , user_id , name, phone , email, type , job_code , rank_code) 
+		values(contacts_seq.nextval , #{user_id} , #{name}, #{phone} , 
+		#{email},#{type},#{job_code}, #{rank_code}) 
+
+	</insert>
+	
+	<select id="SelectContactsList" resultType="com.kedu.project.dto.ContactsDTO">
+		select * from contacts order by name asc
+	</select>	
+	
+	
+	<select id="selectSoloList" resultType="com.kedu.project.dto.ContactsDTO">
+    SELECT * FROM contacts WHERE type = 'solo' order by name asc
+	</select>
+
+	<select id="selectMultiList" resultType="com.kedu.project.dto.ContactsDTO">
+    SELECT * FROM contacts WHERE type = 'multi' order by name asc
+	</select>
+	
+	
+	<select id="searchName" resultType="com.kedu.project.dto.ContactsDTO">
+	select * from contacts where name like  '%' || #{name} || '%'
+	</select>
+	
+	<select id="searchByNameAndType" resultType="com.kedu.project.dto.ContactsDTO">
+    SELECT * FROM contacts 
+    <where>
+    <if test="type != null and type != ''"> AND type = #{type} </if>
+    <if test="name != null and name != ''">AND name LIKE '%' || #{name} || '%'</if>
+    </where> 
+    ORDER BY name ASC
+	</select>
+
+	
+	<delete id="deleteContacts">
+	delete from contacts where seq in
+	<foreach item="seq" collection="collection" open="(" separator="," close=")">
+    #{seq}</foreach>
+	</delete>
+	
+	<update id="updateContacts" parameterType="map">
+    UPDATE contacts
+    SET
+    name = #{dto.name},
+    phone = #{dto.phone},
+    email = #{dto.email},
+    job_code = #{dto.job_code},
+    rank_code = #{dto.rank_code}
+    WHERE seq = #{seq}
+	</update>
+	
+	
+	<update id="updateContactsTypeMulti" parameterType="map">
+    UPDATE contacts
+   SET type = #{type}
+    WHERE seq IN
+    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq}
+    </foreach>
+    </update>
+    
+    <update id="updateContactsTypeSingle" parameterType="map">
+    UPDATE contacts	
+   SET type = #{type}	
+    WHERE seq IN
+    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq}
+    </foreach>
+    
+    
+</update>
+
+	
+</mapper>

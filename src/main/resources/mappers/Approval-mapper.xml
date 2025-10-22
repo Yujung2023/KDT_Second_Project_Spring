@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="approval">
+	<select id="selectAll" resultType="com.kedu.project.dto.ApprovalDTO">
+	select * from approval_doc
+	</select>
+	
+	  <select id="selectByStatus" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
+	  select * from approval_doc where status=#{status} order by seq desc
+	  </select>
+	  
+	  <insert id="insert" parameterType="com.kedu.project.dto.ApprovalDTO">
+	  insert into approval_doc (seq,writer,title,comments,writeDate)
+	  values(approval_seq.nextval,#{writer},#{title},#{comments},SYSDATE)
+	  
+	  </insert>
+	  
+	    <insert id="tempinsert" parameterType="com.kedu.project.dto.ApprovalDTO">
+	  insert into approval_doc (seq,writer,title,comments,status,writeDate)
+	  values(approval_seq.nextval,#{writer},#{title},#{comments},#{status},SYSDATE)
+	  
+	  </insert>
+	  
+	  <select id="getDetail" parameterType="int" resultType="com.kedu.project.dto.ApprovalDTO">
+	  
+	  select * from approval_doc where seq=#{seq}
+	  </select>
+	  
+	  <select id="findTempByWriter" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
+		select * from approval_doc where writer=#{writerId} and status='temp'
+		</select>
+		
+		<update id="tempUpdate" parameterType="com.kedu.project.dto.ApprovalDTO">
+		update approval_doc set title=#{title},comments=#{comments},writeDate=SYSDATE where seq=#{seq} and status='temp'
+		</update>
+
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mail">
+	
+	<insert id="SendMail" useGeneratedKeys="true" parameterType="com.kedu.project.dto.MailDTO">
+	 <selectKey keyProperty="seq" resultType="long" order="BEFORE">
+        SELECT mail_seq.NEXTVAL FROM dual
+    </selectKey>
+		insert into mail 
+		(seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
+		values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
+		#{senderName}, #{recipientName}, #{content} ) 
+	</insert>
+	
+	 <select id="getNameById" resultType="string">
+        SELECT name FROM contacts  WHERE email = #{userId}
+    </select>
+
+	
+	<select id="SelectrecipientMailList" resultType="com.kedu.project.dto.MailDTO">
+   select * from mail 
+   where recipientId = #{value, jdbcType=VARCHAR} 
+   order by sendDate asc
+	</select>
+	
+	<select id="SelectSendMailList" resultType="com.kedu.project.dto.MailDTO">
+   select * from mail 
+   where senderId = #{value, jdbcType=VARCHAR} 
+   order by sendDate asc
+	</select>
+	
+	
+	
+	<select id="searchName" parameterType="map" resultType="com.kedu.project.dto.MailDTO">
+    SELECT * 
+    FROM mail	
+    WHERE recipientId = #{loginId}
+     AND senderId LIKE '%' || #{name} || '%'
+    ORDER BY sendDate ASC
+	</select>
+
+
+	<select id="searchsendName"  parameterType="map" resultType="com.kedu.project.dto.MailDTO">
+    SELECT * 
+    FROM mail
+    WHERE senderId = #{loginId}
+     AND recipientId LIKE '%' || #{name} || '%'
+
+    ORDER BY sendDate ASC
+	</select>
+
+	
+	<delete id="deleteMail">
+	delete from mail where seq in
+	<foreach item="seq" collection="collection" open="(" separator="," close=")">
+    #{seq}</foreach>
+	</delete>
+	
+	<insert id="MailFileUpload" parameterType="list">
+    INSERT INTO mailFile(seq, mailSeq, sysname, orgname)
+    VALUES (mailFile_seq.NEXTVAL, #{mailSeq}, #{sysname}, #{orgname})
+	</insert>
+
+	
+	<select id="MailFileDownload" parameterType="map" resultType="com.kedu.project.dto.MailFileDTO">
+    SELECT mailSeq, sysname, orgname
+    FROM mailFile
+    WHERE mailSeq = #{mailSeq} AND sysname = #{sysname}
+    
+	</select>
+	
+	
+	<select id="getMailFileList" parameterType="long" resultType="com.kedu.project.dto.MailFileDTO">
+    SELECT mailSeq, sysname, orgname
+    FROM mailFile
+    WHERE mailSeq = #{mailSeq}
+    
+	</select>
+
+	
+</mapper>
