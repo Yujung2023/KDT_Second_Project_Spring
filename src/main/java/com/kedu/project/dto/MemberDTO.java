@@ -1,6 +1,7 @@
 package com.kedu.project.dto;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 public class MemberDTO {
 
     // DB 컬럼명과 1:1 동일
@@ -80,6 +81,8 @@ public class MemberDTO {
     public void setRank_code(String rank_code) { this.rank_code = rank_code; }
 }
 =======
+=======
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 import java.sql.Timestamp;
 
 public class MemberDTO {
@@ -275,4 +278,7 @@ public class MemberDTO {
 
 }
 
+<<<<<<< HEAD
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
+=======
 >>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8

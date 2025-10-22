@@ -10,6 +10,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 
+<<<<<<< HEAD
 @Component // ✅ Spring이 자동으로 Bean으로 등록해주는 어노테이션 (다른 곳에서 @Autowired로 주입 가능)
 public class JwtUtil {
 
@@ -35,17 +36,39 @@ public class JwtUtil {
 			   withExpiresAt(new Date(System.currentTimeMillis()+exp)). // ✅ 토큰 만료 시각 (현재시간 + exp)
 			   sign(this.algorithm); // ✅ 위에서 설정한 알고리즘으로 서명하여 토큰 문자열 반환
 =======
+=======
+@Component
+public class JwtUtil {
+	@Value("${jwt.expiration}")
+	private Long exp;
+	
+	private Algorithm algorithm;
+	private JWTVerifier jwt;
+	
+	public JwtUtil(@Value("${jwt.secret}") String secret ) {
+		this.algorithm = Algorithm.HMAC256(secret);
+		this.jwt = JWT.require(algorithm).build();
+	}
+	
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 	public String createToken(String id,String name) {
 		return JWT.create().
 			   withSubject(id).
 			   withClaim("name",name). //이름 추가했어요
 			   withIssuedAt(new Date()).withExpiresAt(new Date(System.currentTimeMillis()+ exp * 1000)).
 			   sign(this.algorithm);
+<<<<<<< HEAD
 >>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 	}
 	
 	// ✅ 전달받은 JWT 토큰의 유효성 검증 및 디코딩 (서명, 만료 등 확인)
 	public DecodedJWT verifyToken(String token) {
 		return jwt.verify(token); // ✅ 검증에 성공하면 DecodedJWT 객체 반환 (payload 내용 조회 가능)
+=======
+	}
+	
+	public DecodedJWT verifyToken(String token) {
+		return jwt.verify(token);
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 	}
 }

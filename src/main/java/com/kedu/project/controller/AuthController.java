@@ -4,6 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import org.springframework.web.bind.annotation.GetMapping;
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 =======
 import org.springframework.web.bind.annotation.GetMapping;
 >>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
@@ -14,13 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.AuthDTO;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.kedu.project.security.JwtUtil;
 =======
+=======
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
+<<<<<<< HEAD
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
+=======
 >>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 
 @RestController
@@ -30,6 +40,7 @@ public class AuthController {
 	@Autowired
 	private JwtUtil jwt;
 	
+<<<<<<< HEAD
 <<<<<<< HEAD
 	@PostMapping
 	public ResponseEntity<String> login(@RequestBody AuthDTO dto){
@@ -43,6 +54,8 @@ public class AuthController {
 	}
 }
 =======
+=======
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
 	
 	@Autowired
 	private MemberService memberService;
@@ -67,5 +80,9 @@ public class AuthController {
 		return ResponseEntity.ok("인증자 전용 데이터");
 	}
 
+<<<<<<< HEAD
+}
+>>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
+=======
 }
 >>>>>>> 29a2a6656e479b23beb52c2383a0387d3cd8d6d8
