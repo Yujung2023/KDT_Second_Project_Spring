@@ -1,6 +1,8 @@
 package com.kedu.project.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,8 +39,16 @@ public class MemberService {
         }
     }
 	
-	public List<MemberDTO> getAllMembers() {
-        List<MemberDTO> members = memberDao.getAllMembers(); // 서비스에서 리스트 조회
+	public List<MemberDTO> getMembers(String status,String dept, String employment, String job, String rank) {
+		
+		Map<String , Object> param = new HashMap<>();
+		param.put("status", status);
+		param.put("dept" , dept);
+		param.put("employment" , employment);
+		param.put("rank" , rank);
+		param.put("job" , job);
+		
+        List<MemberDTO> members = memberDao.getMembers(param); // 서비스에서 리스트 조회
         return members; 
     }
 	

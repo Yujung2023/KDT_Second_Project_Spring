@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kedu.project.dto.BoardDTO;
 import com.kedu.project.service.BoardService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/board")
 public class BoardController {
@@ -18,11 +20,14 @@ public class BoardController {
 	BoardService boardService;
 	
 	@PostMapping
-	public ResponseEntity<Integer> writeBoard(@RequestBody BoardDTO boardDTO){
+	public ResponseEntity<Integer> writeBoard(@RequestBody BoardDTO boardDTO , HttpServletRequest request){
 		
-		boardDTO.setWriterId("testUser2");
-		int result = boardService.writeBoard(boardDTO);
+		String loginId = (String) request.getAttribute("loginID");
 		
-		return ResponseEntity.ok(result);
+		boardDTO.setWriter_id(loginId);
+		
+		boardService.writeBoard(boardDTO);
+		
+		return ResponseEntity.ok(boardDTO.getSeq());
 	}
 }

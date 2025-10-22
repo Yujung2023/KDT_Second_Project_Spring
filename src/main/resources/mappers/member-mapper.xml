@@ -4,9 +4,26 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Member">
 
-	<select id="getAllMembers" resultType="com.kedu.project.dto.MemberDTO">
-		select name,id,employee_no,employmentType,dept_code,rank_code,job_code,hire_date from member
-	</select>	
+	<select id="getMembers" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
+	    SELECT name, id, employee_no, employmentType, dept_code, rank_code, job_code, hire_date,status  
+	    FROM member
+	    WHERE 1=1
+	    <if test="status != null and status != '재직 상태'">
+        AND status = #{status}
+	    </if>
+	    <if test="dept != null and dept != '전체 부서'">
+	        AND dept_code = #{dept}
+	    </if>
+	    <if test="employment != null and employment != '근로 형태'">
+	        AND employmentType = #{employment}
+	    </if>
+	    <if test="rank != null and rank != '전체 직위'">
+	        AND rank_code = #{rank}
+	    </if>
+	    <if test="job != null and job != '전체 직무'">
+	        AND job_code = #{job}
+	    </if>
+	</select>
 	
 	<select id="checkId" resultType="int">
 		select count(*) from member where id=#{id}
@@ -31,7 +48,7 @@
 	        #{calendarType},
 	        #{zip_code, jdbcType=VARCHAR}, #{address_line1, jdbcType=VARCHAR}, #{address_line2, jdbcType=VARCHAR},
 	        'E' || LPAD(member_seq.NEXTVAL, 5, '0'),
-	        'active',
+	        '재직자',
 	        sysdate
 	    )
 	</insert>

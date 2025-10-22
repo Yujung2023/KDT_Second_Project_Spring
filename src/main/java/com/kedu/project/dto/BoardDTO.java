@@ -4,11 +4,11 @@ import java.sql.Timestamp;
 
 public class BoardDTO {
 
-	private int boardId;      // PK
-	private int categoryId;   // FK: 게시판
+	private int seq;     
+	private int category_id;   // 게시판 카테고리
 	private String title;      // 제목
 	private String content;    // 본문
-	private String writerId;   // FK: 작성자
+	private String writer_id;   // FK: 작성자
 	private String noticeYn;   // 공지 여부
 	private int hit;           // 조회수
 	private Timestamp createdAt; // 작성일시
@@ -17,34 +17,34 @@ public class BoardDTO {
 
 	public BoardDTO() {}
 	
-	public BoardDTO(int boardId, int categoryId, String title, String content, String writerId, String noticeYn,
-			int hit, Timestamp createdAt, Timestamp updatedAt) {
+	public BoardDTO(int seq, int category_id, String title, String content, String writer_id, String noticeYn, int hit,
+			Timestamp createdAt, Timestamp updatedAt) {
 		super();
-		this.boardId = boardId;
-		this.categoryId = categoryId;
+		this.seq = seq;
+		this.category_id = category_id;
 		this.title = title;
 		this.content = content;
-		this.writerId = writerId;
+		this.writer_id = writer_id;
 		this.noticeYn = noticeYn;
 		this.hit = hit;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
 
-	public int getBoardId() {
-		return boardId;
+	public int getSeq() {
+		return seq;
 	}
 
-	public void setBoardId(int boardId) {
-		this.boardId = boardId;
+	public void setSeq(int seq) {
+		this.seq = seq;
 	}
 
-	public int getCategoryId() {
-		return categoryId;
+	public int getCategory_id() {
+		return category_id;
 	}
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
+	public void setCategory_id(int category_id) {
+		this.category_id = category_id;
 	}
 
 	public String getTitle() {
@@ -63,12 +63,12 @@ public class BoardDTO {
 		this.content = content;
 	}
 
-	public String getWriterId() {
-		return writerId;
+	public String getWriter_id() {
+		return writer_id;
 	}
 
-	public void setWriterId(String writerId) {
-		this.writerId = writerId;
+	public void setWriter_id(String writer_id) {
+		this.writer_id = writer_id;
 	}
 
 	public String getNoticeYn() {
@@ -102,5 +102,4 @@ public class BoardDTO {
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-
 }

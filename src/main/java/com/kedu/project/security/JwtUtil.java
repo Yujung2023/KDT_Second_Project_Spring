@@ -10,8 +10,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 
+@Component
 
-@Component // ✅ Spring이 자동으로 Bean으로 등록해주는 어노테이션 (다른 곳에서 @Autowired로 주입 가능)
 public class JwtUtil {
 
 	@Value("${jwt.expiration}") // ✅ application.properties 또는 yml에서 jwt.expiration 값을 주입받음 (만료시간)
@@ -28,12 +28,12 @@ public class JwtUtil {
 	
 
 	// ✅ JWT 생성 메서드: 사용자의 id를 기반으로 새로운 토큰을 만들어 반환
-	public String createToken(String id) {
+	public String createToken(String id, String name) {
 		return JWT.create(). // ✅ JWT 토큰 빌더 시작
 			   withSubject(id). // ✅ 표준 클레임 중 하나인 subject(sub)에 id를 저장 (보통 사용자 식별자)
-			   withClaim("name","tom"). // ✅ 커스텀 클레임 추가 (예시로 name: tom)
+			   withClaim("name",name). // ✅ 커스텀 클레임 추가 (예시로 name: tom)
 			   withIssuedAt(new Date()). // ✅ 토큰 발급 시각 (iat) 설정
-			   withExpiresAt(new Date(System.currentTimeMillis()+exp)). // ✅ 토큰 만료 시각 (현재시간 + exp)
+			   withExpiresAt(new Date(System.currentTimeMillis()+exp * 1000)). // ✅ 토큰 만료 시각 (현재시간 + exp)
 			   sign(this.algorithm); // ✅ 위에서 설정한 알고리즘으로 서명하여 토큰 문자열 반환
 
 	}
@@ -44,4 +44,7 @@ public class JwtUtil {
 
 
 	}
+	
+    
 }
+
