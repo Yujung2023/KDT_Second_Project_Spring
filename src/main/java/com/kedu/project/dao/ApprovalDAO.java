@@ -15,10 +15,6 @@ public class ApprovalDAO {
 	private SqlSession mybatis;
 	
 	
-	
-	
-	 
-	
 	public List<ApprovalDTO> selectAll(){
 		return mybatis.selectList("approval.selectAll");
 	}

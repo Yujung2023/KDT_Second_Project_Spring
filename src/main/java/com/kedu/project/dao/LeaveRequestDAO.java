@@ -4,5 +4,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface LeaveRequestDAO {
-    int selectRemainLeave(String memberId);
+   Integer selectRemainLeave(String memberId);
 }

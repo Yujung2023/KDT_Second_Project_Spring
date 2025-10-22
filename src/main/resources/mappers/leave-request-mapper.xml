@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kedu.project.dao.LeaveRequestDAO">
-   <select id="selectRemainLeave" parameterType="string" resultType="int">
+   <select id="selectRemainLeave" parameterType="string" resultType="Integer">
         SELECT leave_count
         FROM leave_request
         WHERE member_id = #{member_id}
