@@ -6,3 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface LeaveRequestDAO {
    Integer selectRemainLeave(String memberId);
 }
+
+
