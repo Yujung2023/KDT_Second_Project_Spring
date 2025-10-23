@@ -25,18 +25,20 @@ public class MemberDTO {
 	private Timestamp birthDate;
 	private String calendarType;
 	
-	
+	private String profileImage_servName;
+	private String profileImage_oriName;
 	
 	
 	public MemberDTO() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
 	public MemberDTO(String id, String password, String name, String englishName, String employmentType,
 			String zip_code, String address_line1, String address_line2, String status, String employee_no,
 			Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
 			String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
-			String calendarType) {
+			String calendarType, String profileImage_servName, String profileImage_oriName) {
 		super();
 		this.id = id;
 		this.password = password;
@@ -59,7 +61,26 @@ public class MemberDTO {
 		this.mobilePhone = mobilePhone;
 		this.birthDate = birthDate;
 		this.calendarType = calendarType;
+		this.profileImage_servName = profileImage_servName;
+		this.profileImage_oriName = profileImage_oriName;
 	}
+
+	public String getProfileImage_servName() {
+		return profileImage_servName;
+	}
+
+	public void setProfileImage_servName(String profileImage_servName) {
+		this.profileImage_servName = profileImage_servName;
+	}
+
+	public String getProfileImage_oriName() {
+		return profileImage_oriName;
+	}
+
+	public void setProfileImage_oriName(String profileImage_oriName) {
+		this.profileImage_oriName = profileImage_oriName;
+	}
+
 	public String getId() {
 		return id;
 	}

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kedu.project.dto.AuthDTO;
 import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.security.JwtUtil;
+import com.kedu.project.service.AuthService;
 import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,10 @@ public class AuthController {
 	@Autowired
 	private MemberService memberService;
 
+	@Autowired
+	private AuthService authService;
+
+	
 	@PostMapping
 	public ResponseEntity<String> login(@RequestBody AuthDTO authDTO){
 	    System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw());
@@ -37,13 +42,29 @@ public class AuthController {
 	}
 
 
-
 	@GetMapping
 	public ResponseEntity<String> test(HttpServletRequest request){
 		System.out.println(request.getAttribute("loginID"));
 		
 		return ResponseEntity.ok("인증자 전용 데이터");
 	}
+	
+	@GetMapping("/check") //권한 체크
+	public ResponseEntity<String> check(HttpServletRequest request){
+		String loginId = (String)request.getAttribute("loginID");
+		System.out.println("로그인 아이디는:"+loginId);
+		int result = authService.check(loginId);
+		System.out.println("결과는:" + result);
+		if(result > 0) {
+			System.out.println("관리자 맞음");
+			return ResponseEntity.ok("관리자 맞음");	
+		}
+		System.out.println("관리자 아님");
+		return ResponseEntity.badRequest().body("삭제 실패");
+		
+	}
+	
+	
 }
 
 	

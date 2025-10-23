@@ -10,5 +10,9 @@ public class AuthDAO {
 
 	@Autowired
 	private SqlSession mybatis;
+	
+	public int check(String id){	//admin 존재 확인
+		return mybatis.selectOne("Auth.check",id);
+	}
 
 }

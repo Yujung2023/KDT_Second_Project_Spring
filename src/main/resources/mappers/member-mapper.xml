@@ -29,14 +29,17 @@
 		select count(*) from member where id=#{id}
 	</select>
 	
-	
+	<select id="countMembers" resultType="int">
+    	SELECT COUNT(*) FROM MEMBER
+	</select>
+
 	<insert id="register" parameterType="com.kedu.project.dto.MemberDTO">
 	    INSERT INTO Member (
 	        id, password, name, englishName, employmentType, hire_date,
 	        dept_code, rank_code, job_code, officeEmail, personalEmail,
 	        officePhone, mobilePhone, birthDate, calendarType,
 	        zip_code, address_line1, address_line2,
-	        employee_no, status, created_time
+	        employee_no, status, created_time,profileimage_servname,profileimage_oriname
 	    )
 	    VALUES (
 	        #{id}, #{password}, #{name}, #{englishName}, #{employmentType},
@@ -49,12 +52,20 @@
 	        #{zip_code, jdbcType=VARCHAR}, #{address_line1, jdbcType=VARCHAR}, #{address_line2, jdbcType=VARCHAR},
 	        'E' || LPAD(member_seq.NEXTVAL, 5, '0'),
 	        '재직자',
-	        sysdate
+	        sysdate ,#{profileImage_servName},#{profileImage_oriName}
 	    )
 	</insert>
 	
 	<delete id="delete">
 		delete from auth where id = #{id}
+	</delete>
+	
+	<delete id="deleteMembers">
+    	DELETE FROM MEMBER
+    	WHERE id IN
+    	<foreach collection="list" item="id" open="(" separator="," close=")">
+        	#{id}
+    	</foreach>
 	</delete>
 	
 	<select id="myPage" resultType="com.kedu.project.dto.AuthDTO">
@@ -68,4 +79,110 @@
 	<update id="update">
 		update auth set name=#{name} where id=#{id}
 	</update>
+	
+	
+	<update id="updateEmpType" parameterType="map">
+	  UPDATE Member
+	  SET employmentType = #{empType}
+	  WHERE id IN
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	    #{id}
+	  </foreach>
+	</update>
+
+	<update id="updateDept" parameterType="map">
+	  UPDATE Member
+	  SET dept_code = #{dept}
+	  WHERE id IN
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	    #{id}
+	  </foreach>
+	</update>
+	<update id="updateRank" parameterType="map">
+	  UPDATE Member
+	  SET rank_code = #{rank}
+	  WHERE id IN
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	    #{id}
+	  </foreach>
+	</update>
+	<update id="updateJob" parameterType="map">
+	  UPDATE Member
+	  SET job_code = #{job}
+	  WHERE id IN
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	    #{id}
+	  </foreach>
+	</update>
+	<update id="updateStatus" parameterType="map">
+	  UPDATE Member
+	  SET status = #{status}
+	  WHERE id IN
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	    #{id}
+	  </foreach>
+	</update>
+	
+	<select id="selectMemberById" parameterType="String" resultType="com.kedu.project.dto.MemberDTO">
+		select id, name, englishName,employmentType,hire_date,dept_code,
+		rank_code,job_code,personalEmail,officephone,mobilephone,birthdate,calendarType,
+		zip_code,address_line1,address_line2, profileimage_servname 
+		from member where id=#{id}
+	</select>
+	
+	<update id="updateMember" parameterType="com.kedu.project.dto.MemberDTO">
+	  UPDATE member
+	  SET
+	    name = #{name},
+	    englishName = #{englishName},
+	    employmentType = #{employmentType},
+	    hire_date = #{hire_date},
+	    dept_code = #{dept_code},
+	    rank_code = #{rank_code},
+	    job_code = #{job_code},
+	    personalEmail = #{personalEmail},
+	    officePhone = #{officePhone},
+	    mobilePhone = #{mobilePhone},
+	    birthdate = #{birthDate},
+	    calendarType = #{calendarType},
+	    zip_code = #{zip_code},
+	    address_line1 = #{address_line1},
+	    address_line2 = #{address_line2},
+	    profileImage_servName = #{profileImage_servName, jdbcType=VARCHAR}, 
+   		profileImage_oriName = #{profileImage_oriName, jdbcType=VARCHAR}
+	    <if test="password != null and password != ''">
+	      , password = #{password}
+	    </if>
+	    
+	  WHERE id = #{id}
+	</update>
+	
+	<update id="updateMemberDelProfile" parameterType="com.kedu.project.dto.MemberDTO">
+	  UPDATE member
+	  SET
+	    name = #{name},
+	    englishName = #{englishName},
+	    employmentType = #{employmentType},
+	    hire_date = #{hire_date},
+	    dept_code = #{dept_code},
+	    rank_code = #{rank_code},
+	    job_code = #{job_code},
+	    personalEmail = #{personalEmail},
+	    officePhone = #{officePhone},
+	    mobilePhone = #{mobilePhone},
+	    birthdate = #{birthDate},
+	    calendarType = #{calendarType},
+	    zip_code = #{zip_code},
+	    address_line1 = #{address_line1},
+	    address_line2 = #{address_line2},
+	    profileImage_servName = null, 
+   		profileImage_oriName = null
+	    <if test="password != null and password != ''">
+	      , password = #{password}
+	    </if>
+	    
+	  WHERE id = #{id}
+	</update>
+
+	
 </mapper>
