@@ -31,7 +31,13 @@ public class AttendanceService {
 		LocalDateTime now=LocalDateTime.now();
 		LocalDateTime baseStart=LocalDate.now().atTime(9,0);//9시
 		String status=now.isAfter(baseStart) ? "late" : "normal";
-		dao.insertCheckIn(member_id, status);
+		
+		int updated=dao.updateLateFormAbsence(member_id);
+		
+		if(updated==0){
+			dao.insertCheckIn(member_id, status);
+		}
+		
 	}
 	
 	//퇴근 처리
@@ -43,7 +49,7 @@ public class AttendanceService {
 		}
 		
 		//퇴근 미체크
-		@Scheduled(cron="0 15 19 * * *")
+		@Scheduled(cron="0 00 18 * * *")
 		public void autonoCheck() {
 			dao.autoNoCheck();
 			System.out.println("퇴근 미체크함 수고");
@@ -54,9 +60,10 @@ public class AttendanceService {
 			return dao.getToday(member_id);
 		}
 		
-		
-		@Scheduled(cron="0 19 16 * * *")
+		//결근
+		@Scheduled(cron="0 00 09 * * *")
 		public void autoAbsence() {
+			
 		    dao.autoAbsence();
 		    System.out.println("결근 자동 처리 완료");
 		}
