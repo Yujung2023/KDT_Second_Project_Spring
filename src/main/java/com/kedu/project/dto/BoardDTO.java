@@ -6,6 +6,7 @@ public class BoardDTO {
 
 	private int seq;     
 	private int category_id;   // 게시판 카테고리
+	private String category_name;
 	private String title;      // 제목
 	private String content;    // 본문
 	private String writer_id;   // FK: 작성자
@@ -16,12 +17,13 @@ public class BoardDTO {
 
 
 	public BoardDTO() {}
-	
-	public BoardDTO(int seq, int category_id, String title, String content, String writer_id, String noticeYn, int hit,
-			Timestamp createdAt, Timestamp updatedAt) {
+
+	public BoardDTO(int seq, int category_id, String category_name, String title, String content, String writer_id,
+			String noticeYn, int hit, Timestamp createdAt, Timestamp updatedAt) {
 		super();
 		this.seq = seq;
 		this.category_id = category_id;
+		this.category_name = category_name;
 		this.title = title;
 		this.content = content;
 		this.writer_id = writer_id;
@@ -45,6 +47,14 @@ public class BoardDTO {
 
 	public void setCategory_id(int category_id) {
 		this.category_id = category_id;
+	}
+
+	public String getCategory_name() {
+		return category_name;
+	}
+
+	public void setCategory_name(String category_name) {
+		this.category_name = category_name;
 	}
 
 	public String getTitle() {
@@ -102,4 +112,6 @@ public class BoardDTO {
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+	
+
 }
