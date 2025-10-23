@@ -17,12 +17,28 @@ public class BoardDAO {
 	// insert
 	public int writeBoard (BoardDTO boardDTO) {
 		
-		int result = myBatis.insert("Board.insert",boardDTO);
+		int result = myBatis.insert ("Board.insert",boardDTO);
 		
 		return result;
 	}
 	
+	// list
 	public List<BoardDTO> getBoardsByCategory(int category_id) {
-	    return myBatis.selectList("Board.selectByCategory", category_id);
+	    return myBatis.selectList ("Board.selectByCategory", category_id);
+	}
+	
+	// detail
+	public BoardDTO getDetail (int seq) {
+	    return myBatis.selectOne ("Board.getDetail", seq);
+	}
+	
+	// delete
+	public void deleteBoard (int seq) {
+	    myBatis.delete ("Board.deleteBoard", seq);
+	}
+	
+	// modify
+	public void modifyBoard (BoardDTO boardDTO) {
+	    myBatis.update("Board.modifyBoard", boardDTO);
 	}
 }
