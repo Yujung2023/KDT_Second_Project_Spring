@@ -3,11 +3,45 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kedu.project.dao.LeaveRequestDAO">
-   <select id="selectRemainLeave" parameterType="string" resultType="Integer">
-        SELECT leave_count
-        FROM leave_request
-        WHERE member_id = #{member_id}
+
+    <!-- ✅ 잔여 연차 조회 (사용 연차 조회용) -->
+    <select id="selectRemainLeave" parameterType="string" resultType="double">
+        SELECT NVL(userLeave, 0)
+        FROM leave_balance
+        WHERE id = #{memberId}
     </select>
 
+    <!-- ✅ 휴가 신청 INSERT -->
+    <insert id="insertLeaveRequest" parameterType="com.kedu.project.dto.LeaveRequestDTO">
+        INSERT INTO leave_request (
+            seq,
+            member_id,
+            leave_count,
+            leave_code,
+            start_leave_time,
+            end_leave_time,
+            reason,
+            status
+        ) VALUES (
+            leave_request_seq.NEXTVAL,
+            #{member_id},
+            #{leave_count},
+            #{leave_code},
+            #{start_leave_time},
+            #{end_leave_time},
+            #{reason},
+            #{status}
+        )
+    </insert>
+
+ <update id="updateUsedLeave">
+    MERGE INTO leave_balance lb
+    USING (SELECT #{memberId} AS id FROM dual) d
+    ON (lb.id = d.id)
+    WHEN MATCHED THEN
+      UPDATE SET userLeave = NVL(lb.userLeave, 0) + #{used}
+    WHEN NOT MATCHED THEN
+      INSERT (id, userLeave) VALUES (#{memberId}, #{used})
+  </update>
 
 </mapper>

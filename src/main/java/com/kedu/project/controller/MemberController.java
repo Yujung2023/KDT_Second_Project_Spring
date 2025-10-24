@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +20,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.MemberService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -326,6 +326,15 @@ public class MemberController {
 
 		if (result == ids.size()) return ResponseEntity.ok("SUCCESS");
 		return ResponseEntity.badRequest().body("재직 상태 수정 실패");
+	}
+	
+	
+	//리액트에서 랭크 가져오려고
+	@GetMapping("/me")
+	public ResponseEntity<MemberDTO> getMyInfo(HttpServletRequest request) {
+	    String loginId = (String) request.getAttribute("loginID");
+	    MemberDTO member = memberService.selectMemberById(loginId);
+	    return ResponseEntity.ok(member);
 	}
 
 
