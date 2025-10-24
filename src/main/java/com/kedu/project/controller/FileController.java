@@ -30,7 +30,7 @@ import com.kedu.project.dto.MailFileDTO;
 import com.kedu.project.service.FileService;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/file")
 public class FileController {
 
 	// 아무거나
@@ -119,8 +119,7 @@ public class FileController {
 
 	//메일별 파일 다운로드
 	@GetMapping("/download")
-	public ResponseEntity<byte[]> downloadFileBySeq(@RequestParam Long mailSeq,
-	                                                @RequestParam String sysname) throws IOException {
+	public ResponseEntity<byte[]> downloadFileBySeq(@RequestParam Long mailSeq,@RequestParam String sysname) throws IOException {
 		
 	    MailFileDTO file = FServ.downloadFileBySeq(mailSeq, sysname); // DB에서 파일 메타 정보 조회
 	    if (file == null) {

@@ -37,17 +37,16 @@
     SELECT * 
     FROM mail	
     WHERE recipientId = #{loginId}
-     AND senderId LIKE '%' || #{name} || '%'
+     AND senderName LIKE '%' || #{name} || '%'
     ORDER BY sendDate ASC
 	</select>
 
-
+	
 	<select id="searchsendName"  parameterType="map" resultType="com.kedu.project.dto.MailDTO">
     SELECT * 
     FROM mail
     WHERE senderId = #{loginId}
-     AND recipientId LIKE '%' || #{name} || '%'
-
+     AND recipientName LIKE '%' || #{name} || '%'
     ORDER BY sendDate ASC
 	</select>
 
