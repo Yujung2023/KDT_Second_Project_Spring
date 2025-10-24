@@ -2,7 +2,7 @@ package com.kedu.project.dto;
 
 import java.sql.Timestamp;
 
-public class BoardCommet {
+public class BoardCommentDTO {
 
 	private int seq;
 	private int parent_seq;
@@ -10,9 +10,9 @@ public class BoardCommet {
 	private String comments;
 	private Timestamp writeDate;
 	
-	public BoardCommet() {}
+	public BoardCommentDTO() {}
 
-	public BoardCommet(int seq, int parent_seq, String writer_id, String comments, Timestamp writeDate) {
+	public BoardCommentDTO(int seq, int parent_seq, String writer_id, String comments, Timestamp writeDate) {
 		super();
 		this.seq = seq;
 		this.parent_seq = parent_seq;
