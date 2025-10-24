@@ -1,10 +1,9 @@
 package com.kedu.project.service;
 
+import org.springframework.stereotype.Service;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.kedu.project.dao.BoardCommentDAO;
 import com.kedu.project.dao.BoardDAO;
 import com.kedu.project.dto.BoardCommentDTO;
