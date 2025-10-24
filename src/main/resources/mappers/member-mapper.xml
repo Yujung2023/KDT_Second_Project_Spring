@@ -29,6 +29,7 @@
 		select count(*) from member where id=#{id}
 	</select>
 	
+
 	<select id="countMembers" resultType="int">
     	SELECT COUNT(*) FROM MEMBER
 	</select>
@@ -52,7 +53,9 @@
 	        #{zip_code, jdbcType=VARCHAR}, #{address_line1, jdbcType=VARCHAR}, #{address_line2, jdbcType=VARCHAR},
 	        'E' || LPAD(member_seq.NEXTVAL, 5, '0'),
 	        '재직자',
-	        sysdate ,#{profileImage_servName},#{profileImage_oriName}
+	        sysdate ,
+	        #{profileImage_servName, jdbcType=VARCHAR}, 
+   			#{profileImage_oriName, jdbcType=VARCHAR}
 	    )
 	</insert>
 	

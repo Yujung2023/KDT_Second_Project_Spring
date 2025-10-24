@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.kedu.project.dao.ApprovalDAO;
 import com.kedu.project.dto.ApprovalDTO;
+import com.kedu.project.dto.MemberDTO;
 
 @Service
 public class ApprovalService {
@@ -48,6 +49,10 @@ public class ApprovalService {
 	
 	public ApprovalDTO getTemp(String writerId) {
 		return dao.findTempByWriter(writerId);
+	}
+	
+	public List<MemberDTO> getApprovalCandidates(){
+		return dao.selelctApprovalCandidates();
 	}
 	
 	

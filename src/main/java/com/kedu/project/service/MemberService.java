@@ -110,5 +110,6 @@ public class MemberService {
 
 		return memberDao.updateStatus(ids, status);
 	}
+	
 
 }
