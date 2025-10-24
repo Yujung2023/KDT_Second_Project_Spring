@@ -3,11 +3,14 @@ package com.kedu.project.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kedu.project.security.JwtUtil;
+import com.kedu.project.dto.LeaveRequestPayload;
 import com.kedu.project.service.LeaveRequestService;
+import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,17 +22,32 @@ public class LeaveController {
 	@Autowired
 	private LeaveRequestService leaveservice;
 	
-
+	@Autowired
+	private MemberService memberSerice;
 
 	
 	
 	@GetMapping("/count")
-	public ResponseEntity<Integer> getRemainLeave(HttpServletRequest request) {
+	public ResponseEntity<Double> getRemainLeave(HttpServletRequest request) {
 		String loginid = (String) request.getAttribute("loginID");
-	    //String empId = jwtUtil.extractUserId(request); // JWT에서 추출
-	    int cnt = leaveservice.getRemainLeave(loginid);
+	    double cnt = leaveservice.getRemainLeave(loginid);
 	    return ResponseEntity.ok(cnt);
 	}
+	
+	
+	@PostMapping("/request")
+	public ResponseEntity<String> requestLeave(@RequestBody LeaveRequestPayload payload, HttpServletRequest request){
 
+	    String loginid = (String) request.getAttribute("loginID");
+
+	    
+	    String rank = memberSerice.selectMemberById(loginid).getRank_code();
+	    System.out.println("컨트롤러 rank: " + rank);
+
+	    
+	    leaveservice.insertLeaveRequest(payload, loginid, rank);
+
+	    return ResponseEntity.ok("휴가 신청 완료");
+	}
 
 }

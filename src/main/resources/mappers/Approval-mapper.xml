@@ -35,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="selectApprovalCandidates" resultType="com.kedu.project.dto.MemberDTO">
 SELECT id, name, rank_code
 FROM member
-WHERE status = '재직자'
+WHERE status NOT IN ('퇴사', '휴직')
 ORDER BY rank_code
 </select>
 		

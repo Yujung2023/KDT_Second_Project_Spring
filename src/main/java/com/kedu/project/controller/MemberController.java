@@ -317,6 +317,15 @@ public class MemberController {
 		if (result == ids.size()) return ResponseEntity.ok("SUCCESS");
 		return ResponseEntity.badRequest().body("재직 상태 수정 실패");
 	}
+	
+	
+	//리액트에서 랭크 가져오려고
+	@GetMapping("/me")
+	public ResponseEntity<MemberDTO> getMyInfo(HttpServletRequest request) {
+	    String loginId = (String) request.getAttribute("loginID");
+	    MemberDTO member = memberService.selectMemberById(loginId);
+	    return ResponseEntity.ok(member);
+	}
 
 
 }
