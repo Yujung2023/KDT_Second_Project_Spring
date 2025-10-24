@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 public class ChatMessageDTO {
 
 	
-		private String roomId;	 // 채팅방 ID pk
+		private String room_id;	 // 채팅방 ID pk
 		private String sender;   // 보낸 사람
 	    private String content;  // 메시지 내용
 	    private Timestamp sendtime; // 보낸날짜시간
@@ -29,10 +29,10 @@ public class ChatMessageDTO {
 	    
 	    
 	    
-		public ChatMessageDTO(String roomId, String sender, String content, Timestamp sendtime, String fileUrl,
+		public ChatMessageDTO(String room_id, String sender, String content, Timestamp sendtime, String fileUrl,
 				MessageType type, int read) {
 			super();
-			this.roomId = roomId;
+			this.room_id = room_id;
 			this.sender = sender;
 			this.content = content;
 			this.sendtime = sendtime;
@@ -42,13 +42,13 @@ public class ChatMessageDTO {
 		}
 
 
-		public String getRoomId() {
-			return roomId;
+		public String getRoom_id() {
+			return room_id;
 		}
 
 
-		public void setRoomId(String roomId) {
-			this.roomId = roomId;
+		public void setRoom_id(String room_id) {
+			this.room_id = room_id;
 		}
 
 
