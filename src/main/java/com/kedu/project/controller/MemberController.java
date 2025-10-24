@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,22 +20,16 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.kedu.project.dto.MemberDTO;
-import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.MemberService;
 
 
 @RestController
 @RequestMapping("/member")
 public class MemberController {
-
-	@Autowired
-	private JwtUtil jwt;
-
 
 	@Autowired
 	private MemberService memberService;
@@ -48,22 +41,7 @@ public class MemberController {
 	@Value("${spring.cloud.gcp.bucket}")
 	private String bucketName;
 
-	//회원가입
-	//	@PostMapping
-	//	public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO){
-	//		
-	//		int result = memberService.register(memberDTO);
-	//		
-	//		if (result == 0) {
-	//	        // 400 Bad Request 반환
-	//	        return ResponseEntity.badRequest().body("사용자 등록 실패");
-	//	    }
-	//
-	//	    // 성공 시 200 OK 반환
-	//	    return ResponseEntity.ok("사용자 등록 성공");
-	//	}
-
-
+	
 	@PostMapping
 	public ResponseEntity<String> addMember(
 			@RequestPart("member") MemberDTO memberDTO,       // JSON 부분
@@ -203,8 +181,7 @@ public class MemberController {
 		int count = memberService.countMembers();
 		return ResponseEntity.ok(count);
 	}
-
-
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<MemberDTO> getMemberById(@PathVariable String id) {
 		MemberDTO memberDto = memberService.selectMemberById(id);

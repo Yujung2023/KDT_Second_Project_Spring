@@ -20,7 +20,7 @@
 	</select>
 	
 	<select id="check" resultType="int">
-		select count(*) from admin where admin_id=#{id} 
+		select count(*) from admin where id=#{id} 
 	</select>
 	
 	<update id="update">

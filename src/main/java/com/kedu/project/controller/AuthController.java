@@ -57,10 +57,10 @@ public class AuthController {
 		System.out.println("결과는:" + result);
 		if(result > 0) {
 			System.out.println("관리자 맞음");
-			return ResponseEntity.ok("관리자 맞음");	
+			return ResponseEntity.ok("관리자 맞습니다.");	
 		}
 		System.out.println("관리자 아님");
-		return ResponseEntity.badRequest().body("삭제 실패");
+		return ResponseEntity.badRequest().body("관리자가 아닙니다.");
 		
 	}
 	
