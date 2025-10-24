@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Admin">
+		<select id="getAllAdmin" resultType="map">
+		    SELECT m.name AS "name",
+		           m.id AS "id",
+		           m.dept_code AS "dept_code",
+		           TO_CHAR(a.created_time, 'YYYY-MM-DD HH24:MI:SS') AS "created_time"
+		    FROM admin a
+		    LEFT JOIN member m ON a.id = m.id
+		</select>
+
+
+	<insert id="addAdmin" parameterType="string">
+    	INSERT INTO admin (seq, id, type, created_time)
+    	VALUES (admin_seq.NEXTVAL, #{id}, 'admin', sysdate)
+	</insert>
+
+	<delete id="delete" parameterType="string">
+		delete from admin where id = #{id}
+	</delete>
+	
+	<select id="myPage" resultType="com.kedu.project.dto.AuthDTO">
+		select * from auth where id=#{id}
+	</select>
+	
+	<select id="check" resultType="int">
+		select count(*) from admin where id=#{id} 
+	</select>
+	
+	<update id="update">
+		update auth set name=#{name} where id=#{id}
+	</update>
+</mapper>

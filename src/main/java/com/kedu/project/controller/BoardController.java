@@ -55,16 +55,36 @@ public class BoardController {
 	
 	// update
 	@PutMapping("/{seq}")
-	public ResponseEntity<Void> modifyBoard (@PathVariable int seq , @RequestBody BoardDTO boardDTO) {
-		boardService.modifyBoard(seq , boardDTO);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Void> modifyBoard (@PathVariable int seq , @RequestBody BoardDTO boardDTO , HttpServletRequest request) {
+		
+		String loginId = (String) request.getAttribute("loginID");
+		
+//	    BoardDTO existing = boardService.getDetail(seq);
+
+	    // 작성자만 수정 가능
+//	    if (!existing.getWriter_id().equals(loginId)) {
+//	        return ResponseEntity.status(403).build(); // Forbidden
+//	    }
+
+	    boardService.modifyBoard(seq, boardDTO);
+	    return ResponseEntity.ok().build();
 	}
 	
 	// delete
 	@DeleteMapping("/{seq}")
-	public ResponseEntity<Void> deleteBoard (@PathVariable int seq) {
-		boardService.deleteBoard(seq);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Void> deleteBoard (@PathVariable int seq , HttpServletRequest request) {
+		
+		String loginId = (String) request.getAttribute("loginID");
+		
+//		BoardDTO existing = boardService.getDetail(seq);
+
+	    // 작성자 삭제 가능
+//	    if (!existing.getWriter_id().equals(loginId)) {
+//	        return ResponseEntity.status(403).build(); // Forbidden
+//	    }
+
+	    boardService.deleteBoard(seq);
+	    return ResponseEntity.ok().build();
 	}
-	
+
 }

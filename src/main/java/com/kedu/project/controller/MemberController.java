@@ -24,7 +24,6 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.kedu.project.dto.MemberDTO;
-import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,10 +32,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/member")
 public class MemberController {
-
-	@Autowired
-	private JwtUtil jwt;
-
 
 	@Autowired
 	private MemberService memberService;
@@ -48,22 +43,7 @@ public class MemberController {
 	@Value("${spring.cloud.gcp.bucket}")
 	private String bucketName;
 
-	//회원가입
-	//	@PostMapping
-	//	public ResponseEntity<String> register(@RequestBody MemberDTO memberDTO){
-	//		
-	//		int result = memberService.register(memberDTO);
-	//		
-	//		if (result == 0) {
-	//	        // 400 Bad Request 반환
-	//	        return ResponseEntity.badRequest().body("사용자 등록 실패");
-	//	    }
-	//
-	//	    // 성공 시 200 OK 반환
-	//	    return ResponseEntity.ok("사용자 등록 성공");
-	//	}
-
-
+	
 	@PostMapping
 	public ResponseEntity<String> addMember(
 			@RequestPart("member") MemberDTO memberDTO,       // JSON 부분
@@ -203,9 +183,8 @@ public class MemberController {
 		int count = memberService.countMembers();
 		return ResponseEntity.ok(count);
 	}
-
-
-	@GetMapping("/{id}")
+	
+	@GetMapping("/info/{id}")
 	public ResponseEntity<MemberDTO> getMemberById(@PathVariable String id) {
 		MemberDTO memberDto = memberService.selectMemberById(id);
 
@@ -215,6 +194,17 @@ public class MemberController {
 		return ResponseEntity.ok(memberDto);
 	}
 
+	@GetMapping("/userInfo")
+	public ResponseEntity<?> getUserByIdForInfo(HttpServletRequest request) {
+		System.out.println("서버도착");
+		String loginId = (String) request.getAttribute("loginID");
+		MemberDTO memberDto = memberService.selectMemberById(loginId);
+
+		if (memberDto == null) {
+			return ResponseEntity.badRequest().body("존재하는 사용자가 아닙니다.");
+		}
+		return ResponseEntity.ok(memberDto);
+	}
 
 	@DeleteMapping
 	public ResponseEntity<String> deleteMembers(@RequestBody List<String> data) {
