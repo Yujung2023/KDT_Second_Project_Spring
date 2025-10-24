@@ -41,10 +41,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 <insert id="autoAbsence">
-    INSERT into attendance (seq, member_id, start_time,start_status)
-    VALUES (attendance_seq.nextval, #{member_id}, SYSTIMESTAMP, 'absence')
+    INSERT INTO attendance (seq, member_id,start_status)
+    SELECT attendance_seq.nextval, m.id, 'absence'
+    FROM member m
+    WHERE m.status = '재직자'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM attendance a
+          WHERE a.member_id = m.id
+            AND TRUNC(a.start_time) = TRUNC(SYSDATE)  
+      )
 </insert>
-    
 
 <insert id="insertCheckIn">
 Insert into attendance(seq,member_id,start_time,start_status)
@@ -67,14 +74,14 @@ and start_time is not null
 </update>
 
 
-   <update id="updateCheckIn" parameterType="map">
-        UPDATE attendance
-        SET start_time = SYSTIMESTAMP,
-            start_status = #{status},
-            status = 'normal'
-        WHERE member_id = #{member_id}
-        AND TRUNC(start_time) = TRUNC(SYSDATE)
-        AND status = 'absence'
-    </update>
+<update id="updateLateFormAbsence" parameterType="string">
+UPDATE attendance
+SET start_time = SYSTIMESTAMP,
+    start_status = 'late'
+WHERE member_id = #{member_id}
+  AND start_status = 'absence'
+  AND end_status IS NULL
+  AND (start_time IS NULL OR TRUNC(start_time) = TRUNC(SYSDATE))
+</update>
 
 </mapper>

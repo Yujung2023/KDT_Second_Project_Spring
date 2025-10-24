@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kedu.project.dto.ApprovalDTO;
+import com.kedu.project.dto.MemberDTO;
 
 @Repository
 public class ApprovalDAO {
@@ -51,6 +52,12 @@ public class ApprovalDAO {
 	//임시 저장  내용 업데이트
 	public int tempUpdate(ApprovalDTO dto) {
 		return mybatis.update("approval.tempUpdate",dto);
+	}
+	
+	
+	//결재선 직급 불러올거야
+	public List<MemberDTO> selelctApprovalCandidates(){
+		return mybatis.selectList("approval.selectApprovalCandidates");
 	}
 	
 	

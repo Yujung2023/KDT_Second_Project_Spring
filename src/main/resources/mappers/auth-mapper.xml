@@ -19,6 +19,10 @@
 		select * from auth where id=#{id}
 	</select>
 	
+	<select id="check" resultType="int">
+		select count(*) from admin where id=#{id} 
+	</select>
+	
 	<update id="update">
 		update auth set name=#{name} where id=#{id}
 	</update>

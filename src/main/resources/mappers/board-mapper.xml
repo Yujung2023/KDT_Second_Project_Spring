@@ -4,9 +4,57 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Board">
 
-	<insert id="insert">
-		insert into board values(board_seq.nextval,#{category_id},#{title}, #{content},
-		 #{writer_id},#{noticeYn},0, sysdate,null)
-	</insert>
+<insert id="insert" parameterType="com.kedu.project.dto.BoardDTO" useGeneratedKeys="false">
+  
+  <!-- insert 실행 전 시퀀스 값을 먼저 조회 -->
+  <selectKey keyProperty="seq" resultType="int" order="BEFORE">
+    SELECT board_seq.NEXTVAL FROM dual
+  </selectKey>
+
+  insert into board (
+    seq, category_id, title, content, writer_id, noticeyn, hit, createdat, updatedat
+  )
+  values (
+    #{seq}, #{category_id}, #{title}, #{content}, #{writer_id}, #{noticeYn}, 0, sysdate, null
+  )
+</insert>
+
+<!-- Board List  -->
+<select id="selectByCategory" resultType="com.kedu.project.dto.BoardDTO">
+  SELECT 
+    b.seq, b.category_id, b.title, b.writer_id, b.noticeyn, b.hit, b.createdat, c.categoryname
+  FROM board b
+  JOIN board_category c ON b.category_id = c.categoryid
+  WHERE b.category_id = #{category_id}
+  ORDER BY b.seq DESC
+</select>
+
+<!-- Board Detail  -->
+<select id="getDetail" resultType="com.kedu.project.dto.BoardDTO">
+	SELECT 
+    b.seq,
+    b.category_id,
+    c.categoryname AS category_name,
+    b.title,
+    b.content,
+    b.writer_id,
+    b.noticeyn ,
+    b.hit,
+    b.createdat ,
+    b.updatedat
+  FROM board b
+  JOIN board_category c ON b.category_id = c.categoryid
+  WHERE b.seq = #{seq}
+</select>
+
+<!-- Board Delete  -->
+<delete id="deleteBoard" >
+	delete from board where seq = #{seq}
+</delete>
+
+<!-- Board Update  -->
+<update id="modifyBoard">
+	update board set title = #{title} , content = #{content} where seq = #{seq}
+</update>
 	
 </mapper>

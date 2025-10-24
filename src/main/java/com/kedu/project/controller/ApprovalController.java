@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.ApprovalDTO;
+import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.service.ApprovalService;
 
 @RestController
@@ -77,5 +78,11 @@ public class ApprovalController {
 		return ResponseEntity.ok(dto);
 	}
 	
+	//직급 불러오가
+	@GetMapping("/candidates")
+	public List<MemberDTO> getCandidates() {
+	    return approvalservice.getApprovalCandidates();
+	}
+
 	
 }

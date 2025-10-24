@@ -6,19 +6,20 @@ public class LeaveRequestDTO {
 
 	private int seq;
 	private String member_id;
-	private int leave_count;
+	private Double leave_count;
 	private String leave_code;
+
 	private Timestamp start_leave_time;
 	private Timestamp end_leave_time;
 	private String reason;
 	private String status;
 	
-	public void LeaveRequstDTO() {
+	public LeaveRequestDTO() {
 		
 	}
 	
 	
-	public LeaveRequestDTO(int seq, String member_id, int leave_count, String leave_code, Timestamp start_leave_time,
+	public LeaveRequestDTO(int seq, String member_id, double leave_count, String leave_code, Timestamp start_leave_time,
 			Timestamp end_leave_time, String reason, String status) {
 		super();
 		this.seq = seq;
@@ -42,10 +43,10 @@ public class LeaveRequestDTO {
 	public void setMember_id(String member_id) {
 		this.member_id = member_id;
 	}
-	public int getLeave_count() {
+	public double getLeave_count() {
 		return leave_count;
 	}
-	public void setLeave_count(int leave_count) {
+	public void setLeave_count(double leave_count) {
 		this.leave_count = leave_count;
 	}
 	public String getLeave_code() {

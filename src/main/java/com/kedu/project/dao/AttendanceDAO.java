@@ -49,21 +49,9 @@ public class AttendanceDAO {
     
     
 
-    // 2) 결근 → 출근 UPDATE (출근 버튼 눌렀을 때)
-    public int updateCheckIn(String member_id, String status) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("member_id", member_id);
-        params.put("status", status);
-        return mybatis.update("attendance.updateCheckIn", params);
-    }
-
-    // 3) 퇴근 UPDATE (명확하게 분리할 경우)
-    public int updateCheckOut(String member_id, String status) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("member_id", member_id);
-        params.put("status", status);
-        return mybatis.update("attendance.updateCheckOut", params);
-    }
+   public int updateLateFormAbsence(String member_id) {
+	   return mybatis.update("attendance.updateLateFormAbsence",member_id);
+   }
 
     
     
