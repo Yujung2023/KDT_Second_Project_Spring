@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kedu.project.dto.ContactsDTO;
 import com.kedu.project.dto.MailDTO;
 import com.kedu.project.service.MailService;
 
@@ -28,10 +28,11 @@ public class MailController {
 	private MailService MServ;
 
 	@PostMapping // 메일 작성 (DB insert)
-	public ResponseEntity<Long> sendMail(@RequestBody MailDTO dto, HttpServletRequest request) {
+	public ResponseEntity<String> sendMail(@RequestBody MailDTO dto, HttpServletRequest request) {
 
 		String loginId = (String) request.getAttribute("loginID");
-
+		
+		try {
 		// dto에 로그인한 아이디 넣기
 		dto.setUser_id(loginId);
 		dto.setSenderId(loginId);
@@ -40,8 +41,12 @@ public class MailController {
 		dto.setSenderName(senderName);
 		
 		MServ.SendMail(dto);
-
-		return ResponseEntity.ok(dto.getSeq());
+		}catch(Exception e) {
+			e.printStackTrace();
+			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("발송 실패! 주소록에 등록된 수신자가 아닙니다");
+		}
+		
+		   return ResponseEntity.ok(String.valueOf(dto.getSeq()));
 	}
 
 
