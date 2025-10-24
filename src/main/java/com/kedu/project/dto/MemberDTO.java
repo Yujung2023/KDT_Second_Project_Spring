@@ -1,64 +1,63 @@
 package com.kedu.project.dto;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class MemberDTO {
-	private String id;
-	private String password;
-	private String name;
-	private String englishName;
-	private String employmentType;
-	private String zip_code; 
-	private String address_line1;
-	private String address_line2;
-	private String status;
-	private String employee_no;
-	private Timestamp hire_date;
-	private String dept_code;
-	private String job_code;
-	private String rank_code; 
-	private Timestamp created_time;
-	private String officeEmail;
-	private String personalEmail;
-	private String officePhone;
-	private String mobilePhone;
-	private Timestamp birthDate;
-	private String calendarType;
-	
-	
-	
-	
-	public MemberDTO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	public MemberDTO(String id, String password, String name, String englishName, String employmentType,
-			String zip_code, String address_line1, String address_line2, String status, String employee_no,
-			Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
-			String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
-			String calendarType) {
+    private String id;              // 아이디
+    private String password;        // 비밀번호
+    private String name;            // 이름
+    private String englishName;     // 영어이름
+    private String employmentType;  // 근로형태
+    private Timestamp hire_date;   // 입사일
+    private String dept_code;       // 부서
+    private String rank_code;       // 직위
+    private String job_code;        // 직무
+    private String officeEmail;     // 회사 이메일
+    private String personalEmail;   // 개인 이메일
+    private String officePhone;     // 회사 번호
+    private String mobilePhone;     // 개인 번호
+    private String birthDate;       // 생일
+    private String calendarType;    // 양력/음력
+    private String zip_code;        // 주소 코드
+    private String address_line1;   // 주소
+    private String address_line2;   // 상세주소
+    private String work_status;     // 근무상태
+    private String employee_no;     // 사번(고유번호)
+    private String status;          // 상태(현직, 퇴사)
+    private Timestamp created_time; // 가입일
+    
+    
+    
+    
+	public MemberDTO(String id, String password, String name, String englishName, String employmentType, Timestamp hire_date,
+			String dept_code, String rank_code, String job_code, String officeEmail, String personalEmail,
+			String officePhone, String mobilePhone, String birthDate, String calendarType, String zip_code,
+			String address_line1, String address_line2, String work_status, String employee_no, String status,
+			Timestamp created_time) {
 		super();
 		this.id = id;
 		this.password = password;
 		this.name = name;
 		this.englishName = englishName;
 		this.employmentType = employmentType;
-		this.zip_code = zip_code;
-		this.address_line1 = address_line1;
-		this.address_line2 = address_line2;
-		this.status = status;
-		this.employee_no = employee_no;
 		this.hire_date = hire_date;
 		this.dept_code = dept_code;
-		this.job_code = job_code;
 		this.rank_code = rank_code;
-		this.created_time = created_time;
+		this.job_code = job_code;
 		this.officeEmail = officeEmail;
 		this.personalEmail = personalEmail;
 		this.officePhone = officePhone;
 		this.mobilePhone = mobilePhone;
 		this.birthDate = birthDate;
 		this.calendarType = calendarType;
+		this.zip_code = zip_code;
+		this.address_line1 = address_line1;
+		this.address_line2 = address_line2;
+		this.work_status = work_status;
+		this.employee_no = employee_no;
+		this.status = status;
+		this.created_time = created_time;
 	}
 	public String getId() {
 		return id;
@@ -90,37 +89,7 @@ public class MemberDTO {
 	public void setEmploymentType(String employmentType) {
 		this.employmentType = employmentType;
 	}
-	public String getZip_code() {
-		return zip_code;
-	}
-	public void setZip_code(String zip_code) {
-		this.zip_code = zip_code;
-	}
-	public String getAddress_line1() {
-		return address_line1;
-	}
-	public void setAddress_line1(String address_line1) {
-		this.address_line1 = address_line1;
-	}
-	public String getAddress_line2() {
-		return address_line2;
-	}
-	public void setAddress_line2(String address_line2) {
-		this.address_line2 = address_line2;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	public String getEmployee_no() {
-		return employee_no;
-	}
-	public void setEmployee_no(String employee_no) {
-		this.employee_no = employee_no;
-	}
-	public Timestamp getHire_date() {
+	public java.util.Date getHire_date() {
 		return hire_date;
 	}
 	public void setHire_date(Timestamp hire_date) {
@@ -132,23 +101,17 @@ public class MemberDTO {
 	public void setDept_code(String dept_code) {
 		this.dept_code = dept_code;
 	}
-	public String getJob_code() {
-		return job_code;
-	}
-	public void setJob_code(String job_code) {
-		this.job_code = job_code;
-	}
 	public String getRank_code() {
 		return rank_code;
 	}
 	public void setRank_code(String rank_code) {
 		this.rank_code = rank_code;
 	}
-	public Timestamp getCreated_time() {
-		return created_time;
+	public String getJob_code() {
+		return job_code;
 	}
-	public void setCreated_time(Timestamp created_time) {
-		this.created_time = created_time;
+	public void setJob_code(String job_code) {
+		this.job_code = job_code;
 	}
 	public String getOfficeEmail() {
 		return officeEmail;
@@ -174,10 +137,10 @@ public class MemberDTO {
 	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
-	public Timestamp getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
-	public void setBirthDate(Timestamp birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 	public String getCalendarType() {
@@ -186,7 +149,48 @@ public class MemberDTO {
 	public void setCalendarType(String calendarType) {
 		this.calendarType = calendarType;
 	}
-	
+	public String getZip_code() {
+		return zip_code;
+	}
+	public void setZip_code(String zip_code) {
+		this.zip_code = zip_code;
+	}
+	public String getAddress_line1() {
+		return address_line1;
+	}
+	public void setAddress_line1(String address_line1) {
+		this.address_line1 = address_line1;
+	}
+	public String getAddress_line2() {
+		return address_line2;
+	}
+	public void setAddress_line2(String address_line2) {
+		this.address_line2 = address_line2;
+	}
+	public String getWork_status() {
+		return work_status;
+	}
+	public void setWork_status(String work_status) {
+		this.work_status = work_status;
+	}
+	public String getEmployee_no() {
+		return employee_no;
+	}
+	public void setEmployee_no(String employee_no) {
+		this.employee_no = employee_no;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public java.util.Date getCreated_time() {
+		return created_time;
+	}
+	public void setCreated_time(Timestamp created_time) {
+		this.created_time = created_time;
+	}
 
 
 	
