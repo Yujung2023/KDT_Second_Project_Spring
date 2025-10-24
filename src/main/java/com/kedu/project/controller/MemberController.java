@@ -26,6 +26,8 @@ import com.google.cloud.storage.Storage;
 import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.service.MemberService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping("/member")
@@ -182,7 +184,7 @@ public class MemberController {
 		return ResponseEntity.ok(count);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/info/{id}")
 	public ResponseEntity<MemberDTO> getMemberById(@PathVariable String id) {
 		MemberDTO memberDto = memberService.selectMemberById(id);
 
@@ -192,6 +194,17 @@ public class MemberController {
 		return ResponseEntity.ok(memberDto);
 	}
 
+	@GetMapping("/userInfo")
+	public ResponseEntity<?> getUserByIdForInfo(HttpServletRequest request) {
+		System.out.println("서버도착");
+		String loginId = (String) request.getAttribute("loginID");
+		MemberDTO memberDto = memberService.selectMemberById(loginId);
+
+		if (memberDto == null) {
+			return ResponseEntity.badRequest().body("존재하는 사용자가 아닙니다.");
+		}
+		return ResponseEntity.ok(memberDto);
+	}
 
 	@DeleteMapping
 	public ResponseEntity<String> deleteMembers(@RequestBody List<String> data) {

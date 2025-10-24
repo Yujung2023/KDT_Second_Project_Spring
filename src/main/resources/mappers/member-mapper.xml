@@ -29,6 +29,7 @@
 		select count(*) from member where id=#{id}
 	</select>
 	
+
 	<select id="countMembers" resultType="int">
     	SELECT COUNT(*) FROM MEMBER
 	</select>
