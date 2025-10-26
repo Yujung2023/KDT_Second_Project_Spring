@@ -16,16 +16,13 @@ public class LeaveRequestService {
     @Autowired
     private LeaveRequestDAO leaveRequestDAO;
 
-
     public double getRemainLeave(String memberId) {
-        Double used = leaveRequestDAO.selectRemainLeave(memberId); // ✅ Double 로 받기
+        Double used = leaveRequestDAO.selectRemainLeave(memberId);
         double usedLeave = (used != null) ? used : 0.0;
         return 15.0 - usedLeave;
     }
 
-   
     public void insertLeaveRequest(LeaveRequestPayload payload, String memberId, String rank) {
-    	System.out.println("랭크:"+rank);
         List<LeaveRequestPayload.Item> items = payload.getItems();
 
         String start  = items.get(0).getDate();
@@ -33,7 +30,7 @@ public class LeaveRequestService {
         String reason = items.get(0).getReason();
         String code   = items.get(0).getType();
 
-        // ✅ 차감 규칙
+        // ✅ 연차 차감 계산
         double useDays = 0.0;
         if ("annual".equals(code)) {
             useDays = items.size();
@@ -50,24 +47,21 @@ public class LeaveRequestService {
         dto.setEnd_leave_time(Timestamp.valueOf(end   + " 23:59:59"));
         dto.setReason(reason);
 
-        
-        if ("사장".equals(rank)) {
-            dto.setStatus("A"); // 승인 상태로 저장
+        // ✅ 사장 / 부사장 자동 승인
+        if ("사장".equals(rank) || "부사장".equals(rank)) {
+            dto.setStatus("A"); // 승인 상태
             leaveRequestDAO.insertLeaveRequest(dto);
-
-      
-            if (useDays > 0) {
-                leaveRequestDAO.updateUsedLeave(memberId, useDays);
-            }
+            leaveRequestDAO.updateUsedLeave(memberId, useDays);
             return;
         }
 
-      
-        dto.setStatus("N"); // 승인 대기
+        // ✅ 일반 직원 → 결재대기
+        dto.setStatus("N");
         leaveRequestDAO.insertLeaveRequest(dto);
     }
+
+    // ✅ 휴가 현황 조회 (본인 or 관리자 조건)
+    public List<LeaveRequestDTO> getLeaveStatus(String rankCode, String memberId, String deptCode){
+        return leaveRequestDAO.selectLeaveStatus(rankCode, memberId, deptCode);
+    }
 }
-
-	
-
-
