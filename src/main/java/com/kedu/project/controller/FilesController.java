@@ -45,37 +45,36 @@ public class FilesController {
 	private String bucketName;
 
 	@PostMapping ("/upload") // 파일 업로드
-	public ResponseEntity<List<FilesDTO>> uploadFile( @RequestParam String moduleType , 
+	public ResponseEntity<List<FilesDTO>> uploadFile( @RequestParam String module_type , 
 												  @RequestParam int module_seq ,
 												  @RequestParam("files") MultipartFile[] files) throws Exception{
 
-		List<FilesDTO> list = filesService.uploadFile(moduleType, module_seq, files);
+		List<FilesDTO> list = filesService.uploadFile(module_type, module_seq, files);
         return ResponseEntity.ok(list);
     }
 	
-	@GetMapping("/download/{sysname}") // 파일 다운로드
-	public ResponseEntity<byte[]> downloadFile(@PathVariable String sysname) throws Exception {
+	@GetMapping("/download")
+	public ResponseEntity<byte[]> downloadFile(@RequestParam String sysname) throws Exception {
+	    byte[] content = filesService.downloadFile(sysname);
 
-		byte[] content = filesService.downloadFile(sysname);
+	    FilesDTO meta = filesService.getFilesList("all", 0).stream()
+	            .filter(f -> f.getSysname().equals(sysname))
+	            .findFirst().orElse(null);
 
-		FilesDTO meta = filesService.getFilesList("all", 0).stream()
-                .filter(f -> f.getSysname().equals(sysname))
-                .findFirst().orElse(null);
-		
-		HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData(
-                "attachment",
-                new String((meta != null ? meta.getOrgname() : sysname).getBytes("utf-8"), "ISO-8859-1")
-        );
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	    headers.setContentDispositionFormData(
+	            "attachment",
+	            new String((meta != null ? meta.getOrgname() : sysname).getBytes("utf-8"), "ISO-8859-1")
+	    );
 
-        return new ResponseEntity<>(content, headers, HttpStatus.OK);
-    }
+	    return new ResponseEntity<>(content, headers, HttpStatus.OK);
+	}
 	
 	// 파일 목록
     @GetMapping("/fileList")
-    public ResponseEntity<List<FilesDTO>> getFilesList( @RequestParam String moduleType, @RequestParam int module_seq) {
-        return ResponseEntity.ok(filesService.getFilesList(moduleType, module_seq));
+    public ResponseEntity<List<FilesDTO>> getFilesList( @RequestParam String module_type, @RequestParam int module_seq) {
+        return ResponseEntity.ok(filesService.getFilesList(module_type, module_seq));
     }
     
     // 삭제 (GCS + DB 메타)

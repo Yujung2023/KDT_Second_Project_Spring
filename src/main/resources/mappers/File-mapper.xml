@@ -9,7 +9,7 @@
         SELECT FILE_META_SEQ.NEXTVAL FROM dual
     </selectKey>
     INSERT INTO FILE_META (seq, module_type, module_seq, sysname, orgname, contentType)
-    VALUES (#{seq}, #{moduleType}, #{module_seq}, #{sysname}, #{orgname}, #{contentType})
+    VALUES (#{seq}, #{module_type}, #{module_seq}, #{sysname}, #{orgname}, #{contentType})
   </insert>
 
   <select id="downloadFile" resultType="com.kedu.project.dto.FilesDTO">
@@ -17,7 +17,7 @@
   </select>
   
   <select id="getFilesList" resultType="com.kedu.project.dto.FilesDTO">
-    SELECT * FROM FILE_META WHERE module_type = #{moduleType} AND module_seq = #{module_seq}
+    SELECT * FROM FILE_META WHERE module_type = #{module_type} AND module_seq = #{module_seq}
   </select>
 
   <delete id="deleteFile">

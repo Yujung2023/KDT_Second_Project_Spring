@@ -27,9 +27,9 @@ public class FilesDAO {
 	public FilesDTO downloadFile(String sysname) {
 		return mybatis.selectOne("File.downloadFile", sysname);
 	}
-	public List<FilesDTO> getFilesList(String moduleType, int module_seq) {
+	public List<FilesDTO> getFilesList(String module_type, int module_seq) {
 		Map<String, Object> param = new HashMap<>();
-		param.put("moduleType", moduleType);
+		param.put("module_type", module_type);
 		param.put("module_seq", module_seq);
 		return mybatis.selectList("File.getFilesList", param);
 	}
