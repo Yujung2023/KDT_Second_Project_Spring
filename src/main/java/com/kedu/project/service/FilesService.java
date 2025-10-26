@@ -45,20 +45,20 @@ public class FilesService {
 	    @Value("${spring.cloud.gcp.bucket}")
 	    private String bucketName;
 
-	    public List<FilesDTO> uploadFile(String moduleType, int module_seq, MultipartFile[] files) throws IOException {
+	    public List<FilesDTO> uploadFile(String module_type, int module_seq, MultipartFile[] files) throws IOException {
 	       
 	    	List<FilesDTO> fileList = new ArrayList<>();
 
 	        for (MultipartFile file : files) {
 	            if (!file.isEmpty()) {
-	                String sysname = moduleType + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+	                String sysname = module_type + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
 	                BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, sysname)
 	                        .setContentType(file.getContentType()).build();
 	                storage.create(blobInfo, file.getBytes());
 
 	                FilesDTO FilesDTO = new FilesDTO (
-	                    moduleType, module_seq, sysname, file.getOriginalFilename(),
+	                		module_type, module_seq, sysname, file.getOriginalFilename(),
 	                    file.getContentType());
 	                filesDAO.uploadFile(FilesDTO);
 	                fileList.add(FilesDTO);
@@ -68,12 +68,27 @@ public class FilesService {
 	    }
 
 	    public byte[] downloadFile(String sysname) throws IOException {
-	        Blob blob = storage.get(bucketName, sysname);
+	        System.out.println("📦 [Download 요청 sysname] = " + sysname);
+
+	        // 혹시나 공백이나 앞뒤 슬래시가 있을 경우 방지
+	        sysname = sysname.trim();
+	        if (sysname.startsWith("/")) sysname = sysname.substring(1);
+
+	        // GCS에서 파일 조회
+	        Blob blob = storage.get(BlobId.of(bucketName, sysname));
+
+	        if (blob == null || !blob.exists()) {
+	            System.err.println("❌ GCS에서 Blob을 찾을 수 없습니다: " + sysname);
+	            throw new IOException("GCS 파일을 찾을 수 없습니다: " + sysname);
+	        }
+
+	        System.out.println("✅ [Blob 존재] 경로 = " + blob.getName() + " / 타입 = " + blob.getContentType());
 	        return blob.getContent();
 	    }
 
-	    public List<FilesDTO> getFilesList(String moduleType, int module_seq) {
-	        return filesDAO.getFilesList(moduleType, module_seq);
+
+	    public List<FilesDTO> getFilesList(String module_type, int module_seq) {
+	        return filesDAO.getFilesList(module_type, module_seq);
 	    }
 	    
 	    public boolean deleteFile(String sysname) {
