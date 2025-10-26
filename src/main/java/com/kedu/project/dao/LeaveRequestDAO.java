@@ -1,5 +1,7 @@
 package com.kedu.project.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kedu.project.dto.LeaveRequestDTO;
@@ -14,6 +16,8 @@ public interface LeaveRequestDAO {
 
 	   //  사용 연차 누적
 	   int updateUsedLeave(String memberId, Double used);
+	   
+	   List<LeaveRequestDTO> selectLeaveStatus(String rankCode, String memberId, String deptCode);
 }
 
 
