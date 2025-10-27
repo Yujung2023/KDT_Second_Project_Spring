@@ -40,6 +40,21 @@ public class MailService {
 
 		return mailList;  
 	}
+	
+	public List<MailDTO> SelectRecentrecipientMailList(String loginId) {
+		
+		List<MailDTO> mailList = dao.SelectRecentrecipientMailList(loginId);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+		mailList.forEach(mail -> {
+			if(mail.getSendDate() != null) {
+				mail.setSendDateStr(sdf.format(mail.getSendDate()));
+			}
+		});
+
+		return mailList;  
+	}
+
 
 	public List<MailDTO> SelectSendMailList(String loginId) {
 		List<MailDTO> mailList = dao.SelectSendMailList(loginId);
@@ -100,6 +115,7 @@ public class MailService {
 
 		return mailList;  // ← 수정: 포맷팅된 mailList 반환
 	}
+
 
 
 

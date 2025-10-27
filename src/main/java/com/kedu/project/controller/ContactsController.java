@@ -1,7 +1,6 @@
 package com.kedu.project.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,7 @@ public class ContactsController {
 
 	@GetMapping // 주소록 리스트 출력
 	public ResponseEntity<List<ContactsDTO>> SelectContactsList(
-			@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
+			@RequestParam(required = false) String name, @RequestParam(required = false) String type , HttpServletRequest request) {
 
 		List<ContactsDTO> list;
 
@@ -59,7 +58,8 @@ public class ContactsController {
 			} else {
 				// 이름 없이 타입만 필터
 				if (type.equals("solo")) {
-					list = CServ.selectSoloList(type);
+					String loginId = (String) request.getAttribute("loginID");
+					list = CServ.selectSoloList(type,loginId);
 				} else {
 					list = CServ.selectMultiList(type);
 				}
@@ -69,7 +69,11 @@ public class ContactsController {
 			if (name != null && !name.isEmpty()) {
 				list = CServ.searchName(name);
 			} else {
-				list = CServ.SelectContactsList();
+				String loginId = (String) request.getAttribute("loginID");
+				list = new ArrayList<>();
+				list.addAll(CServ.selectMultiList(type));
+				list.addAll(CServ.selectSoloList(type,loginId));
+				  
 			}
 		}
 

@@ -27,6 +27,12 @@ public class MailDAO {
 		
 		return mybatis.selectList("Mail.SelectrecipientMailList" , loginId);
 	}
+	
+	public List<MailDTO> SelectRecentrecipientMailList(String loginId) {
+		
+		return mybatis.selectList("Mail.SelectRecentrecipientMailList" , loginId);
+	}
+
 
 	public List<MailDTO> SelectSendMailList(String loginId) {
 		
@@ -48,11 +54,8 @@ public class MailDAO {
 		return mybatis.selectList("Mail.searchsendName", param);
 	}
 
-	
-	
-	
-	
-	
+
+
 	
 }
 

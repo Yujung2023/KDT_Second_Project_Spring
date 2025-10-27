@@ -24,9 +24,9 @@ public class ContactsService {
 	}
 
 
-	public List<ContactsDTO> SelectContactsList() {
+	public List<ContactsDTO> SelectContactsList(String user_id) {
 
-		return dao.SelectContactsList();
+		return dao.SelectContactsList(user_id);
 	}
 
 
@@ -36,11 +36,14 @@ public class ContactsService {
 	}
 
 
-	public List<ContactsDTO> selectSoloList(String type) {
-
-		return dao.selectSoloList(type);
+	public List<ContactsDTO> selectSoloList(String type, String user_id) {
+		
+		  Map<String, Object> params = new HashMap<>();
+		    params.put("user_id", user_id);
+		    params.put("type", "solo");
+		    
+		    return dao.selectSoloList(params);
 	}
-
 
 	public List<ContactsDTO> selectMultiList(String type) {
 
@@ -79,6 +82,9 @@ public class ContactsService {
 
 		return dao.updateContactsTypeSingle(param);
 	}
+
+
+
 
 
 
