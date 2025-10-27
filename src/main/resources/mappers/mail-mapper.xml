@@ -4,49 +4,46 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Mail">
 	
-	<insert id="SendMail" useGeneratedKeys="true" parameterType="com.kedu.project.dto.MailDTO">
-	 <selectKey keyProperty="seq" resultType="long" order="BEFORE">
-        SELECT mail_seq.NEXTVAL FROM dual
+<insert id="SendMail" useGeneratedKeys="true" parameterType="com.kedu.project.dto.MailDTO">
+	<selectKey keyProperty="seq" resultType="long" order="BEFORE">
+    SELECT mail_seq.NEXTVAL FROM dual
     </selectKey>
-		insert into mail 
-		(seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
-		values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
-		#{senderName}, #{recipientName}, #{content} ) 
-	</insert>
+    insert into mail (seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
+	values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
+	#{senderName}, #{recipientName}, #{content} ) 
+</insert>
 	
-	 <select id="getNameById" resultType="string">
-        SELECT name FROM contacts  WHERE email = #{userId}
+	<select id="getNameById" resultType="string">
+    SELECT name FROM contacts  WHERE email = #{userId}
     </select>
 
 	
 	<select id="SelectrecipientMailList" resultType="com.kedu.project.dto.MailDTO">
-   select * from mail 
-   where recipientId = #{value, jdbcType=VARCHAR} 
-   order by sendDate desc
+   	select * from mail  where recipientId = #{value, jdbcType=VARCHAR}  order by sendDate desc
 	</select>
 	
+	<select id="SelectRecentrecipientMailList" resultType="com.kedu.project.dto.MailDTO">
+    select *from mail 
+    where recipientId = #{value, jdbcType=VARCHAR}
+    and sendDate &gt;= trunc(sysdate) - 1
+ 	and sendDate &lt;= trunc(sysdate) + 1
+ 	order by sendDate desc
+	</select>
+
 	<select id="SelectSendMailList" resultType="com.kedu.project.dto.MailDTO">
-   select * from mail 
-   where senderId = #{value, jdbcType=VARCHAR} 
-   order by sendDate desc
+   	select * from mail where senderId = #{value, jdbcType=VARCHAR} order by sendDate desc
 	</select>
 	
 	
 	
 	<select id="searchName" parameterType="map" resultType="com.kedu.project.dto.MailDTO">
-    SELECT * 
-    FROM mail	
-    WHERE recipientId = #{loginId}
-     AND senderName LIKE '%' || #{name} || '%'
-    ORDER BY sendDate ASC
+    SELECT * FROM mail	WHERE recipientId = #{loginId} AND senderName LIKE '%' || #{name} || '%' ORDER BY sendDate ASC
 	</select>
 
 	
 	<select id="searchsendName"  parameterType="map" resultType="com.kedu.project.dto.MailDTO">
-    SELECT * 
-    FROM mail
-    WHERE senderId = #{loginId}
-     AND recipientName LIKE '%' || #{name} || '%'
+    SELECT * FROM mail
+    WHERE senderId = #{loginId} AND recipientName LIKE '%' || #{name} || '%'
     ORDER BY sendDate ASC
 	</select>
 
@@ -64,18 +61,14 @@
 
 	
 	<select id="MailFileDownload" parameterType="map" resultType="com.kedu.project.dto.MailFileDTO">
-    SELECT mailSeq, sysname, orgname
-    FROM mailFile
+    SELECT mailSeq, sysname, orgname FROM mailFile
     WHERE mailSeq = #{mailSeq} AND sysname = #{sysname}
-    
 	</select>
 	
 	
 	<select id="getMailFileList" parameterType="long" resultType="com.kedu.project.dto.MailFileDTO">
-    SELECT mailSeq, sysname, orgname
-    FROM mailFile
+    SELECT mailSeq, sysname, orgname FROM mailFile
     WHERE mailSeq = #{mailSeq}
-    
 	</select>
 
 	
