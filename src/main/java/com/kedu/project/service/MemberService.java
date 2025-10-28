@@ -111,5 +111,10 @@ public class MemberService {
 		return memberDao.updateStatus(ids, status);
 	}
 	
+	public List<MemberDTO> getListMember() {
+	    
+	    List<MemberDTO> member = memberDao.getListMember();
+	    return member;
+	}
 
 }

@@ -133,6 +133,10 @@
 		from member where id=#{id}
 	</select>
 	
+	<select id="getListMember" resultType="com.kedu.project.dto.MemberDTO">
+		SELECT id, name,dept_code,rank_code FROM MEMBER WHERE status != '퇴사자'
+	</select>
+	
 	<update id="updateMember" parameterType="com.kedu.project.dto.MemberDTO">
 	  UPDATE member
 	  SET

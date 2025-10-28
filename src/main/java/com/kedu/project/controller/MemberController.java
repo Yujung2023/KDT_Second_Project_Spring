@@ -326,6 +326,14 @@ public class MemberController {
 	    MemberDTO member = memberService.selectMemberById(loginId);
 	    return ResponseEntity.ok(member);
 	}
+	
+	//검색용 리스트 가져오기
+		@GetMapping("/list")
+		public ResponseEntity<List<MemberDTO>> getListMember() {    
+		    List<MemberDTO> members = memberService.getListMember();
+		    return ResponseEntity.ok(members);
+		}
+
 
 
 }
