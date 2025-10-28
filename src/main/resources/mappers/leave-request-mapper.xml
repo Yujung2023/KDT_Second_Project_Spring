@@ -1,73 +1,31 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.kedu.project.dao.LeaveRequestDAO">
 
-    <!-- ✅ 잔여 연차 조회 (사용 연차 조회용) -->
-    <select id="selectRemainLeave" parameterType="string" resultType="double">
-        SELECT NVL(userLeave, 0)
-        FROM leave_balance
-        WHERE id = #{memberId}
-    </select>
+  <!-- 1. 잔여 연차 조회 -->
+  <select id="selectRemainLeave" parameterType="string" resultType="double">
+    SELECT NVL(userLeave, 0)
+    FROM leave_balance
+    WHERE id = #{memberId}
+  </select>
 
-    <!-- ✅ 휴가 신청 INSERT -->
-    <insert id="insertLeaveRequest" parameterType="com.kedu.project.dto.LeaveRequestDTO">
-        INSERT INTO leave_request (
-            seq,
-            member_id,
-            leave_count,
-            leave_code,
-            start_leave_time,
-            end_leave_time,
-            reason,
-            status
-        ) VALUES (
-            leave_request_seq.NEXTVAL,
-            #{member_id},
-            #{leave_count},
-            #{leave_code},
-            #{start_leave_time},
-            #{end_leave_time},
-            #{reason},
-            #{status}
-        )
-    </insert>
+  <!-- 2. 휴가 신청 INSERT -->
+  <insert id="insertLeaveRequest" parameterType="com.kedu.project.dto.LeaveRequestDTO">
+    INSERT INTO leave_request (
+      seq, member_id, leave_count, leave_code,
+      start_leave_time, end_leave_time, reason, status, approval_id
+    ) VALUES (
+      leave_request_seq.NEXTVAL,
+      #{member_id}, #{leave_count}, #{leave_code},
+      #{start_leave_time}, #{end_leave_time}, #{reason}, #{status}, #{approval_id}
+    )
+  </insert>
 
-
-<select id="selectLeaveStatus" resultType="com.kedu.project.dto.LeaveRequestDTO">
-    SELECT
-        lr.seq,
-        lr.member_id,
-        lr.leave_count,
-        lr.leave_code,
-        lr.start_leave_time,
-        lr.end_leave_time,
-        lr.reason,
-        lr.status
-    FROM leave_request lr
-    JOIN member m ON lr.member_id = m.id
-    <where>
-              <if test="rankCode == '사원' or rankCode == '대리' or rankCode == '주임'">
-            AND lr.member_id = #{memberId}
-        </if>
-
-     
-        <if test="rankCode == '과장' or rankCode == '차장' or rankCode == '부장'">
-            AND m.dept_code = #{deptCode}
-        </if>
-       
-    </where>
-    ORDER BY lr.start_leave_time DESC
-</select>
-    
-    
-    
-    
-    
-    
-
- <update id="updateUsedLeave">
+  <!-- ✅ 3. 승인된 연차 차감 -->
+  <update id="updateUsedLeave">
     MERGE INTO leave_balance lb
     USING (SELECT #{memberId} AS id FROM dual) d
     ON (lb.id = d.id)
@@ -76,5 +34,33 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     WHEN NOT MATCHED THEN
       INSERT (id, userLeave) VALUES (#{memberId}, #{used})
   </update>
+
+  <!-- ✅ 4. 휴가 현황 조회 -->
+  <select id="selectLeaveStatus"
+        parameterType="map"
+        resultType="com.kedu.project.dto.LeaveStatusDTO">
+
+  SELECT
+      lr.seq,
+      lr.member_id AS memberId,
+      lr.leave_code AS leaveCode,
+      lr.reason AS reason,
+      lr.status AS status,
+      lr.approval_id AS approvalId,
+      TO_CHAR(lr.start_leave_time, 'YYYY-MM-DD HH24:MI:SS') AS startLeaveTime,
+      TO_CHAR(lr.end_leave_time, 'YYYY-MM-DD HH24:MI:SS') AS endLeaveTime
+  FROM leave_request lr
+  LEFT JOIN member writer 
+    ON lr.member_id = writer.id
+  <where>
+    <if test="rankCode == '사원' or rankCode == '대리' or rankCode == '주임'">
+      AND lr.member_id = #{memberId}
+    </if>
+    <if test="rankCode == '과장' or rankCode == '차장' or rankCode == '부장'">
+      AND writer.dept_code = #{deptCode}
+    </if>
+  </where>
+  ORDER BY lr.start_leave_time DESC
+</select>
 
 </mapper>
