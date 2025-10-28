@@ -90,6 +90,9 @@ public class MemberDAO {
 		param.put("status", status);
 		return mybatis.update("Member.updateStatus", param);
 	}
-	
+	public List<MemberDTO> getListMember() {
+
+		return mybatis.selectList("Member.getListMember");
+	}
 }
 
