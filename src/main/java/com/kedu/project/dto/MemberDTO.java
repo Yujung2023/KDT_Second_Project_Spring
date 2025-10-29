@@ -3,30 +3,31 @@ package com.kedu.project.dto;
 import java.sql.Timestamp;
 
 public class MemberDTO {
-   private String id;
-   private String password;
-   private String name;
-   private String englishName;
-   private String employmentType;
-   private String zip_code; 
-   private String address_line1;
-   private String address_line2;
-   private String status;
-   private String employee_no;
-   private Timestamp hire_date;
-   private String dept_code;
-   private String job_code;
-   private String rank_code; 
-   private Timestamp created_time;
-   private String officeEmail;
-   private String personalEmail;
-   private String officePhone;
-   private String mobilePhone;
-   private Timestamp birthDate;
-   private String calendarType;
-   private String work_status;     // 근무상태
-   private String profileImage_servName;
-   private String profileImage_oriName;
+	private String id;                         // 아이디
+	private String password;                   // 비밀번호
+	private String name;                       // 이름
+	private String englishName;                // 영어 이름
+	private String employmentType;             // 근로형태 (정규직, 계약직 등)
+	private String zip_code;                   // 우편번호
+	private String address_line1;              // 기본주소
+	private String address_line2;              // 상세주소
+	private String status;                     // 상태 
+	private String employee_no;                // 사번 (고유번호)
+	private Timestamp hire_date;               // 입사일(채용일)
+	private String dept_code;                  // 부서 코드
+	private String job_code;                    // 직무 코드
+	private String rank_code;                  // 직급 코드 (J001~J008)
+	private Timestamp created_time;            // 회원 등록일(계정 생성일)
+	private String officeEmail;                // 회사 이메일
+	private String personalEmail;              // 개인 이메일
+	private String officePhone;                // 사내 전화번호
+	private String mobilePhone;                // 개인 휴대폰 번호
+	private Timestamp birthDate;               // 생년월일
+	private String calendarType;               // 양력/음력 구분(Y/L)
+	private String work_status;                // 근무상태(근무, 휴직, 파견 등)
+	private String profileImage_servName;      // 프로필 이미지 서버 저장 이름(UUID)
+	private String profileImage_oriName;       // 프로필 이미지 업로드 원본 이름
+
    
    
    
@@ -217,3 +218,4 @@ public class MemberDTO {
    
 
 }
+
