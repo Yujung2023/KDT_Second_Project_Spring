@@ -90,16 +90,17 @@ public class ContactsController {
 	}
 	
 	@PutMapping  // 주소록 타입 변경
-	public ResponseEntity<Void> updateOrganizationType(@RequestBody Map<String, Object> body) {
+	public ResponseEntity<Void> updateContactsType(@RequestBody Map<String, Object> body) {
 
 		String type = (String) body.get("type");
-
+		System.out.println(body.get("seqList"));
+		System.out.println(body.get("type"));
 		if ("multi".equals(type)) {
 			// 공유 주소록으로 이동
-			CServ.updateOrganizationTypeMulti(body);
+			CServ.updateContactsTypeMulti(body);
 		} else if ("solo".equals(type)) {
 			// 개인 주소록으로 이동
-			CServ.updateOrganizationTypeSingle(body);
+			CServ.updateContactsTypeSingle(body);
 		} else {
 			// 알 수 없는 type 처리 (옵션)
 			return ResponseEntity.badRequest().build();
@@ -126,29 +127,27 @@ public class ContactsController {
 		return ResponseEntity.ok().build();
 	}
 
-//
-//	@PutMapping("/orgType")  // 주소록 타입 변경
-//	public ResponseEntity<Void> updateContactsType(@RequestBody Map<String, Object> body) {
-//
-//		String type = (String) body.get("type");
-//
-//		if ("multi".equals(type)) {
-//			// 공유 주소록으로 이동
-//			CServ.updateOrganizationTypeMulti(body);
-//		} else if ("solo".equals(type)) {
-//			// 개인 주소록으로 이동
-//			CServ.updateOrganizationTypeSingle(body);
-//		} else {
-//			// 알 수 없는 type 처리 (옵션)
-//			return ResponseEntity.badRequest().build();
-//		}
-//		return ResponseEntity.ok().build();
-//	}
+
+	@PutMapping("/orgType")  // 주소록 타입 변경
+	public ResponseEntity<Void> updateOrganizationType(@RequestBody Map<String, Object> body) {
+
+		String type = (String) body.get("type");
+
+		if ("multi".equals(type)) {
+			// 공유 주소록으로 이동
+			CServ.updateOrganizationTypeMulti(body);
+		} else if ("solo".equals(type)) {
+			// 개인 주소록으로 이동
+			CServ.updateOrganizationTypeSingle(body);
+		} else {
+			// 알 수 없는 type 처리 (옵션)
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok().build();
+	}
 
 
-	
-	
-	
+
 	@GetMapping("/organization") // 조직도 리스트 출력
 	public ResponseEntity<List<MemberDTO>> SelectOranizationList(){
 		

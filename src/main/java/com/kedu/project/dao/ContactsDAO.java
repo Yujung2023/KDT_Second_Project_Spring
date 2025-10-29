@@ -79,6 +79,8 @@ public class ContactsDAO {
 		return mybatis.update("Contacts.updateContactsTypeSingle", param);
 	}
 
+	
+	
 	public List<MemberDTO> selectOranizationList() {
 		
 		return mybatis.selectList("Contacts.selectOranizationList");
