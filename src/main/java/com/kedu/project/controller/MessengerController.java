@@ -21,7 +21,7 @@ public class MessengerController {
 	
 	@Autowired
 	private MessengerService messengerService;
-	
+
 	
 	@GetMapping("/member")
 	public ResponseEntity<List<MemberDTO>> getAllMembers(){

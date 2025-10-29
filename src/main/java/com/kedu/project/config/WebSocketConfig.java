@@ -9,7 +9,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration // 이 클래스를 스프링 설정 빈으로 등록
 @EnableWebSocketMessageBroker // STOMP 기반 메시지 브로커 사용을 활성화
-public class WebSockConfigGurator implements WebSocketMessageBrokerConfigurer { // WebSocket 설정 클래스, 인터페이스 구현
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+ // WebSocket 설정 클래스, 인터페이스 구현
 
     @Override // 메시지 브로커 동작 방식을 설정하는 메서드
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -29,7 +30,10 @@ public class WebSockConfigGurator implements WebSocketMessageBrokerConfigurer { 
         registry.addEndpoint("/ws-chat")
                 // CORS 허용. Spring 6+/Boot 3+에서는 setAllowedOriginPatterns("*") 권장
                 // 개발 단계에서는 "*"로 두되, 운영에서는 특정 도메인만 허용하도록 제한하는 것이 안전
-                .setAllowedOrigins("http://10.10.55.97:3000","http://192.168.219.108:3000")
+                .setAllowedOrigins("http://10.10.55.97:3000",
+                		"http://192.168.219.108:3000",
+                		"http://192.168.119.210:3000",
+                		"http://172.20.10.8:3000")
                 // 브라우저/프록시 환경에서 WebSocket 미지원 시 XHR-Streaming 등으로 대체해주는 폴백
                 .withSockJS();
     }

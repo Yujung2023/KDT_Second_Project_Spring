@@ -1,7 +1,9 @@
 package com.kedu.project.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +20,6 @@ import com.kedu.project.service.LoginLogService;
 import com.kedu.project.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import com.kedu.project.utils.Encrypt;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,7 +38,8 @@ public class AuthController {
 	private LoginLogService loginLogService;
 
 	@PostMapping
-	public ResponseEntity<String> login(@RequestBody AuthDTO authDTO, HttpServletRequest request){
+
+	public ResponseEntity<?> login(@RequestBody AuthDTO authDTO, HttpServletRequest request){
 		System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw());
 
 		//기본 접속 정보 추출
@@ -81,13 +83,20 @@ public class AuthController {
 		// 토큰 생성 (성공 시에만)
 		if ("로그인 성공".equals(state)) {
 			String token = jwt.createToken(authDTO.getId(), name);
-			return ResponseEntity.ok(token);
+		   
+			Map<String, Object> response = new HashMap<>();
+	        response.put("token", token);    //  토큰 포함
+	        response.put("member", member);  //  사용자 정보 포함
+
+	        return ResponseEntity.ok(response);
+	        
 		} else {
 			//로그인 실패인데 일단 테스트 편하게 하기 위해서 작성해둠.
 			String token = jwt.createToken(authDTO.getId(), name);
 			return ResponseEntity.ok(token);
 			//return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
 		}
+
 	}
 
 
