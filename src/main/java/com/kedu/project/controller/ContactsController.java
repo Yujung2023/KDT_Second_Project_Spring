@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.ContactsDTO;
+import com.kedu.project.dto.MemberDTO;
+import com.kedu.project.service.AuthService;
 import com.kedu.project.service.ContactsService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,24 +28,30 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/contacts")
 public class ContactsController {
 
+    private final AuthService authService;
+
 	@Autowired
 	ContactsService CServ;
 
+    ContactsController(AuthService authService) {
+        this.authService = authService;
+    }
+
 	@PostMapping // 주소록 추가
 	public ResponseEntity<String> insertContacts(@RequestBody ContactsDTO dto , HttpServletRequest request) {
-
+		
 		String loginId = (String) request.getAttribute("loginID");
+		
 		try {
 			dto.setUser_id(loginId);
 			CServ.insertContacts(dto);
 		}catch(Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("올바르게 입력해주세요!");
-
 		}	
 		return ResponseEntity.ok().build();
+
 	}
-
-
 	@GetMapping // 주소록 리스트 출력
 	public ResponseEntity<List<ContactsDTO>> SelectContactsList(
 			@RequestParam(required = false) String name, @RequestParam(required = false) String type , HttpServletRequest request) {
@@ -80,6 +88,24 @@ public class ContactsController {
 		return ResponseEntity.ok(list);
 
 	}
+	
+	@PutMapping  // 주소록 타입 변경
+	public ResponseEntity<Void> updateOrganizationType(@RequestBody Map<String, Object> body) {
+
+		String type = (String) body.get("type");
+
+		if ("multi".equals(type)) {
+			// 공유 주소록으로 이동
+			CServ.updateOrganizationTypeMulti(body);
+		} else if ("solo".equals(type)) {
+			// 개인 주소록으로 이동
+			CServ.updateOrganizationTypeSingle(body);
+		} else {
+			// 알 수 없는 type 처리 (옵션)
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok().build();
+	}
 
 
 	@DeleteMapping // 주소록 삭제
@@ -100,25 +126,38 @@ public class ContactsController {
 		return ResponseEntity.ok().build();
 	}
 
+//
+//	@PutMapping("/orgType")  // 주소록 타입 변경
+//	public ResponseEntity<Void> updateContactsType(@RequestBody Map<String, Object> body) {
+//
+//		String type = (String) body.get("type");
+//
+//		if ("multi".equals(type)) {
+//			// 공유 주소록으로 이동
+//			CServ.updateOrganizationTypeMulti(body);
+//		} else if ("solo".equals(type)) {
+//			// 개인 주소록으로 이동
+//			CServ.updateOrganizationTypeSingle(body);
+//		} else {
+//			// 알 수 없는 type 처리 (옵션)
+//			return ResponseEntity.badRequest().build();
+//		}
+//		return ResponseEntity.ok().build();
+//	}
 
-	@PutMapping  // 주소록 타입 변경
-	public ResponseEntity<Void> updateContactsType(@RequestBody Map<String, Object> body) {
 
-		String type = (String) body.get("type");
-
-		if ("multi".equals(type)) {
-			// 공유 주소록으로 이동
-			CServ.updateContactsTypeMulti(body);
-		} else if ("solo".equals(type)) {
-			// 개인 주소록으로 이동
-			CServ.updateContactsTypeSingle(body);
-		} else {
-			// 알 수 없는 type 처리 (옵션)
-			return ResponseEntity.badRequest().build();
-		}
-		return ResponseEntity.ok().build();
+	
+	
+	
+	@GetMapping("/organization") // 조직도 리스트 출력
+	public ResponseEntity<List<MemberDTO>> SelectOranizationList(){
+		
+		List<MemberDTO> list = CServ.selectOranizationList();
+		
+		return ResponseEntity.ok(list);
+		
 	}
-
+	
 
 
 }
