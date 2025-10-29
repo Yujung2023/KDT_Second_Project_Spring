@@ -15,7 +15,7 @@ public class MemberDTO {
 	private String employee_no;                // 사번 (고유번호)
 	private Timestamp hire_date;               // 입사일(채용일)
 	private String dept_code;                  // 부서 코드
-	private String job_code;                   // 직무 코드
+	private String job_code;                    // 직무 코드
 	private String rank_code;                  // 직급 코드 (J001~J008)
 	private Timestamp created_time;            // 회원 등록일(계정 생성일)
 	private String officeEmail;                // 회사 이메일
