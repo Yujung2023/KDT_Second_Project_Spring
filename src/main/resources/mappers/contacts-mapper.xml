@@ -59,17 +59,63 @@
 	
 	<update id="updateContactsTypeMulti" parameterType="map">
     UPDATE contacts SET type = #{type} WHERE seq IN
-    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
-        #{seq}
+     <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq,jdbcType=NUMERIC}
     </foreach>
     </update>
     
     <update id="updateContactsTypeSingle" parameterType="map">
     UPDATE contacts	SET type = #{type} WHERE seq IN
-    <foreach collection="seqList" item="seq" open="(" separator="," close=")">
-        #{seq}
+     <foreach collection="seqList" item="seq" open="(" separator="," close=")">
+        #{seq,jdbcType=NUMERIC}
     </foreach>
 	</update>
 
+
+	<select id="selectOranizationList" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
+	    SELECT name, id, employee_no, employmentType, dept_code, rank_code, job_code, hire_date,status  FROM member
+	    WHERE 1=1
+	    <if test="status != null and status != '재직 상태'">
+        AND status = #{status}
+	    </if>
+	    <if test="dept != null and dept != '전체 부서'">
+	        AND dept_code = #{dept}
+	    </if>
+	    <if test="employment != null and employment != '근로 형태'">
+	        AND employmentType = #{employment}
+	    </if>
+	    <if test="rank != null and rank != '전체 직위'">
+	        AND rank_code = #{rank}
+	    </if>
+	    <if test="job != null and job != '전체 직무'">
+	        AND job_code = #{job}
+	    </if>
+	order by case rank_code
+        when '사원' then 7
+        when '주임' then 6
+        when '대리' then 5
+        when '과장' then 4
+        when '차장' then 3
+        when '부장' then 2
+        when '사장' then 1
+    end
+	</select>
+	
+	
+<update id="updateOrganizationTypeSingle" parameterType="map">
+    UPDATE contacts SET type = #{type} WHERE email IN
+    <foreach collection="idList" item="email" open="(" separator="," close=")">
+        #{email,jdbcType=VARCHAR}
+    </foreach>
+</update>
+
+<update id="updateOrganizationTypeMulti" parameterType="map">
+    UPDATE contacts SET type = #{type} WHERE email IN
+    <foreach collection="idList" item="email" open="(" separator="," close=")">
+        #{email,jdbcType=VARCHAR}
+    </foreach>
+</update>
+
+	
 	
 </mapper>

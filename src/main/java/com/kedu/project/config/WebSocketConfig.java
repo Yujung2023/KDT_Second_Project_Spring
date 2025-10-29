@@ -33,7 +33,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("http://10.10.55.97:3000",
                 		"http://192.168.219.108:3000",
                 		"http://192.168.119.210:3000",
-                		"http://172.20.10.8:3000")
+                		"http://172.20.10.8:3000",
+                		"http://10.5.5.12:3000")
                 // 브라우저/프록시 환경에서 WebSocket 미지원 시 XHR-Streaming 등으로 대체해주는 폴백
                 .withSockJS();
     }
