@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kedu.project.dto.ContactsDTO;
+import com.kedu.project.dto.MemberDTO;
 
 
 @Repository
@@ -76,6 +77,21 @@ public class ContactsDAO {
 	public Object updateContactsTypeSingle(Map<String, Object> param) {
 
 		return mybatis.update("Contacts.updateContactsTypeSingle", param);
+	}
+
+	public List<MemberDTO> selectOranizationList() {
+		
+		return mybatis.selectList("Contacts.selectOranizationList");
+	}
+
+	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
+		
+		return mybatis.update("Contacts.updateOrganizationTypeMulti", param);
+	}
+
+	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
+		
+		return mybatis.update("Contacts.updateOrganizationTypeSingle", param);
 	}
 
 

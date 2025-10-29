@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.kedu.project.dao.ContactsDAO;
 import com.kedu.project.dto.ContactsDTO;
+import com.kedu.project.dto.MemberDTO;
 
 @Service
 public class ContactsService {
@@ -81,6 +82,26 @@ public class ContactsService {
 	public Object updateContactsTypeSingle(Map<String, Object> param) {
 
 		return dao.updateContactsTypeSingle(param);
+	}
+
+
+	public List<MemberDTO> selectOranizationList() {
+
+		return dao.selectOranizationList();
+	}
+
+
+	
+	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
+		
+		return dao.updateOrganizationTypeMulti(param);
+	}
+
+
+	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
+
+		return dao.updateOrganizationTypeSingle(param);
+		
 	}
 
 
