@@ -54,6 +54,13 @@ public class AttendanceController {
 		//String member_id=jwtUtil.extractUserId(request);
 		return attendanceService.getToday(loginid);
 	}
+	
+	@GetMapping("workdays")
+	public ResponseEntity<?> getWorkDays(HttpServletRequest request){
+		String loginid = (String) request.getAttribute("loginID");
+		int days= attendanceService.getMonthlyWorkDays(loginid);
+		return ResponseEntity.ok(days);
+	}
 
 
 

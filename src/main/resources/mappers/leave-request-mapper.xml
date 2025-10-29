@@ -34,33 +34,83 @@
     WHEN NOT MATCHED THEN
       INSERT (id, userLeave) VALUES (#{memberId}, #{used})
   </update>
+  
+  
+  <update id="updateLeaveStatus">
+    UPDATE LEAVE_REQUEST
+    SET STATUS = #{status}
+    WHERE SEQ = #{seq}
+	</update>
+	
+	
 
-  <!-- ✅ 4. 휴가 현황 조회 -->
-  <select id="selectLeaveStatus"
+
+
+
+<select id="selectLeaveStatus"
         parameterType="map"
         resultType="com.kedu.project.dto.LeaveStatusDTO">
 
   SELECT
       lr.seq,
       lr.member_id AS memberId,
+      m.name AS memberName,         
+      m.rank_code AS rankCode,      
       lr.leave_code AS leaveCode,
       lr.reason AS reason,
       lr.status AS status,
       lr.approval_id AS approvalId,
       TO_CHAR(lr.start_leave_time, 'YYYY-MM-DD HH24:MI:SS') AS startLeaveTime,
-      TO_CHAR(lr.end_leave_time, 'YYYY-MM-DD HH24:MI:SS') AS endLeaveTime
+      TO_CHAR(lr.end_leave_time, 'YYYY-MM-DD HH24:MI:SS') AS endLeaveTime,
+      lr.reject_reason AS rejectReason,
+      TO_CHAR(lr.reject_time, 'YYYY-MM-DD HH24:MI:SS') AS rejectTime
   FROM leave_request lr
-  LEFT JOIN member writer 
-    ON lr.member_id = writer.id
+  JOIN member m ON lr.member_id = m.id      
   <where>
-    <if test="rankCode == '사원' or rankCode == '대리' or rankCode == '주임'">
-      AND lr.member_id = #{memberId}
+
+    <!-- ✅ 과장 이상은 전체 조회 -->
+    <if test="rankCode.trim() == '과장' 
+         or rankCode.trim() == '부장' 
+         or rankCode.trim() == '이사' 
+         or rankCode.trim() == '부사장' 
+         or rankCode.trim() == '사장'">
+      <!-- 조건 없음 -->
     </if>
-    <if test="rankCode == '과장' or rankCode == '차장' or rankCode == '부장'">
-      AND writer.dept_code = #{deptCode}
-    </if>
+
+    <!-- ✅ 그 외는 본인 것만 -->
+   <if test="rankCode.trim() != '과장' 
+     and rankCode.trim() != '부장' 
+     and rankCode.trim() != '이사' 
+     and rankCode.trim() != '부사장' 
+     and rankCode.trim() != '사장'">
+    AND (
+         lr.member_id = #{memberId}
+         OR EXISTS (
+              SELECT 1 FROM approval_line al
+              WHERE al.approval_id = lr.approval_id
+              AND al.approver_id = #{memberId}
+              AND al.approver_status = 'REFERENCE'
+         )
+    )
+</if>
+
   </where>
+
   ORDER BY lr.start_leave_time DESC
+
+</select>
+
+
+<select id="getLeaveCount" resultType="double">
+    SELECT LEAVE_COUNT
+    FROM LEAVE_REQUEST
+    WHERE SEQ = #{seq}
+</select>
+
+<select id="selectRequesterId" resultType="string">
+    SELECT member_id
+    FROM leave_request
+    WHERE seq = #{seq}
 </select>
 
 </mapper>

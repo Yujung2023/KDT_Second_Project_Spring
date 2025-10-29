@@ -42,6 +42,12 @@ public class AttendanceDAO {
         return mybatis.update("attendance.autoNoCheck");
     }
     
+    //근무일수 처리
+    
+    public int selectMonthWorkDays(String memberId) {
+    	return mybatis.selectOne("attendance.selectMonthWorkDays",memberId);
+    }
+    
     
     public int autoAbsence() {
         return mybatis.insert("attendance.autoAbsence");

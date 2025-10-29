@@ -1,5 +1,8 @@
 package com.kedu.project.controller;
 
+import java.security.Principal;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +41,8 @@ public class LeaveController {
     public ResponseEntity<String> requestLeave(
             @RequestBody LeaveRequestPayload payload,
             HttpServletRequest request) {
-
+    	 System.out.println(">>> RECEIVED REFERENCES: " + payload.getReferences()); // ✅ 이 줄 추가
+    	 
         String loginId = (String) request.getAttribute("loginID");
         MemberDTO member = memberService.selectMemberById(loginId);
 
@@ -49,11 +53,14 @@ public class LeaveController {
         String rank = member.getRank_code();
         System.out.println("컨트롤러 rank: " + rank);
 
-        leaveService.insertLeaveRequest(payload, loginId, rank);
+        try { // ★ 여기 추가
+            leaveService.insertLeaveRequest(payload, loginId, rank);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         return ResponseEntity.ok("휴가 신청 및 결재 등록 완료");
     }
-
     // ✅ 휴가 현황 조회
     @GetMapping("/status")
     public ResponseEntity<?> getLeaveStatus(HttpServletRequest request) {
@@ -72,4 +79,24 @@ public class LeaveController {
                 )
         );
     }
+    
+    @PostMapping("/approve")
+    public ResponseEntity<?> approve(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+        int seq = (int) data.get("seq");
+        String loginId = (String) request.getAttribute("loginID");
+        leaveService.approveLeave(seq, loginId);
+        return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/reject")
+    public ResponseEntity<?> reject(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+        int seq = (int) data.get("seq");
+        String reason = (String) data.get("reason");
+        String loginId = (String) request.getAttribute("loginID"); 
+        leaveService.rejectLeave(seq, loginId, reason);
+        return ResponseEntity.ok().build();
+    }
+    
+    
+    
 }

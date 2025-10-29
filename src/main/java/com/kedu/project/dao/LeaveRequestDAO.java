@@ -3,6 +3,7 @@ package com.kedu.project.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.kedu.project.dto.LeaveRequestDTO;
 import com.kedu.project.dto.LeaveStatusDTO;
@@ -21,4 +22,12 @@ public interface LeaveRequestDAO {
 
     //  휴가현황 + 결재선 조회 (관리자용)
     List<LeaveStatusDTO> selectLeaveStatus(String rankCode, String memberId, String deptCode);
+    
+    //승인 반려 확인용
+    int updateLeaveStatus(@Param("seq") int seq, @Param("status") String status);
+
+    // 최종 승인 시 연차 차감을 위해 휴가 사용일수 조회
+    Double getLeaveCount(@Param("seq") int seq);
+    
+    String selectRequesterId(@Param("seq") int seq);
 }
