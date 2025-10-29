@@ -102,19 +102,20 @@
 	</select>
 	
 	
-	<update id="updateOrganizationTypeMulti" parameterType="map">
+<update id="updateOrganizationTypeSingle" parameterType="map">
     UPDATE contacts SET type = #{type} WHERE email IN
-     <foreach collection="idList" item="email" open="(" separator="," close=")">
+    <foreach collection="idList" item="email" open="(" separator="," close=")">
         #{email,jdbcType=VARCHAR}
     </foreach>
-    </update>
-    
-    <update id="updateOrganizationTypeSingle" parameterType="map">
-    UPDATE contacts	SET type = #{type} WHERE email IN
-     <foreach collection="idList" item="email" open="(" separator="," close=")">
+</update>
+
+<update id="updateOrganizationTypeMulti" parameterType="map">
+    UPDATE contacts SET type = #{type} WHERE email IN
+    <foreach collection="idList" item="email" open="(" separator="," close=")">
         #{email,jdbcType=VARCHAR}
     </foreach>
-	</update>
+</update>
+
 	
 	
 </mapper>
