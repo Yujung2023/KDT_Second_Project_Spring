@@ -4,47 +4,59 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kedu.project.dao.ApprovalDocDAO">
+<insert id="insertApprovalLine" parameterType="map">
+INSERT INTO approval_line (
+    seq,
+    approval_id,
+    approvalNumber,
+    approval_userid,
+    approver_id,
+    approver_order,
+    approver_status,
+    status,
+    writeDate
+) VALUES (
+    approval_line_seq.NEXTVAL,
+    #{approvalId},
+    #{approvalNumber},
+    #{approvalUserId},
+    #{approverId},
 
-    <!-- ✅ 결재선 INSERT -->
- <insert id="insertApprovalLine" parameterType="map">
-    INSERT INTO approval_line (
-        seq,
-        approval_id,
-        approvalNumber,
-        approval_userid,
-        approver_id,
-        approver_order,
-        approver_status,
-        status,
-        writeDate
-    ) VALUES (
-        approval_line_seq.NEXTVAL,
-        #{approvalId},
-        #{approvalNumber},
-        #{approvalUserId},
-        #{approverId},
-        #{orderNo},
-        'WAITING',     -- 결재자 상태
-        'WAITING',     -- 휴가 전체 상태 
-        SYSTIMESTAMP
-    )
+    <choose>
+        <when test="orderNo != null">
+            #{orderNo}
+        </when>
+        <otherwise>
+            NULL
+        </otherwise>
+    </choose>,
+
+    #{status},       <!-- ✅ approver_status -->
+    #{docStatus},    <!-- ✅ 문서 상태는 WAITING 유지 -->
+    SYSTIMESTAMP
+)
 </insert>
 
 
+
+
     <!-- ✅ 결재선 조회 -->
-    <select id="selectApprovalLine" parameterType="string" resultType="map">
-        SELECT
-            al.seq,
-            al.approval_id AS approvalId,
-            al.approver_id AS id,
-            m.name AS name,
-            m.rank_code AS rank_code,
-            al.approver_status AS STATUS
-        FROM approval_line al
-        JOIN member m ON al.approver_id = m.id
-        WHERE al.approval_id = #{approvalId}
-        ORDER BY al.approver_order
-    </select>
+<select id="selectApprovalLine" parameterType="string" resultType="map">
+    SELECT
+        al.seq,
+        al.approval_id AS approvalId,
+        al.approver_id AS id,
+        m.name AS name,
+        m.rank_code AS rank_code,
+        al.approver_status AS STATUS,
+        CASE 
+            WHEN al.approver_order IS NULL THEN 1 ELSE 0 
+        END AS referenceFlag
+    FROM approval_line al
+    JOIN member m ON al.approver_id = m.id
+    WHERE al.approval_id = #{approvalId}
+    ORDER BY referenceFlag, al.approver_order
+</select>
     
     <!-- ✅ 휴가 seq -> approval_id 조회 -->
     <select id="getApprovalIdBySeq" resultType="string">

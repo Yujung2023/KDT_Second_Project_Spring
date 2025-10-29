@@ -78,13 +78,21 @@
     </if>
 
     <!-- ✅ 그 외는 본인 것만 -->
-    <if test="rankCode.trim() != '과장' 
-         and rankCode.trim() != '부장' 
-         and rankCode.trim() != '이사' 
-         and rankCode.trim() != '부사장' 
-         and rankCode.trim() != '사장'">
-      AND lr.member_id = #{memberId}
-    </if>
+   <if test="rankCode.trim() != '과장' 
+     and rankCode.trim() != '부장' 
+     and rankCode.trim() != '이사' 
+     and rankCode.trim() != '부사장' 
+     and rankCode.trim() != '사장'">
+    AND (
+         lr.member_id = #{memberId}
+         OR EXISTS (
+              SELECT 1 FROM approval_line al
+              WHERE al.approval_id = lr.approval_id
+              AND al.approver_id = #{memberId}
+              AND al.approver_status = 'REFERENCE'
+         )
+    )
+</if>
 
   </where>
 

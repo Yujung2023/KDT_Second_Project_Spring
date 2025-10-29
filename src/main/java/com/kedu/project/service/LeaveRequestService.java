@@ -72,8 +72,8 @@ public class LeaveRequestService {
         // ✅ 일반 직원 → 대기 상태 저장
         dto.setStatus("WAITING");
         leaveRequestDAO.insertLeaveRequest(dto);
-
-        // ✅ 결재선 저장
+        
+        //결재자 저장
         List<LeaveRequestPayload.Approver> approvers = payload.getApprovers();
         for (int i = 0; i < approvers.size(); i++) {
             Map<String, Object> map = new HashMap<>();
@@ -82,8 +82,25 @@ public class LeaveRequestService {
             map.put("approvalUserId", memberId);
             map.put("approverId", approvers.get(i).getId());
             map.put("orderNo", i + 1);
-            map.put("status", "WAITING"); // N = 대기
+            map.put("status", "WAITING");   // 결재자 상태
+            map.put("docStatus", "WAITING"); // 문서 상태 ✅ 추가
             approvalDocDAO.insertApprovalLine(map);
+        }
+
+        // 참조자 저장
+        List<LeaveRequestPayload.Approver> references = payload.getReferences();
+        if (references != null) {
+            for (LeaveRequestPayload.Approver ref : references) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("approvalId", approvalId);
+                map.put("approvalNumber", approvalNumber);
+                map.put("approvalUserId", memberId);
+                map.put("approverId", ref.getId());
+                map.put("orderNo", null);       // NULL ✅
+                map.put("status", "REFERENCE"); // 개인 상태
+                map.put("docStatus", "WAITING"); // 문서 상태 유지 ✅ (핵심)
+                approvalDocDAO.insertApprovalLine(map);
+            }
         }
     }
 

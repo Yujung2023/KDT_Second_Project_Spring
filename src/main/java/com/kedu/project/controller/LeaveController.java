@@ -41,7 +41,8 @@ public class LeaveController {
     public ResponseEntity<String> requestLeave(
             @RequestBody LeaveRequestPayload payload,
             HttpServletRequest request) {
-
+    	 System.out.println(">>> RECEIVED REFERENCES: " + payload.getReferences()); // ✅ 이 줄 추가
+    	 
         String loginId = (String) request.getAttribute("loginID");
         MemberDTO member = memberService.selectMemberById(loginId);
 
