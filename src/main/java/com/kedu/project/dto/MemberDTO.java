@@ -1,79 +1,41 @@
 package com.kedu.project.dto;
-
-import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
 
 public class MemberDTO {
-<<<<<<< HEAD
-    private String id;              // 아이디
-    private String password;        // 비밀번호
-    private String name;            // 이름
-    private String englishName;     // 영어이름
-    private String employmentType;  // 근로형태
-    private Timestamp hire_date;   // 입사일
-    private String dept_code;       // 부서
-    private String rank_code;       // 직위
-    private String job_code;        // 직무
-    private String officeEmail;     // 회사 이메일
-    private String personalEmail;   // 개인 이메일
-    private String officePhone;     // 회사 번호
-    private String mobilePhone;     // 개인 번호
-    private String birthDate;       // 생일
-    private String calendarType;    // 양력/음력
-    private String zip_code;        // 주소 코드
-    private String address_line1;   // 주소
-    private String address_line2;   // 상세주소
-    private String work_status;     // 근무상태
-    private String employee_no;     // 사번(고유번호)
-    private String status;          // 상태(현직, 퇴사)
-    private Timestamp created_time; // 가입일
+
+    private String id;                         // 아이디
+    private String password;                   // 비밀번호
+    private String name;                       // 이름
+    private String englishName;                // 영어이름
+    private String employmentType;             // 근로형태
+    private Date hire_date;                    // 입사일
+    private String dept_code;                  // 부서
+    private String rank_code;                  // 직위
+    private String job_code;                   // 직무
+    private String officeEmail;                // 회사 이메일
+    private String personalEmail;              // 개인 이메일
+    private String officePhone;                // 회사 번호
+    private String mobilePhone;                // 개인 번호
+    private String birthDate;                  // 생일
+    private String calendarType;               // 양력/음력
+    private String zip_code;                   // 주소 코드
+    private String address_line1;              // 주소
+    private String address_line2;              // 상세주소
+    private String work_status;                // 근무상태
+    private String employee_no;                // 사번(고유번호)
+    private String profileImage_servName;      // 프로필 이미지 서버 이름
+    private String profileImage_oriName;       // 프로필 이미지 원본 이름
+    private String status;                     // 상태(현직, 퇴사)
+    private Date created_time;                 // 가입일
     
     
     
-    
-	public MemberDTO(String id, String password, String name, String englishName, String employmentType, Timestamp hire_date,
+    public MemberDTO() {};
+	public MemberDTO(String id, String password, String name, String englishName, String employmentType, Date hire_date,
 			String dept_code, String rank_code, String job_code, String officeEmail, String personalEmail,
 			String officePhone, String mobilePhone, String birthDate, String calendarType, String zip_code,
-			String address_line1, String address_line2, String work_status, String employee_no, String status,
-			Timestamp created_time) {
-=======
-	private String id;
-	private String password;
-	private String name;
-	private String englishName;
-	private String employmentType;
-	private String zip_code; 
-	private String address_line1;
-	private String address_line2;
-	private String status;
-	private String employee_no;
-	private Timestamp hire_date;
-	private String dept_code;
-	private String job_code;
-	private String rank_code; 
-	private Timestamp created_time;
-	private String officeEmail;
-	private String personalEmail;
-	private String officePhone;
-	private String mobilePhone;
-	private Timestamp birthDate;
-	private String calendarType;
-	
-	private String profileImage_servName;
-	private String profileImage_oriName;
-	
-	
-	public MemberDTO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
-	public MemberDTO(String id, String password, String name, String englishName, String employmentType,
-			String zip_code, String address_line1, String address_line2, String status, String employee_no,
-			Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
-			String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
-			String calendarType, String profileImage_servName, String profileImage_oriName) {
->>>>>>> a6c28815bf248e895027fc562e5d72398c032b3e
+			String address_line1, String address_line2, String work_status, String employee_no,
+			String profileImage_servName, String profileImage_oriName, String status, Date created_time) {
 		super();
 		this.id = id;
 		this.password = password;
@@ -90,36 +52,16 @@ public class MemberDTO {
 		this.mobilePhone = mobilePhone;
 		this.birthDate = birthDate;
 		this.calendarType = calendarType;
-<<<<<<< HEAD
 		this.zip_code = zip_code;
 		this.address_line1 = address_line1;
 		this.address_line2 = address_line2;
 		this.work_status = work_status;
 		this.employee_no = employee_no;
+		this.profileImage_servName = profileImage_servName;
+		this.profileImage_oriName = profileImage_oriName;
 		this.status = status;
 		this.created_time = created_time;
-=======
-		this.profileImage_servName = profileImage_servName;
-		this.profileImage_oriName = profileImage_oriName;
->>>>>>> a6c28815bf248e895027fc562e5d72398c032b3e
 	}
-
-	public String getProfileImage_servName() {
-		return profileImage_servName;
-	}
-
-	public void setProfileImage_servName(String profileImage_servName) {
-		this.profileImage_servName = profileImage_servName;
-	}
-
-	public String getProfileImage_oriName() {
-		return profileImage_oriName;
-	}
-
-	public void setProfileImage_oriName(String profileImage_oriName) {
-		this.profileImage_oriName = profileImage_oriName;
-	}
-
 	public String getId() {
 		return id;
 	}
@@ -150,10 +92,10 @@ public class MemberDTO {
 	public void setEmploymentType(String employmentType) {
 		this.employmentType = employmentType;
 	}
-	public java.util.Date getHire_date() {
+	public Date getHire_date() {
 		return hire_date;
 	}
-	public void setHire_date(Timestamp hire_date) {
+	public void setHire_date(Date hire_date) {
 		this.hire_date = hire_date;
 	}
 	public String getDept_code() {
@@ -240,22 +182,32 @@ public class MemberDTO {
 	public void setEmployee_no(String employee_no) {
 		this.employee_no = employee_no;
 	}
+	public String getProfileImage_servName() {
+		return profileImage_servName;
+	}
+	public void setProfileImage_servName(String profileImage_servName) {
+		this.profileImage_servName = profileImage_servName;
+	}
+	public String getProfileImage_oriName() {
+		return profileImage_oriName;
+	}
+	public void setProfileImage_oriName(String profileImage_oriName) {
+		this.profileImage_oriName = profileImage_oriName;
+	}
 	public String getStatus() {
 		return status;
 	}
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public java.util.Date getCreated_time() {
+	public Date getCreated_time() {
 		return created_time;
 	}
-	public void setCreated_time(Timestamp created_time) {
+	public void setCreated_time(Date created_time) {
 		this.created_time = created_time;
 	}
 
-
-	
-
-	
-
+    
+    
+    
 }

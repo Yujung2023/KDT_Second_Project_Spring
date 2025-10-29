@@ -1,22 +1,26 @@
-
 package com.kedu.project.entity;
 
 import jakarta.persistence.*;
-
-
+import lombok.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
-
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "chatRoom")
+@Table(name = "chat_room")
 public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;            // 방 PK
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "room_id")
+    private String roomId;  // ✅ UUID Primary Key
 
-    private String roomName;    // 방 이름 (1:1이면 null 가능)
-    private LocalDateTime createdAt;
-    
+    private String roomMembers; // ✅ "userA_userB" 로 저장
+
+    private String roomName;
+    private String lastMessage;
+    private LocalDateTime lastUpdatedAt;
 }

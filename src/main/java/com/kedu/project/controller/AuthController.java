@@ -1,5 +1,8 @@
 package com.kedu.project.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,14 +34,24 @@ public class AuthController {
 
 	
 	@PostMapping
-	public ResponseEntity<String> login(@RequestBody AuthDTO authDTO){
-	    System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw());
+	public ResponseEntity<?> login(@RequestBody AuthDTO authDTO){
+	    System.out.println("id: " + authDTO.getId() + ", pw: " + authDTO.getPw());
 
+	    //  사용자 정보 조회
 	    MemberDTO member = memberService.findById(authDTO.getId());
-	    String name = (member != null) ? member.getName() : "누구세요"; // null방지용
+	    if (member == null) {
+	        return ResponseEntity.badRequest().body("존재하지 않는 사용자입니다.");
+	    }
 
-	    String token = jwt.createToken(authDTO.getId(), name);
-	    return ResponseEntity.ok(token);
+	    //  JWT 생성
+	    String token = jwt.createToken(member.getId(), member.getName());
+
+	    //  token + 사용자 정보 함께 응답
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("token", token);
+	    response.put("member", member);
+
+	    return ResponseEntity.ok(response);
 	}
 
 
