@@ -8,24 +8,54 @@ public class LeaveStatusDTO {
 	    private String status;
 	    private String approverId;
 	    private String approvalId;
-	    
-	    public String getApprovalId() {
-			return approvalId;
-		}
-		public void setApprovalId(String approvalId) {
-			this.approvalId = approvalId;
-		}
+	    private String rejectReason;
+	    private String rejectTime;
+	    private String memberName;
 		private String approverName;
 	    private String rankCode;  // member에서 가져온 rank_code
 	    private String approvalStatus;
 	    private String startLeaveTime;
 	    private String endLeaveTime;
 	    
+	    
+		public String getMemberName() {
+			return memberName;
+		}
+		public void setMemberName(String memberName) {
+			this.memberName = memberName;
+		}
+
+	    
+	    
+	    public String getRejectReason() {
+			return rejectReason;
+		}
+		public void setRejectReason(String rejectReason) {
+			this.rejectReason = rejectReason;
+		}
+		public String getRejectTime() {
+			return rejectTime;
+		}
+		public void setRejectTime(String rejectTime) {
+			this.rejectTime = rejectTime;
+		}
+		public String getApprovalId() {
+			return approvalId;
+		}
+		public void setApprovalId(String approvalId) {
+			this.approvalId = approvalId;
+		}
+
+	    
 	    public LeaveStatusDTO() {
 	    	
 	    }
+
+		
+	
 		public LeaveStatusDTO(int seq, String memberId, String leaveCode, String reason, String status,
-				String approverId, String approverName, String rankCode, String approvalStatus, String startLeaveTime,
+				String approverId, String approvalId, String rejectReason, String rejectTime, String memberName,
+				String approverName, String rankCode, String approvalStatus, String startLeaveTime,
 				String endLeaveTime) {
 			super();
 			this.seq = seq;
@@ -34,6 +64,10 @@ public class LeaveStatusDTO {
 			this.reason = reason;
 			this.status = status;
 			this.approverId = approverId;
+			this.approvalId = approvalId;
+			this.rejectReason = rejectReason;
+			this.rejectTime = rejectTime;
+			this.memberName = memberName;
 			this.approverName = approverName;
 			this.rankCode = rankCode;
 			this.approvalStatus = approvalStatus;
