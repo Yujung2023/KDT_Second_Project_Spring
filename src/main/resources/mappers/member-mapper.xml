@@ -128,9 +128,13 @@
 	
 	<select id="selectMemberById" parameterType="String" resultType="com.kedu.project.dto.MemberDTO">
 		select id, name, englishName,employmentType,hire_date,dept_code,
-		rank_code,job_code,personalEmail,officephone,mobilephone,birthdate,calendarType,
+		rank_code,job_code,officeEmail,personalEmail,officephone,mobilephone,birthdate,calendarType,
 		zip_code,address_line1,address_line2, profileimage_servname 
 		from member where id=#{id}
+	</select>
+	
+	<select id="getListMember" resultType="com.kedu.project.dto.MemberDTO">
+		SELECT id, name,dept_code,rank_code FROM MEMBER WHERE status != '퇴사자'
 	</select>
 	
 	<update id="updateMember" parameterType="com.kedu.project.dto.MemberDTO">

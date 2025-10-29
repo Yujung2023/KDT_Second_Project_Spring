@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.LeaveRequestPayload;
+import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.service.LeaveRequestService;
 import com.kedu.project.service.MemberService;
 
@@ -49,5 +50,23 @@ public class LeaveController {
 
 	    return ResponseEntity.ok("휴가 신청 완료");
 	}
+	
+	@GetMapping("/status")
+	
+	public ResponseEntity<?> getLeaveStatus(HttpServletRequest request){
+	
+	String loginid=(String)request.getAttribute("loginID");
+	
+	  MemberDTO member = memberSerice.selectMemberById(loginid);
+	    String rankCode = member.getRank_code();   
+	    String deptCode = member.getDept_code();   
+	    String memberId = member.getId(); 
+	    
+	    return ResponseEntity.ok(
+	    		leaveservice.getLeaveStatus(rankCode, memberId, deptCode));
+
+	
+	
+	}	
 
 }

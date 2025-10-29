@@ -23,16 +23,21 @@ public class ContactsDAO {
 	}
 
 	// 전체 리스트
-	public List<ContactsDTO> SelectContactsList() {
+	public List<ContactsDTO> SelectContactsList(String user_id) {
 
-		return mybatis.selectList("Contacts.SelectContactsList");
+		return mybatis.selectList("Contacts.SelectContactsList",user_id);
 	}
 
 	// 개인 주소록 리스트
-	public List<ContactsDTO> selectSoloList(String type) {
+//	public List<ContactsDTO> selectSoloList(String type) {
+//
+//		return mybatis.selectList("Contacts.selectSoloList",type);
+//	}
+	public List<ContactsDTO> selectSoloList(Map<String ,Object > params) {
 
-		return mybatis.selectList("Contacts.selectSoloList",type);
+		return mybatis.selectList("Contacts.selectSoloList",params);
 	}
+	
 	// 공용 주소록 리스트
 	public List<ContactsDTO> selectMultiList(String type) {
 

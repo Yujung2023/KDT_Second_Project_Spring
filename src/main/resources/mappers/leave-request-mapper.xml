@@ -34,6 +34,39 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         )
     </insert>
 
+
+<select id="selectLeaveStatus" resultType="com.kedu.project.dto.LeaveRequestDTO">
+    SELECT
+        lr.seq,
+        lr.member_id,
+        lr.leave_count,
+        lr.leave_code,
+        lr.start_leave_time,
+        lr.end_leave_time,
+        lr.reason,
+        lr.status
+    FROM leave_request lr
+    JOIN member m ON lr.member_id = m.id
+    <where>
+              <if test="rankCode == '사원' or rankCode == '대리' or rankCode == '주임'">
+            AND lr.member_id = #{memberId}
+        </if>
+
+     
+        <if test="rankCode == '과장' or rankCode == '차장' or rankCode == '부장'">
+            AND m.dept_code = #{deptCode}
+        </if>
+       
+    </where>
+    ORDER BY lr.start_leave_time DESC
+</select>
+    
+    
+    
+    
+    
+    
+
  <update id="updateUsedLeave">
     MERGE INTO leave_balance lb
     USING (SELECT #{memberId} AS id FROM dual) d

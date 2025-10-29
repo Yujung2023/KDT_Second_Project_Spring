@@ -43,13 +43,26 @@ public class MailController {
 		MServ.SendMail(dto);
 		}catch(Exception e) {
 			e.printStackTrace();
-			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("발송 실패! 주소록에 등록된 수신자가 아닙니다");
+			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메일 발송을 실패했습니다.");
 		}
 		
 		   return ResponseEntity.ok(String.valueOf(dto.getSeq()));
 	}
 
+	@GetMapping("/recent") // 홈에서 받은 메일 리스트 출력
+	public ResponseEntity<List<MailDTO>> SelectRecentrecipientMailList(@RequestParam(required = false) String name ,  HttpServletRequest request) {
+		 String loginId = (String) request.getAttribute("loginID");
+		List<MailDTO> list;
+		if (name != null && !name.isEmpty()) { // 안적으면 검색기능 나오게(수정필요)
+			list = MServ.searchName(name,loginId);
 
+		}else {
+			list = MServ.SelectRecentrecipientMailList(loginId);
+		}
+		return ResponseEntity.ok(list);
+	}
+	
+	
 	@GetMapping // 받은 메일 리스트 출력
 	public ResponseEntity<List<MailDTO>> SelectrecipientMailList(@RequestParam(required = false) String name ,  HttpServletRequest request) {
 		 String loginId = (String) request.getAttribute("loginID");

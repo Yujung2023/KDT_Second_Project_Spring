@@ -15,7 +15,7 @@ public class BoardService {
 	BoardDAO boardDAO;
 
 	// insert
-	public int writeBoard(BoardDTO boardDTO) {
+    public int writeBoard(BoardDTO boardDTO) {
 		return boardDAO.writeBoard(boardDTO);
 	}
 	

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LoginLog">
+	<select id="searchLogs" parameterType="map" resultType="com.kedu.project.dto.LoginLogDTO">
+	    SELECT 
+	        seq, user_id,
+	        TO_CHAR(login_time, 'YYYY-MM-DD HH24:MI:SS') AS login_time,
+	        state,
+	        channel,
+	        os,
+	        browser,
+	        ip_address
+	    FROM LOGINLOG
+	    WHERE 1=1
+	    <if test="startDate != null and startDate != ''">
+	        AND login_time >= TO_TIMESTAMP(#{startDate}, 'YYYY-MM-DD')
+	    </if>
+	    <if test="endDate != null and endDate != ''">
+	        AND login_time &lt;= TO_TIMESTAMP(#{endDate}, 'YYYY-MM-DD') + INTERVAL '1' DAY
+	    </if>
+	    <if test="userId != null and userId != ''">
+	        AND user_id LIKE '%' || #{userId} || '%'
+	    </if>
+	    <if test="ip != null and ip != ''">
+	        AND ip_address LIKE '%' || #{ip} || '%'
+	    </if>
+	    ORDER BY seq DESC
+	</select>
+	
+	<insert id="saveLog" parameterType="com.kedu.project.dto.LoginLogDTO">
+	 INSERT INTO LOGINLOG (
+            seq, user_id, login_time, state, channel, os, browser, ip_address
+        ) VALUES (
+            LOGINLOG_SEQ.NEXTVAL, #{user_id}, SYSTIMESTAMP, #{state}, #{channel},
+            #{os}, #{browser}, #{ip_address}
+        )
+	</insert>
+</mapper>
