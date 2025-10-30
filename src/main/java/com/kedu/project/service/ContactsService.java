@@ -38,12 +38,12 @@ public class ContactsService {
 
 
 	public List<ContactsDTO> selectSoloList(String type, String user_id) {
-		
-		  Map<String, Object> params = new HashMap<>();
-		    params.put("user_id", user_id);
-		    params.put("type", "solo");
-		    
-		    return dao.selectSoloList(params);
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("user_id", user_id);
+		params.put("type", "solo");
+
+		return dao.selectSoloList(params);
 	}
 
 	public List<ContactsDTO> selectMultiList(String type) {
@@ -60,18 +60,18 @@ public class ContactsService {
 
 
 	public void updateContacts(Map<String, String> dto, List<Integer> seqList) {
-	    for(Integer seq : seqList) {
-	        dao.updateContact(seq, dto); // seq 기준으로 DB 업데이트
-	    }
-	    
+		for(Integer seq : seqList) {
+			dao.updateContact(seq, dto); // seq 기준으로 DB 업데이트
+		}
+
 	}
-	
+
 	public List<ContactsDTO> searchByNameAndType(String name, String type) {
 		Map<String , Object> param = new HashMap<>();
 		param.put("name", name);
 		param.put("type" , type);
-		
-	    return dao.searchByNameAndType(param);
+
+		return dao.searchByNameAndType(param);
 	}
 
 	public Object updateContactsTypeMulti(Map<String, Object> param) {
@@ -91,9 +91,9 @@ public class ContactsService {
 	}
 
 
-	
+
 	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
-		
+
 		return dao.updateOrganizationTypeMulti(param);
 	}
 
@@ -101,15 +101,35 @@ public class ContactsService {
 	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
 
 		return dao.updateOrganizationTypeSingle(param);
-		
+
 	}
 
+	// 조직도 검색
+	public List<MemberDTO> searchByOrgName(String name) {
+		
+		return dao.searchByOrgName(name);
+	}
 
-
-
-
-
-
+	
+	
+//	// 개인주소록으로 복사
+//	public Object copyContactsToSolo(String loginId, List<Integer> seqList) {
+//		Map<String, Object> map = new HashMap<>();
+//		map.put("user_id", loginId);
+//		map.put("seqList", seqList);
+//		return dao.copyContactsToSolo(map);
+//	}
+//
+//
+//	   // 조직도 개인 주소록으로 복사
+//    public Object copyOrgContactsToSolo(String loginId, List<String> idList) {
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("user_id", loginId);
+//        map.put("idList", idList);
+//  
+//      
+//        return dao.copyOrgContactsToSolo(map);
+//    }
 
 
 

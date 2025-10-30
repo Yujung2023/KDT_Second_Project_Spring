@@ -31,7 +31,7 @@ public class MailController {
 	public ResponseEntity<String> sendMail(@RequestBody MailDTO dto, HttpServletRequest request) {
 
 		String loginId = (String) request.getAttribute("loginID");
-		
+	
 		try {
 		// dto에 로그인한 아이디 넣기
 		dto.setUser_id(loginId);
