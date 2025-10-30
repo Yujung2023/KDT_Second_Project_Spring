@@ -8,14 +8,17 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.dto.MemberDTO;
+import com.kedu.project.dto.TaskCommentDTO;
 import com.kedu.project.dto.TaskDTO;
 import com.kedu.project.dto.TaskGroupDTO;
 import com.kedu.project.service.TaskService;
@@ -73,7 +76,9 @@ public class TaskController {
     }
     
     @GetMapping("/detail/{groupSeq}")
-    public ResponseEntity<Map<String, Object>> getGroupDetail(@PathVariable int groupSeq) {
+    public ResponseEntity<Map<String, Object>> getGroupDetail(@PathVariable int groupSeq, HttpServletRequest request) {
+    	String loginId = (String) request.getAttribute("loginID");
+    	
         Map<String, Object> result = new HashMap<>();
         TaskGroupDTO group = taskService.getGroupBySeq(groupSeq);
         List<TaskDTO> tasks = taskService.getTasksByGroup(groupSeq);
@@ -84,7 +89,7 @@ public class TaskController {
         result.put("tasks", tasks);
         result.put("membersCount", membersCount);
         result.put("members", members);
-
+        result.put("loginId", loginId);
         return ResponseEntity.ok(result);
     }
     
@@ -99,5 +104,119 @@ public class TaskController {
         }
         return ResponseEntity.ok("fail");  
     	 
+    }
+    
+    @DeleteMapping("/delMember")
+    public ResponseEntity<String> deleteMemberFromGroup(@RequestBody Map<String, Object> data) {
+        int groupSeq = Integer.valueOf(data.get("group_seq").toString());
+        String memberId = data.get("member_id").toString();
+        taskService.deleteMember(groupSeq, memberId);
+        return ResponseEntity.ok("삭제 성공");
+    }
+    
+    @DeleteMapping("/delGroup")
+    public ResponseEntity<Integer> deleteGroup(@RequestBody Map<String, Object> payload,HttpServletRequest request) {
+    	String loginId = (String) request.getAttribute("loginID");
+    	
+    	int groupSeq = Integer.parseInt(payload.get("group_seq").toString());
+        int result = taskService.deleteGroup(groupSeq,loginId);
+        return ResponseEntity.ok(result);
+    }
+    
+    @PostMapping("/insertTask")
+    public ResponseEntity<TaskDTO> insertTask(@RequestBody TaskDTO taskDTO) {
+    	TaskDTO result = taskService.insertTask(taskDTO);
+    	
+        return ResponseEntity.ok(result);
+    }
+    
+    //  업무 상태 업데이트
+    @PutMapping("/updateStatus")
+    public ResponseEntity<?> updateTaskStatus(@RequestBody TaskDTO dto) {
+        try {
+            int result = taskService.updateTaskStatus(dto.getSeq(), dto.getStatus());
+            if (result > 0) {
+            	TaskDTO tasks = taskService.getTaskBySeq(dto.getSeq());
+                return ResponseEntity.ok().body(tasks);
+            } else {
+                return ResponseEntity.badRequest().body("해당 업무를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("업무 상태 업데이트 중 오류 발생");
+        }
+    }
+    
+    @PutMapping("/updateTask")
+    public ResponseEntity<?> updateTask(@RequestBody TaskDTO dto) {
+    	System.out.println("seq: "+dto.getSeq() + "status"+dto.getStatus());
+    	
+        int result = taskService.updateTask(dto);
+        
+        if (result > 0) {
+        	TaskDTO tasks = taskService.getTaskBySeq(dto.getSeq());
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body("해당 업무를 찾을 수 없습니다.");
+        }
+    }
+    
+    // 업무 삭제
+    @DeleteMapping("/deleteTask")
+    public ResponseEntity<?> deleteTask(@RequestBody Map<String, Object> data) {
+        try {
+            int seq = Integer.parseInt(data.get("seq").toString());
+            int result = taskService.deleteTask(seq);
+            
+            return ResponseEntity.ok("삭제 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    // 댓글 등록
+    @PostMapping("/comment")
+    public ResponseEntity<?> addComment(@RequestBody TaskCommentDTO commentDTO, HttpServletRequest request) {
+    	String loginId = (String) request.getAttribute("loginID");
+    	
+        try {
+            int result = taskService.insertComment(commentDTO,loginId);
+            
+            if(result > 0) {
+            	return ResponseEntity.ok("success");            	
+            }
+            else
+            {
+            	return ResponseEntity.badRequest().body("fail");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("fail");
+        }
+    }
+
+    // 특정 업무 댓글 목록 조회
+    @GetMapping("/comment/{taskSeq}")
+    public ResponseEntity<List<TaskCommentDTO>> getComments(@PathVariable("taskSeq") int taskSeq) {
+        List<TaskCommentDTO> list = taskService.getCommentsByTask(taskSeq);
+        return ResponseEntity.ok(list);
+    }
+    
+    // 	댓글 삭제
+    @DeleteMapping("/comment/{seq}")
+    public ResponseEntity<?> deleteComment(@PathVariable("seq") int seq) {
+        try {
+            int result = taskService.deleteComment(seq);
+            
+            if(result > 0)
+            {
+            	return ResponseEntity.ok("success");            	
+            }
+            return ResponseEntity.badRequest().body("fail");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("fail");
+        }
     }
 }

@@ -10,6 +10,7 @@ public class TaskDTO {
 	private String created_id;     
 	private String created_at;    
 	private String updated_at;
+	
 	public int getSeq() {
 		return seq;
 	}
