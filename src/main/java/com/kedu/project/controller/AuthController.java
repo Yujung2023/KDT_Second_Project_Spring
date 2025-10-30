@@ -103,8 +103,14 @@ public class AuthController {
 	@GetMapping
 	public ResponseEntity<String> test(HttpServletRequest request){
 		System.out.println(request.getAttribute("loginID"));
-
-		return ResponseEntity.ok("인증자 전용 데이터");
+		String loginId = (String)request.getAttribute("loginID");
+		
+		int result = memberService.checkId(loginId);
+		System.out.println("여기까지 왔어욤 업무관리: " + result);
+		if(result > 0) {
+			return ResponseEntity.ok(loginId); 
+		}
+		return ResponseEntity.badRequest().body("없는 아이디");
 	}
 
 	@GetMapping("/check") //권한 체크

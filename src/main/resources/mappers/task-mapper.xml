@@ -20,10 +20,40 @@
     <select id="getLastInsertedGroupId" resultType="int">
     	  SELECT TASKGROUP_SEQ.CURRVAL FROM dual
     </select>
-    
+    <select id="getGroupsById" parameterType="String" resultType="map">
+    SELECT 
+        g.seq AS seq,
+        g.group_name AS group_name,
+        g.manager_id AS manager_id,
+        g.description AS description,
+        rm.name AS manager_name
+	    FROM TaskGroup g
+	    JOIN TaskGroupMember m ON g.seq = m.group_seq
+	    JOIN member rm ON g.manager_id = rm.id
+	    WHERE m.member_id = #{member_id}
+	</select>
+        	
      <!-- 구성원 추가 -->
     <insert id="insertGroupMember" parameterType="map">
         INSERT INTO TaskGroupMember  (seq,group_seq, member_id, role, created_at)
         VALUES (TaskGroupMember_SEQ.nextval, #{group_seq}, #{memberId},#{role}, SYSTIMESTAMP)
     </insert>
+    
+    <select id="getMemberCount" parameterType="int" resultType="int">
+    	select count(*) from TaskGroupMember where group_seq = #{group_seq}
+    </select>
+    
+    <select id="getGroupBySeq" parameterType="int" resultType="com.kedu.project.dto.TaskGroupDTO">
+    	select * from TASKGROUP where seq = #{seq}
+    </select>
+    
+    <select id="getMembersByGroup" parameterType="int" resultType="com.kedu.project.dto.MemberDTO">
+    	select id,name,dept_code,rank_code,job_code from TASKGROUPmember g
+		join member m on g.member_id = m.id where group_seq = #{group_seq}
+    </select>
+    
+    <select id="getTasksByGroup" parameterType="int" resultType="com.kedu.project.dto.TaskDTO">
+    	select * from TASK where group_seq = #{group_seq}
+    </select>
+    
 </mapper>
