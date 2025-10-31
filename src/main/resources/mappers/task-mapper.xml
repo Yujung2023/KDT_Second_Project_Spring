@@ -30,7 +30,8 @@
 	    FROM TaskGroup g
 	    JOIN TaskGroupMember m ON g.seq = m.group_seq
 	    JOIN member rm ON g.manager_id = rm.id
-	    WHERE m.member_id = #{member_id}
+	    WHERE m.member_id = #{member_id} 
+	    order by updated_at desc
 	</select>
         	
      <!-- 구성원 추가 -->
@@ -44,7 +45,7 @@
     </select>
     
     <select id="getGroupBySeq" parameterType="int" resultType="com.kedu.project.dto.TaskGroupDTO">
-    	select * from TASKGROUP where seq = #{seq}
+    	select * from TASKGROUP where seq = #{seq} 
     </select>
     
     <select id="getMembersByGroup" parameterType="int" resultType="com.kedu.project.dto.MemberDTO">
@@ -133,4 +134,14 @@
 	  <delete id="deleteComment" parameterType="int">
 	  	DELETE FROM task_comment WHERE seq = #{seq}
 	  </delete>
+	  
+	  <update id="updateGroup" parameterType="com.kedu.project.dto.TaskGroupDTO">
+		  UPDATE TaskGroup
+		  SET
+		    group_name = #{group_name},
+		    description = #{description},
+		    manager_id = #{manager_id},
+		    updated_at = SYSTIMESTAMP
+		  WHERE seq = #{seq}
+		</update>
 </mapper>

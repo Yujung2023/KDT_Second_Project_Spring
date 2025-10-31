@@ -219,4 +219,21 @@ public class TaskController {
             return ResponseEntity.internalServerError().body("fail");
         }
     }
+    
+    
+    // 그룹 업데이트
+    @PutMapping("/updateGroup")
+    public ResponseEntity<?> updateGroup(@RequestBody TaskGroupDTO dto) {
+    	System.out.println("dto.seq:"+ dto.getSeq());
+    	
+        try {
+            int result = taskService.updateGroup(dto);
+            return result > 0 
+                ? ResponseEntity.ok("success")
+                : ResponseEntity.status(400).body("fail");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("error");
+        }
+    }
 }

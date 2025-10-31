@@ -135,4 +135,11 @@ public class TaskDAO {
 	public int deleteComment (int seq) {
 		return mybatis.delete("Task.deleteComment",seq);
 	}
+	
+	
+	//그룹 업데이트
+	public int updateGroup(TaskGroupDTO dto) {
+		System.out.println("dto.seq:"+ dto.getSeq());
+		return mybatis.delete("Task.updateGroup",dto);
+	}
 }

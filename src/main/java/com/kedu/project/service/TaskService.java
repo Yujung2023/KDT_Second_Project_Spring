@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.kedu.project.dao.MemberDAO;
@@ -24,7 +26,7 @@ public class TaskService {
 
 	@Autowired
 	private MemberDAO memberDAO;
-	
+
 	@Transactional // 트랜잭션 적용
 	public void addGroup(TaskGroupDTO dto) {
 		String manager_id = dto.getManager_id();
@@ -130,26 +132,32 @@ public class TaskService {
 	public int deleteTask(int seq) {
 		return taskDAO.deleteTask(seq);   
 	}
-	
+
 	public TaskDTO getTaskBySeq(int seq) {
 		return taskDAO.getTaskBySeq(seq);
 	}
-	
+
 	public int insertComment(TaskCommentDTO commentDTO, String loginId) {
 		commentDTO.setWriter_name(memberDAO.selectMemberById(loginId).getName());
 		commentDTO.setWriter_id(loginId);
-		
+
 		return taskDAO.insertComment(commentDTO);
 	}
-	
-	
+
+
 	public List<TaskCommentDTO> getCommentsByTask(int taskSeq) {
-        List<TaskCommentDTO> list = taskDAO.getCommentsByTask(taskSeq);
-        return list;
-    }
-	
+		List<TaskCommentDTO> list = taskDAO.getCommentsByTask(taskSeq);
+		return list;
+	}
+
 	public int deleteComment (int seq) {
 		return taskDAO.deleteComment(seq);
 	}
-	
+
+	public int updateGroup(TaskGroupDTO dto) {
+		System.out.println("dto.seq:"+ dto.getSeq());
+
+		return taskDAO.updateGroup(dto);
+	}
+
 }
