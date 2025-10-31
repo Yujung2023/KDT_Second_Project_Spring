@@ -107,7 +107,6 @@ public class FileController {
 		for(MultipartFile file : files) {
 		    String sysname = UUID.randomUUID() + "_" + file.getOriginalFilename();
 		    storage.create(BlobInfo.newBuilder(bucketName, sysname).build(), file.getBytes());
-
 		    fileList.add(new MailFileDTO(mailSeq, sysname, file.getOriginalFilename()));
 		}
 

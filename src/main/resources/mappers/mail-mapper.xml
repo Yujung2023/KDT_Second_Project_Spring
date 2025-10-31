@@ -54,22 +54,7 @@
     #{seq}</foreach>
 	</delete>
 	
-	<insert id="MailFileUpload" parameterType="list">
-    INSERT INTO mailFile(seq, mailSeq, sysname, orgname)
-    VALUES (mailFile_seq.NEXTVAL, #{mailSeq}, #{sysname}, #{orgname})
-	</insert>
-
 	
-	<select id="MailFileDownload" parameterType="map" resultType="com.kedu.project.dto.MailFileDTO">
-    SELECT mailSeq, sysname, orgname FROM mailFile
-    WHERE mailSeq = #{mailSeq} AND sysname = #{sysname}
-	</select>
-	
-	
-	<select id="getMailFileList" parameterType="long" resultType="com.kedu.project.dto.MailFileDTO">
-    SELECT mailSeq, sysname, orgname FROM mailFile
-    WHERE mailSeq = #{mailSeq}
-	</select>
 
 	
 </mapper>
