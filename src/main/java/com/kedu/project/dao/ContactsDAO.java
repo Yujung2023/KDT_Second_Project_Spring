@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kedu.project.dto.ContactsDTO;
+import com.kedu.project.dto.MemberDTO;
 
 
 @Repository
@@ -29,15 +30,17 @@ public class ContactsDAO {
 	}
 
 	// 개인 주소록 리스트
-//	public List<ContactsDTO> selectSoloList(String type) {
-//
-//		return mybatis.selectList("Contacts.selectSoloList",type);
-//	}
+	//	public List<ContactsDTO> selectSoloList(String type) {
+	//
+	//		return mybatis.selectList("Contacts.selectSoloList",type);
+	//	}
+
+	// 개인 주소록 리스트
 	public List<ContactsDTO> selectSoloList(Map<String ,Object > params) {
 
 		return mybatis.selectList("Contacts.selectSoloList",params);
 	}
-	
+
 	// 공용 주소록 리스트
 	public List<ContactsDTO> selectMultiList(String type) {
 
@@ -80,7 +83,37 @@ public class ContactsDAO {
 
 
 
+	public List<MemberDTO> selectOranizationList() {
+
+		return mybatis.selectList("Contacts.selectOranizationList");
+	}
+
+	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
+
+		return mybatis.update("Contacts.updateOrganizationTypeMulti", param);
+	}
+
+	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
+
+		return mybatis.update("Contacts.updateOrganizationTypeSingle", param);
+	}
 
 
+	//개인주소록으로 복사
+	public Object copyContactsToSolo(Map<String, Object> map) {
+		return  mybatis.insert("Contacts.copyContactsToSolo", map);
+	}
+
+	// 주소록 개인 주소록으로 복사
+	public Object copyOrgContactsToSolo(Map<String, Object> map) {
+
+		return mybatis.insert("Contacts.copyOrgContactsToSolo", map);
+	}
+
+	// 조직도 이름으로 검색
+	public List<MemberDTO> searchByOrgName(String name) {
+		
+		return mybatis.selectList("Contacts.searchByOrgName", name);
+	}
 
 }

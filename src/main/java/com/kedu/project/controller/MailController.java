@@ -31,7 +31,7 @@ public class MailController {
 	public ResponseEntity<String> sendMail(@RequestBody MailDTO dto, HttpServletRequest request) {
 
 		String loginId = (String) request.getAttribute("loginID");
-		
+	
 		try {
 		// dto에 로그인한 아이디 넣기
 		dto.setUser_id(loginId);
@@ -43,7 +43,7 @@ public class MailController {
 		MServ.SendMail(dto);
 		}catch(Exception e) {
 			e.printStackTrace();
-			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메일 발송을 실패했습니다.");
+			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수신인,제목,내용을 모두 입력해주세요");
 		}
 		
 		   return ResponseEntity.ok(String.valueOf(dto.getSeq()));

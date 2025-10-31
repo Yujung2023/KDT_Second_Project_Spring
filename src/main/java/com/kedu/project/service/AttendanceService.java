@@ -67,6 +67,10 @@ public class AttendanceService {
 		    dao.autoAbsence();
 		    System.out.println("결근 자동 처리 완료");
 		}
+		
+		 public int getMonthlyWorkDays(String memberId) {
+		        return dao.selectMonthWorkDays(memberId);
+		    }
 
 
 }

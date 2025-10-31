@@ -22,6 +22,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 </select>
 
 
+
+
 <select id="getToday" parameterType="string" resultType="map">
   SELECT *
     FROM (
@@ -38,6 +40,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     WHERE ROWNUM = 1
 
 </select>
+
+<select id="selectMonthWorkDays" parameterType="string" resultType="int">
+    SELECT 
+        (
+            -- 출근한 날
+            SELECT COUNT(DISTINCT TRUNC(start_time))
+            FROM attendance
+            WHERE member_id = #{value}
+              AND start_time IS NOT NULL
+              AND TRUNC(start_time) BETWEEN TRUNC(SYSDATE, 'MM') AND TRUNC(SYSDATE)
+        )
+        +
+        (
+            -- 승인된 휴가일
+            SELECT COUNT(*)
+            FROM (
+                SELECT TRUNC(start_leave_time + LEVEL - 1)
+                FROM leave_request
+                WHERE member_id = #{value}
+                  AND status = 'APPROVED'
+                  AND TRUNC(start_leave_time + LEVEL - 1) BETWEEN TRUNC(SYSDATE, 'MM') AND TRUNC(SYSDATE)
+                CONNECT BY LEVEL  <![CDATA[ <= ]]>  TRUNC(end_leave_time) - TRUNC(start_leave_time) + 1
+            )
+        )
+    FROM dual
+</select>
+
+
+
 
 
 <insert id="autoAbsence">
@@ -78,7 +109,7 @@ and start_time is not null
 UPDATE attendance
 SET start_time = SYSTIMESTAMP,
     start_status = 'late'
-WHERE member_id = #{member_id}
+WHERE member_id = #{value}
   AND start_status = 'absence'
   AND end_status IS NULL
   AND (start_time IS NULL OR TRUNC(start_time) = TRUNC(SYSDATE))
