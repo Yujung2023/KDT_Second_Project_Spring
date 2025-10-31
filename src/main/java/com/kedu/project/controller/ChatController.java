@@ -1,78 +1,59 @@
 package com.kedu.project.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.kedu.project.dto.ChatMessageDTO;
+import com.kedu.project.dto.MemberSimpleDTO;
+import com.kedu.project.service.ChatRoomService;
 import com.kedu.project.service.ChatService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j // 로그 출력용 어노테이션
-@Controller // WebSocket 메시지 처리 컨트롤러
-@RequiredArgsConstructor // 생성자 자동 주입
+@Slf4j
+@Controller
+@RequiredArgsConstructor
 public class ChatController {
 
-    // ChatMessageService 주입 (메시지 저장 담당)
-    private final ChatService ChatService;
+    private final ChatService chatService;
+    private final ChatRoomService chatRoomService;   // ✅ 추가
+    private final SimpMessagingTemplate template;
 
-    /**
-     * 클라이언트로부터 메시지 수신
-     * WebSocket publish 경로: /app/chat/{roomId}
-     * 구독자에게 메시지 전송: /topic/chatroom/{roomId}
-     */
+    /**  일반 채팅 메시지 송신 */
     @MessageMapping("/chat/{roomId}")
     @SendTo("/topic/chatroom/{roomId}")
     public ChatMessageDTO sendMessage(
             @DestinationVariable String roomId,
             ChatMessageDTO message
     ) {
-        log.info("Message Received. roomId={}, sender={}, content={}",
-                roomId, message.getSender(), message.getContent());
-
-        // room_id가 없을 경우 URL 경로에서 받은 roomId로 설정
-        message.setRoom_id(roomId);
-
-        // DB 저장 및 클라이언트에게 전달할 DTO 반환
-        return ChatService.saveMessage(roomId, message);
+        message.setRoomId(roomId);
+        if (message.getType() == null) message.setType("TALK");
+        return chatService.saveMessage(roomId, message);
     }
 
-    /**
-     * 사용자 입장 알림 메시지 처리
-     */
-    @MessageMapping("/chat/enter/{roomId}")
-    @SendTo("/topic/chatroom/{roomId}")
-    public ChatMessageDTO enterRoom(
+    /**  읽음 이벤트 (SendTo 사용 안 함) */
+    @MessageMapping("/chat/read/{roomId}")
+    public void readMessage(
             @DestinationVariable String roomId,
             ChatMessageDTO message
     ) {
-        log.info("User Enter. roomId={}, sender={}", roomId, message.getSender());
-
-        message.setRoom_id(roomId);
-        message.setType("ENTER"); // String 기반 타입
-        message.setContent(message.getSender() + "님이 입장했습니다.");
-
-        return ChatService.saveMessage(roomId, message);
+        ChatMessageDTO updated = chatService.markRead(roomId, message.getMessageId(), message.getSender());
+        template.convertAndSend("/topic/chatroom/" + roomId, updated);
     }
 
-    /**
-     * 사용자 퇴장 알림 메시지 처리
-     */
-    @MessageMapping("/chat/leave/{roomId}")
-    @SendTo("/topic/chatroom/{roomId}")
-    public ChatMessageDTO leaveRoom(
-            @DestinationVariable String roomId,
-            ChatMessageDTO message
-    ) {
-        log.info("User Leave. roomId={}, sender={}", roomId, message.getSender());
-
-        message.setRoom_id(roomId);
-        message.setType("LEAVE");
-        message.setContent(message.getSender() + "님이 퇴장했습니다.");
-
-        return ChatService.saveMessage(roomId, message);
+    /**  참여자 목록 조회 API (이름 + 직급만 반환) */
+    @GetMapping("/api/chat/members/{roomId}")
+    public ResponseEntity<List<MemberSimpleDTO>> getRoomMembers(@PathVariable String roomId) {
+        List<MemberSimpleDTO> members = chatRoomService.getRoomMembers(roomId);
+        return ResponseEntity.ok(members);
     }
 }

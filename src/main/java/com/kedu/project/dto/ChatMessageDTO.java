@@ -1,35 +1,16 @@
 package com.kedu.project.dto;
 
-import java.sql.Timestamp;
+import lombok.*;
+import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ChatMessageDTO {
-
-    private String room_id;
+    private Long messageId;
+    private String roomId;
     private String sender;
     private String content;
-    private String type; //  추가
-    private Timestamp sendtime;
     private String fileUrl;
-    private int read;
-	
-    
-    
+    private String type;          // TALK / FILE / ENTER / LEAVE / READ
+    private LocalDateTime sendTime;
+    private Integer readCount;    // 계산값 (null 가능)
 }
-
-	   
-	    
-	    
-	    
-		
-

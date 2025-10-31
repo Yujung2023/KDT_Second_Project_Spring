@@ -4,48 +4,47 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "chat_message")
+@Table(name = "CHAT_MESSAGE")
 public class ChatMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) // Oracle Trigger에서 자동생성
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)  // Oracle Trigger/Sequence 사용
+    @Column(name = "ID")
     private Long id;
 
-    // FK : room_id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "ROOM_ID", nullable = false)
     private ChatRoom room;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "SENDER", nullable = false)
     private String sender;
 
     @Lob
-    @Column(columnDefinition = "CLOB")
+    @Column(name = "CONTENT")
     private String content;
 
+    @Column(name = "FILE_URL")
     private String fileUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MessageType type = MessageType.TALK; // 기본 TALK
+    @Column(name = "TYPE", nullable = false)
+    private MessageType type;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT SYSTIMESTAMP")
+    @Column(name = "SEND_TIME", nullable = false)
     private LocalDateTime sendTime;
 
-    @Column(columnDefinition = "NUMBER DEFAULT 0")
+    // ✅ DB에 저장 안하고 계산해서 내려주는 값
+    @Transient
     private int readCount;
 
     @PrePersist
     protected void onCreate() {
         if (sendTime == null) sendTime = LocalDateTime.now();
-        if (readCount == 0) readCount = 0;
+        if (type == null) type = MessageType.TALK;
     }
 
     public enum MessageType {
