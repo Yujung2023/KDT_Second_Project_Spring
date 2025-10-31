@@ -1,104 +1,152 @@
 package com.kedu.project.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.project.dto.ChatMessageDTO;
 import com.kedu.project.entity.ChatMessage;
+import com.kedu.project.entity.ChatMessageRead;
+import com.kedu.project.entity.ChatMessageReadId;
 import com.kedu.project.entity.ChatRoom;
+import com.kedu.project.entity.ChatRoomMember;
+import com.kedu.project.entity.ChatRoomMemberId;
 import com.kedu.project.entity.Member;
+import com.kedu.project.repository.ChatMessageReadRepository;
 import com.kedu.project.repository.ChatMessageRepository;
+import com.kedu.project.repository.ChatRoomMemberRepository;
 import com.kedu.project.repository.ChatRoomRepository;
-import com.kedu.project.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChatService {
 
-    private final ChatRoomRepository chatRoomRepo;
-    private final ChatMessageRepository chatMessageRepo;
-    private final MemberRepository memberRepo;
+    private final ChatRoomRepository roomRepo;
+    private final ChatRoomMemberRepository roomMemberRepo;
+    private final ChatMessageRepository msgRepo;
+    private final ChatMessageReadRepository readRepo;
 
-    @Transactional
+    /** ✅ 메시지 저장: 보낸 즉시 보낸 사람 읽음 처리, 방 최신정보 갱신, 읽음수 계산 */
     public ChatMessageDTO saveMessage(String roomId, ChatMessageDTO dto) {
+        ChatRoom room = roomRepo.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("room not found: " + roomId));
 
-        ChatRoom room = chatRoomRepo.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("채팅방이 존재하지 않습니다. roomId = " + roomId));
+        ChatMessage.MessageType type = parseType(dto.getType());
 
-        if (dto.getSender() == null || dto.getSender().trim().isEmpty()) {
-            throw new IllegalArgumentException("Sender cannot be null or empty");
-        }
-
-        ChatMessage.MessageType messageType;
-        try {
-            messageType = dto.getType() != null
-                    ? ChatMessage.MessageType.valueOf(dto.getType())
-                    : ChatMessage.MessageType.TALK;
-        } catch (Exception e) {
-            messageType = ChatMessage.MessageType.TALK;
-        }
-
-        ChatMessage entity = ChatMessage.builder()
+        ChatMessage msg = ChatMessage.builder()
                 .room(room)
-                .sender(dto.getSender())
+                .sender(require(dto.getSender(), "sender"))
                 .content(dto.getContent())
                 .fileUrl(dto.getFileUrl())
-                .type(messageType)
+                .type(type == null ? ChatMessage.MessageType.TALK : type)
                 .sendTime(LocalDateTime.now())
-                .readCount(0)
                 .build();
 
-        chatMessageRepo.save(entity);
+        msg = msgRepo.save(msg);
 
-        room.setLastMessage(entity.getContent());
+        // ✅ 보낸 사람은 즉시 읽음 처리
+        markReadInternal(msg.getId(), dto.getSender());
+
+        // ✅ 보낸 사람의 lastReadMessageId 갱신
+        ChatRoomMemberId id = new ChatRoomMemberId(roomId, dto.getSender());
+        ChatRoomMember crm = roomMemberRepo.findById(id).orElse(null);
+        if (crm != null) {
+            crm.setLastReadMessageId(msg.getId());
+            roomMemberRepo.save(crm);
+        }
+
+        // ✅ 방 최신 정보 갱신
+        room.setLastMessage(preview(type, dto.getContent()));
         room.setLastUpdatedAt(LocalDateTime.now());
-        chatRoomRepo.save(room);
 
-        dto.setRoom_id(roomId);
-        dto.setSendtime(Timestamp.valueOf(entity.getSendTime()));
+        // ✅ 읽음 수 계산
+        int memberCount = roomMemberRepo.countMembers(roomId);
+        int readers = readRepo.countReaders(msg.getId());
+        int unread = Math.max(0, memberCount - readers);
 
+        return toDTO(msg, unread);
+    }
+
+
+    /** ✅ 읽음 이벤트 처리 */
+    public ChatMessageDTO markRead(String roomId, Long messageId, String memberId) {
+        ChatMessage msg = msgRepo.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("message not found: " + messageId));
+
+        // ✅ 읽음 기록 (중복 방지)
+        markReadInternal(messageId, memberId);
+
+        // ✅ 내 마지막 읽은 메시지 ID 갱신
+        ChatRoomMemberId id = new ChatRoomMemberId(roomId, memberId);
+        ChatRoomMember crm = roomMemberRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("room-member not found: " + id));
+
+        if (crm.getLastReadMessageId() == null || crm.getLastReadMessageId() < messageId) {
+            crm.setLastReadMessageId(messageId);
+            roomMemberRepo.save(crm); // ⚡ DB 반영
+        }
+
+        // ✅ 남은 미읽은 인원 수 계산
+        int totalMembers = roomMemberRepo.countMembers(roomId);
+        int readers = readRepo.countReaders(messageId);
+        int unread = Math.max(0, totalMembers - readers);
+
+        ChatMessageDTO dto = toDTO(msg, unread);
+        dto.setType("READ_UPDATE"); // 실시간 읽음수 갱신용 이벤트
         return dto;
     }
 
-    public List<Map<String, Object>> getRoomsByUser(String userId) {
-        List<ChatRoom> rooms = chatRoomRepo.findByRoomMembersContaining(userId);
-        List<Map<String, Object>> result = new ArrayList<>();
+    // ===== 내부 유틸 =====
 
-        for (ChatRoom room : rooms) {
-            String[] members = room.getRoomMembers().split("_");
-            String targetId = Arrays.stream(members)
-                    .filter(id -> !id.equals(userId))
-                    .findFirst()
-                    .orElse("unknown");
-
-            Member target = memberRepo.findById(userId).orElse(null);
-            Map<String, Object> dto = new HashMap<>();
-            dto.put("roomId", room.getRoomId());
-            dto.put("lastMessage", room.getLastMessage());
-            dto.put("lastUpdatedAt", room.getLastUpdatedAt());
-
-            if (target != null) {
-                dto.put("targetId", target.getId());
-                dto.put("targetName", target.getName());
-                dto.put("targetRank", target.getRank_code());
-                dto.put("avatar", target.getProfileImage_servName());
-            }
-
-            dto.put("unread", 0);
-
-            result.add(dto);
+    private void markReadInternal(Long messageId, String memberId) {
+        ChatMessageReadId rid = new ChatMessageReadId(messageId, memberId);
+        if (!readRepo.existsById(rid)) {
+            ChatMessageRead r = ChatMessageRead.builder()
+                    .id(rid)
+                    .message(ChatMessage.builder().id(messageId).build())
+                    .member(Member.builder().id(memberId).build())
+                    .readTime(LocalDateTime.now())
+                    .build();
+            readRepo.save(r);
         }
+    }
 
-        return result;
+    private ChatMessageDTO toDTO(ChatMessage m, int unread) {
+        return ChatMessageDTO.builder()
+                .messageId(m.getId())
+                .roomId(m.getRoom().getRoomId())
+                .sender(m.getSender())
+                .content(m.getContent())
+                .fileUrl(m.getFileUrl())
+                .type(m.getType().name())
+                .sendTime(m.getSendTime())
+                .readCount(unread)
+                .build();
+    }
+
+    private String preview(ChatMessage.MessageType type, String content) {
+        if (type == ChatMessage.MessageType.FILE) return "파일을 보냈습니다";
+        if (content == null) return null;
+        String t = content.strip();
+        return t.length() > 40 ? t.substring(0, 40) + "…" : t;
+    }
+
+    private ChatMessage.MessageType parseType(String t) {
+        if (t == null) return null;
+        try {
+            return ChatMessage.MessageType.valueOf(t);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    private String require(String v, String name) {
+        if (v == null || v.trim().isEmpty())
+            throw new IllegalArgumentException(name + " is required");
+        return v;
     }
 }

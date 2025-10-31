@@ -1,26 +1,56 @@
 package com.kedu.project.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "chat_room")
+@Table(name = "CHAT_ROOM")
 public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "room_id")
-    private String roomId;  // ✅ UUID Primary Key
+    @Column(name = "ROOM_ID", length = 36)
+    private String roomId;  // UUID
 
-    private String roomMembers; // ✅ "userA_userB" 로 저장
-
+    @Column(name = "ROOM_NAME")
     private String roomName;
+
+    @Column(name = "LAST_MESSAGE")
     private String lastMessage;
+
+    @Column(name = "LAST_UPDATED_AT")
     private LocalDateTime lastUpdatedAt;
+
+    @Column(name = "CREATED_AT", updatable = false)
+    private LocalDateTime createdAt;
+
+    //  단체방 멤버 매핑
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
+    private List<ChatRoomMember> members = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (lastUpdatedAt == null) lastUpdatedAt = LocalDateTime.now();
+    }
+    
 }

@@ -1,18 +1,33 @@
 package com.kedu.project.repository;
 
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import com.kedu.project.entity.ChatRoom;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 
-    //  1:1 채팅방 정확히 조회
-    Optional<ChatRoom> findByRoomMembers(String roomMembers);
+	/**  로그인한 사용자가 속한 모든 방 반환 (채팅방 목록용) */
+	@Query("""
+			    SELECT DISTINCT r
+			    FROM ChatRoom r
+			    JOIN r.members m
+			    WHERE m.member.id = :memberId
+			    ORDER BY r.lastUpdatedAt DESC
+			""")
+	List<ChatRoom> findRoomsOf(@Param("memberId") String memberId);
 
-    //  로그인 사용자 포함된 모든 방 조회 (채팅 리스트 화면용)
-    List<ChatRoom> findByRoomMembersContainingOrderByLastUpdatedAtDesc(String memberId);
-    List<ChatRoom> findByRoomMembersContaining(String userId);
+	@Query("""
+		    SELECT m.member.id, m.member.name, m.member.rank_code
+		    FROM ChatRoomMember m
+		    WHERE m.room.roomId = :roomId
+		""")
+		List<Object[]> findMemberInfoByRoomId(@Param("roomId") String roomId);
+ 
+	
 }
