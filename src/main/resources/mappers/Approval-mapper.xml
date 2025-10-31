@@ -3,44 +3,177 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="approval">
-	<select id="selectAll" resultType="com.kedu.project.dto.ApprovalDTO">
-	select * from approval_doc
-	</select>
-	
-	  <select id="selectByStatus" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
-	  select * from approval_doc where status=#{status} order by seq desc
-	  </select>
-	  
-	  <insert id="insert" parameterType="com.kedu.project.dto.ApprovalDTO">
-	  insert into approval_doc (seq,writer,title,comments,writeDate)
-	  values(approval_seq.nextval,#{writer},#{title},#{comments},SYSDATE)
-	  
-	  </insert>
-	  
-	    <insert id="tempinsert" parameterType="com.kedu.project.dto.ApprovalDTO">
-	  insert into approval_doc (seq,writer,title,comments,status,writeDate)
-	  values(approval_seq.nextval,#{writer},#{title},#{comments},#{status},SYSDATE)
-	  
-	  </insert>
-	  
-	  <select id="getDetail" parameterType="int" resultType="com.kedu.project.dto.ApprovalDTO">
-	  
-	  select * from approval_doc where seq=#{seq}
-	  </select>
-	  
-	  <select id="findTempByWriter" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
-		select * from approval_doc where writer=#{writerId} and status='temp'
-		</select>
-		
-<select id="selectApprovalCandidates" resultType="com.kedu.project.dto.MemberDTO">
-SELECT id, name, rank_code
-FROM member
-WHERE status NOT IN ('퇴사', '휴직')
-ORDER BY rank_code
-</select>
-		
-		<update id="tempUpdate" parameterType="com.kedu.project.dto.ApprovalDTO">
-		update approval_doc set title=#{title},comments=#{comments},writeDate=SYSDATE where seq=#{seq} and status='temp'
-		</update>
+
+    <select id="selectAll" resultType="com.kedu.project.dto.ApprovalDTO">
+        select * from approval_doc
+    </select>
+
+    <select id="selectByStatus" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
+        select * from approval_doc where status=#{status} order by seq desc
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.kedu.project.dto.ApprovalDTO">
+        <selectKey keyProperty="seq" order="BEFORE" resultType="int">
+            SELECT approval_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO approval_doc (seq, writer, title, comments, status, writeDate)
+        VALUES (#{seq}, #{writer}, #{title}, #{comments}, 'WAIT', SYSDATE)
+    </insert>
+
+    <!-- 결재선 INSERT -->
+    <insert id="insertApprovalLine" parameterType="map">
+        INSERT INTO approval_line (
+            seq, approval_id, approvalNumber, approval_userid,
+            approver_id, approver_order, status, writeDate
+        ) VALUES (
+            approval_line_seq.NEXTVAL,
+            #{approvalId}, #{approvalId}, #{approvalUserId},
+            #{approverId}, #{orderNo, jdbcType=INTEGER},
+            #{status}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <!-- 임시 저장 -->
+    <insert id="tempinsert" parameterType="com.kedu.project.dto.ApprovalDTO">
+        <selectKey keyProperty="seq" order="BEFORE" resultType="int">
+            SELECT approval_seq.NEXTVAL FROM dual
+        </selectKey>
+        insert into approval_doc (seq,writer,title,comments,status,writeDate)
+        values(#{seq},#{writer},#{title},#{comments},#{status},SYSDATE)
+    </insert>
+
+    <select id="getDetail" parameterType="int" resultType="com.kedu.project.dto.ApprovalDTO">
+        select * from approval_doc where seq=#{seq}
+    </select>
+
+    <select id="findTempByWriter" parameterType="String" resultType="com.kedu.project.dto.ApprovalDTO">
+        select * from approval_doc where writer=#{writerId} and status='temp'
+    </select>
+
+    <select id="selectApprovalCandidates" resultType="com.kedu.project.dto.MemberDTO">
+        SELECT id, name, rank_code
+        FROM member
+        WHERE status NOT IN ('퇴사', '휴직')
+        ORDER BY rank_code
+    </select>
+
+    <select id="findById" parameterType="string" resultType="com.kedu.project.dto.MemberDTO">
+        SELECT id, name, dept_code, rank_code
+        FROM member
+        WHERE id = #{id}
+    </select>
+
+    <!-- 결재선 조회 -->
+    <select id="selectApprovalLine" parameterType="string" resultType="map">
+        SELECT
+            al.seq,
+            al.approval_id AS approvalId,
+            al.approver_id AS id,
+            m.name AS name,
+            m.rank_code AS rank_code,
+            al.status AS status,
+            al.approver_order AS orderNo,
+            CASE WHEN al.approver_order IS NULL THEN 1 ELSE 0 END AS referenceFlag
+        FROM approval_line al
+        JOIN member m ON al.approver_id = m.id
+        WHERE al.approval_id = #{_parameter}
+        ORDER BY referenceFlag, al.approver_order
+    </select>
+
+    <!-- 문서 상태 변경 -->
+    <update id="updateDocStatus" parameterType="map">
+        UPDATE approval_doc
+        SET status = #{status}
+        WHERE seq = #{approvalId}
+    </update>
+
+    <!-- 승인 처리 -->
+    <update id="approveLine" parameterType="map">
+        UPDATE approval_line
+        SET status = 'Y'
+        WHERE approval_id = #{approvalId}
+          AND approver_id = #{userId}
+    </update>
+
+    <!-- ✅ 반려 처리 (사유 포함 / 중복 없음) -->
+    <update id="rejectLine" parameterType="map">
+        UPDATE approval_line
+        SET status = 'R',
+           reject_reason = #{reason}
+        WHERE approval_id = #{approvalId}
+          AND approver_id = #{userId}
+    </update>
+
+    <!-- 승인 / 반려 상태 검사 -->
+    <select id="existsReject" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+          AND status = 'R'
+    </select>
+
+    <select id="existsApproved" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+          AND status = 'Y'
+    </select>
+
+    <select id="isAllApproved" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) = 0 THEN 1 ELSE 0 END
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+          AND approver_order IS NOT NULL
+          AND status != 'Y'
+    </select>
+
+    <select id="selectNextApprover" parameterType="string" resultType="string">
+        SELECT approver_id
+        FROM (
+            SELECT approver_id
+            FROM approval_line
+            WHERE approval_id = #{approvalId}
+              AND status = 'N'
+              AND approver_order IS NOT NULL
+            ORDER BY approver_order
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <!-- 승인 대기 목록 -->
+    <select id="selectMyWaitList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
+        SELECT d.*
+        FROM approval_doc d
+        JOIN approval_line l ON d.seq = l.approval_id
+        WHERE d.status != 'REJECTED'
+          AND l.approver_id = #{userId}
+          AND l.status = 'N'
+          AND l.approver_order = (
+                SELECT MIN(approver_order)
+                FROM approval_line
+                WHERE approval_id = d.seq
+                  AND status = 'N'
+                  AND approver_order IS NOT NULL
+          )
+        ORDER BY d.writeDate DESC
+    </select>
+
+    <!-- 예정 문서 목록 -->
+    <select id="selectMyScheduledList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
+        SELECT d.*
+        FROM approval_doc d
+        JOIN approval_line l ON d.seq = l.approval_id
+        WHERE l.approver_id = #{userId}
+          AND l.status = 'N'
+          AND l.approver_order > (
+                SELECT MIN(approver_order)
+                FROM approval_line
+                WHERE approval_id = d.seq
+                  AND status = 'N'
+                  AND approver_order IS NOT NULL
+          )
+        ORDER BY d.writeDate DESC
+    </select>
 
 </mapper>
