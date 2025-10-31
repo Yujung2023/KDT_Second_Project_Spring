@@ -2,10 +2,13 @@ package com.kedu.project.dao;
 
 import java.util.List;
 import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import com.kedu.project.dto.ApprovalDocDTO;
+import com.kedu.project.dto.MemberDTO;
 
 @Repository
 public class ApprovalDocDAO {
@@ -14,6 +17,10 @@ public class ApprovalDocDAO {
 
     @Autowired
     private SqlSessionTemplate sqlSession;
+    
+    public List<MemberDTO> selectReferenceList(Map<String, Object> param) {
+        return sqlSession.selectList(NAMESPACE + "selectReferenceList", param);
+    }
 
     // 결재문서 등록 (leave_request insert)
     public int insertApprovalDoc(ApprovalDocDTO dto) {
@@ -75,5 +82,9 @@ public class ApprovalDocDAO {
         return sqlSession.update(NAMESPACE + "updateRejectReason", param); // 
     }
     
+    //같은 부서 상급상사 출력
+    public List<MemberDTO> selectApproverCandidates(Map<String,Object> param){
+    	return sqlSession.selectList(NAMESPACE+"selectApproverCandidates",param);
+    }
     
 }

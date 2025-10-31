@@ -1,7 +1,8 @@
 package com.kedu.project.dao;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -59,6 +60,91 @@ public class ApprovalDAO {
 	public List<MemberDTO> selelctApprovalCandidates(){
 		return mybatis.selectList("approval.selectApprovalCandidates");
 	}
+	
+	 //같은 부서 상급상사 출력
+    public List<MemberDTO> selectApproverCandidates(Map<String,Object> param){
+    	return  mybatis.selectList("approval.selectApproverCandidates",param);
+    }
+    
+    //결재선 조회
+    public List<Map<String, Object>> selectApprovalLine(String approvalId){
+        return mybatis.selectList("approval.selectApprovalLine", approvalId);
+    }
+
+    //  참조자 조회
+    public List<MemberDTO> selectReferenceList(int seq) {
+        return mybatis.selectList("approval.selectReferenceList", seq);
+    }
+    
+    
+    //결재선 조회
+    public int insertApprovalLine(int approvalId, String approvalUserId, String approverId, Integer orderNo, String status) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("approvalId", approvalId);       // 문서번호
+        param.put("approvalNumber", approvalId);   // 문서번호 그대로 재사용
+        param.put("approvalUserId", approvalUserId); // 작성자 ID
+        param.put("approverId", approverId);       // 결재자 ID
+        param.put("orderNo", orderNo);             // 순번 (참조자는 null)
+        param.put("status", status);  
+        return mybatis.insert("approval.insertApprovalLine", param);
+    }
+    public boolean existsReject(String approvalId){
+        return mybatis.selectOne("approval.existsReject", approvalId);
+    }
+
+    // 모든 결재자 승인 완료 여부 체크
+    public boolean isAllApproved(String approvalId){
+        return mybatis.selectOne("approval.isAllApproved", approvalId);
+    }
+
+    //승인한 결재자 존재 여부 체크
+    public boolean existsApproved(String approvalId){
+        return mybatis.selectOne("approval.existsApproved", approvalId);
+    }
+    
+    
+    
+    public int approveLine(String approvalId, String userId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("approvalId", approvalId);
+        param.put("userId", userId);
+        return mybatis.update("approval.approveLine", param);
+    }
+
+    public String selectNextApprover(String approvalId) {  
+        return mybatis.selectOne("approval.selectNextApprover", approvalId);
+    }
+    public void updateDocStatus(String approvalId, String status) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("approvalId", approvalId);
+        param.put("status", status);
+        mybatis.update("approval.updateDocStatus", param);
+    }
+    
+    public List<ApprovalDTO> selectMyWaitList(String userId){
+        return mybatis.selectList("approval.selectMyWaitList", userId);
+    }
+
+    public List<ApprovalDTO> selectMyScheduledList(String userId){
+        return mybatis.selectList("approval.selectMyScheduledList", userId);
+    }
+    
+    public int rejectLine(String approvalId, String userId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("approvalId", approvalId);
+        param.put("userId", userId);
+        return mybatis.update("approval.rejectLine", param);
+    }
+    
+    public void rejectLine(String approvalId, String userId, String reason){
+        Map<String, Object> param = new HashMap<>();
+        param.put("approvalId", approvalId);
+        param.put("userId", userId);
+        param.put("reason", reason);
+        mybatis.update("approval.rejectLine", param);
+    }
+
+    
 	
 	
 	

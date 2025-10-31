@@ -27,41 +27,58 @@ public class MemberDTO {
 	private String work_status;                // 근무상태(근무, 휴직, 파견 등)
 	private String profileImage_servName;      // 프로필 이미지 서버 저장 이름(UUID)
 	private String profileImage_oriName;       // 프로필 이미지 업로드 원본 이름
-
+	private Integer orderNo;       // 결재 순번
+	private String approveStatus;  // 결재 상태 (N, Y, R)
    
    
    
+   public Integer getOrderNo() {
+		return orderNo;
+	}
+	public void setOrderNo(Integer orderNo) {
+		this.orderNo = orderNo;
+	}
+	public String getApproveStatus() {
+		return approveStatus;
+	}
+	public void setApproveStatus(String approveStatus) {
+		this.approveStatus = approveStatus;
+	}
+ 
    public MemberDTO(String id, String password, String name, String englishName, String employmentType,
-         String zip_code, String address_line1, String address_line2, String status, String employee_no,
-         Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
-         String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
-         String calendarType, String work_status, String profileImage_servName, String profileImage_oriName) {
-      super();
-      this.id = id;
-      this.password = password;
-      this.name = name;
-      this.englishName = englishName;
-      this.employmentType = employmentType;
-      this.zip_code = zip_code;
-      this.address_line1 = address_line1;
-      this.address_line2 = address_line2;
-      this.status = status;
-      this.employee_no = employee_no;
-      this.hire_date = hire_date;
-      this.dept_code = dept_code;
-      this.job_code = job_code;
-      this.rank_code = rank_code;
-      this.created_time = created_time;
-      this.officeEmail = officeEmail;
-      this.personalEmail = personalEmail;
-      this.officePhone = officePhone;
-      this.mobilePhone = mobilePhone;
-      this.birthDate = birthDate;
-      this.calendarType = calendarType;
-      this.work_status = work_status;
-      this.profileImage_servName = profileImage_servName;
-      this.profileImage_oriName = profileImage_oriName;
-   }
+			String zip_code, String address_line1, String address_line2, String status, String employee_no,
+			Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
+			String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
+			String calendarType, String work_status, String profileImage_servName, String profileImage_oriName,
+			Integer orderNo, String approveStatus) {
+		super();
+		this.id = id;
+		this.password = password;
+		this.name = name;
+		this.englishName = englishName;
+		this.employmentType = employmentType;
+		this.zip_code = zip_code;
+		this.address_line1 = address_line1;
+		this.address_line2 = address_line2;
+		this.status = status;
+		this.employee_no = employee_no;
+		this.hire_date = hire_date;
+		this.dept_code = dept_code;
+		this.job_code = job_code;
+		this.rank_code = rank_code;
+		this.created_time = created_time;
+		this.officeEmail = officeEmail;
+		this.personalEmail = personalEmail;
+		this.officePhone = officePhone;
+		this.mobilePhone = mobilePhone;
+		this.birthDate = birthDate;
+		this.calendarType = calendarType;
+		this.work_status = work_status;
+		this.profileImage_servName = profileImage_servName;
+		this.profileImage_oriName = profileImage_oriName;
+		this.orderNo = orderNo;
+		this.approveStatus = approveStatus;
+	}
    public MemberDTO() {
       super();
       // TODO Auto-generated constructor stub

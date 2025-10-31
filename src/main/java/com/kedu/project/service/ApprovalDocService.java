@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.kedu.project.dao.ApprovalDocDAO;
 import com.kedu.project.dto.ApprovalDocDTO;
+import com.kedu.project.dto.MemberDTO;
+
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,10 @@ public class ApprovalDocService {
         // 사용 안함
         System.out.println("⚠️ updateStatus() 호출됨 – 현재 휴가 시스템은 approval_doc 상태를 관리하지 않음");
     }
+    
+    public List<MemberDTO> selectApproverCandidates(Map<String,Object >param){
+    	return approvalDocDAO.selectApproverCandidates(param);
+    }
 
     /**
      * ❌ approval_doc 조회도 사용 안함
@@ -45,5 +51,9 @@ public class ApprovalDocService {
      */
     public List<Map<String, Object>> getApprovalLine(String approvalId) {
         return approvalDocDAO.selectApprovalLine(approvalId);
+    }
+    
+    public List<MemberDTO> selectReferenceList(Map<String, Object> param) {
+        return  approvalDocDAO.selectReferenceList(param);
     }
 }

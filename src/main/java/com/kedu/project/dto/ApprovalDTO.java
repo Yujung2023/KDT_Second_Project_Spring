@@ -1,8 +1,7 @@
 package com.kedu.project.dto;
 
 import java.sql.Timestamp;
-
-import java.sql.Timestamp;
+import java.util.List;
 
 public class ApprovalDTO {
 	private int seq;
@@ -11,21 +10,46 @@ public class ApprovalDTO {
 	private String comments;
 	private String status;
 	private Timestamp writeDate;
+	private List<MemberDTO> approvers;
+	private List<MemberDTO> referenceList;
+
 
 	
+
+	public List<MemberDTO> getApprovers() {
+		return approvers;
+	}
+
+	public void setApprovers(List<MemberDTO> approvers) {
+		this.approvers = approvers;
+	}
+
+	public List<MemberDTO> getReferenceList() {
+		return referenceList;
+	}
+
+	public void setReferenceList(List<MemberDTO> referenceList) {
+		this.referenceList = referenceList;
+	}
+
 	public ApprovalDTO() {
 		
 	}
 	
-	public ApprovalDTO(int seq, String title, String writer, String comments, Timestamp writeDate, String status) {
+	
+	public ApprovalDTO(int seq, String title, String writer, String comments, String status, Timestamp writeDate,
+			List<MemberDTO> approvers, List<MemberDTO> referenceList) {
 		super();
 		this.seq = seq;
 		this.title = title;
 		this.writer = writer;
 		this.comments = comments;
-		this.writeDate = writeDate;
 		this.status = status;
+		this.writeDate = writeDate;
+		this.approvers = approvers;
+		this.referenceList = referenceList;
 	}
+
 	public int getSeq() {
 		return seq;
 	}

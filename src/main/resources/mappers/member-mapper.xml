@@ -76,7 +76,7 @@
 	</select>
 	
 	<select id="findById" parameterType="String" resultType="com.kedu.project.dto.MemberDTO">
-		select id,password,name,rank_code from member where id=#{id}
+		select id,password,name,rank_code,dept_code from member where id=#{id}
 	</select>
 	
 	<update id="update">
