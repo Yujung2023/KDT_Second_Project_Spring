@@ -48,7 +48,7 @@ public class ContactsController {
 			CServ.insertContacts(dto);
 		}catch(Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("올바른 값과 다른 이메일이랑 중복되지 않게 입력해주세요!");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("올바른 값 또는 다른 아이디와 중복없도록 입력해주세요!");
 		}	
 		return ResponseEntity.ok().build();
 
