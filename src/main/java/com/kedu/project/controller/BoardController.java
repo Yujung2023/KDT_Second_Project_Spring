@@ -47,44 +47,40 @@ public class BoardController {
 	
 	// detail
 	@GetMapping("/detail/{seq}")
-	public ResponseEntity<BoardDTO> getDetail (@PathVariable int seq) {
-		System.out.println("디테일");
-		BoardDTO boardDTO = boardService.getDetail(seq);
-		return ResponseEntity.ok(boardDTO);
+	public ResponseEntity<BoardDTO> getDetail(@PathVariable int seq) {
+	    BoardDTO board = boardService.getDetail(seq);
+	    return ResponseEntity.ok(board);
 	}
-	
-	// update
 	@PutMapping("/{seq}")
-	public ResponseEntity<Void> modifyBoard (@PathVariable int seq , @RequestBody BoardDTO boardDTO , HttpServletRequest request) {
-		
-		String loginId = (String) request.getAttribute("loginID");
-		
-//	    BoardDTO existing = boardService.getDetail(seq);
+	public ResponseEntity<Void> modifyBoard(
+	    @PathVariable int seq,
+	    @RequestBody BoardDTO boardDTO,
+	    HttpServletRequest request
+	) {
+	    String loginId = (String) request.getAttribute("loginID");
 
-	    // 작성자만 수정 가능
-//	    if (!existing.getWriter_id().equals(loginId)) {
-//	        return ResponseEntity.status(403).build(); // Forbidden
-//	    }
+	    boolean success = boardService.modifyBoard(seq, boardDTO, loginId);
+	    if (!success) return ResponseEntity.status(403).build();
 
-	    boardService.modifyBoard(seq, boardDTO);
 	    return ResponseEntity.ok().build();
 	}
-	
-	// delete
+
 	@DeleteMapping("/{seq}")
-	public ResponseEntity<Void> deleteBoard (@PathVariable int seq , HttpServletRequest request) {
-		
-		String loginId = (String) request.getAttribute("loginID");
-		
-//		BoardDTO existing = boardService.getDetail(seq);
+	public ResponseEntity<Void> deleteBoard(
+	    @PathVariable int seq,
+	    HttpServletRequest request
+	) {
+	    String loginId = (String) request.getAttribute("loginID");
 
-	    // 작성자 삭제 가능
-//	    if (!existing.getWriter_id().equals(loginId)) {
-//	        return ResponseEntity.status(403).build(); // Forbidden
-//	    }
+	    boolean success = boardService.deleteBoard(seq, loginId);
+	    if (!success) return ResponseEntity.status(403).build();
 
-	    boardService.deleteBoard(seq);
 	    return ResponseEntity.ok().build();
 	}
 
+	@PutMapping("/hit/{seq}")
+	public ResponseEntity<Void> increaseHit(@PathVariable int seq) {
+	    boardService.increaseHit(seq);
+	    return ResponseEntity.ok().build();
+	}
 }
