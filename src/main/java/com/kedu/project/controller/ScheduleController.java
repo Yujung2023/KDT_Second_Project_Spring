@@ -25,62 +25,66 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ScheduleController {
 
 	@Autowired
-	ScheduleService scheduleService;
-	
-	// insert
-	@PostMapping 
-	public ResponseEntity<Integer> insertSchedule(@RequestBody ScheduleDTO scheduleDTO , HttpServletRequest request){
-		
+	private ScheduleService scheduleService;
+
+	// 일정 등록
+	@PostMapping
+	public ResponseEntity<Integer> insertSchedule(@RequestBody ScheduleDTO scheduleDTO, HttpServletRequest request) {
 		String loginId = (String) request.getAttribute("loginID");
-		
 		scheduleDTO.setCreated_id(loginId);
-		
 		int seq = scheduleService.insertSchedule(scheduleDTO);
-		
 		return ResponseEntity.ok(seq);
 	}
-	
-	// 카테고리별 일정 목록 조회
+
+	// 카테고리별 조회
 	@GetMapping("/category/{category}")
-	public ResponseEntity<List<ScheduleDTO>> getSchedulesByCategory(@PathVariable String category) {
-	    List<ScheduleDTO> schedules = scheduleService.getSchedulesByCategory(category);
-	    return ResponseEntity.ok(schedules);
+	public ResponseEntity<List<ScheduleDTO>> getSchedulesByCategory(@PathVariable String category, HttpServletRequest request) {
+		String loginId = (String) request.getAttribute("loginID");
+		List<ScheduleDTO> schedules = scheduleService.getSchedulesByCategory(category, loginId);
+		return ResponseEntity.ok(schedules);
 	}
-	
-	// 카테고리 all
+
+	// 전체 일정 조회
 	@GetMapping("/all")
-	public ResponseEntity<List<ScheduleDTO>> getAllSchedules() {
-	    List<ScheduleDTO> schedules = scheduleService.getAllSchedules();
-	    return ResponseEntity.ok(schedules);
+	public ResponseEntity<List<ScheduleDTO>> getAllSchedules(HttpServletRequest request) {
+		String loginId = (String) request.getAttribute("loginID");
+		List<ScheduleDTO> schedules = scheduleService.getAllSchedules(loginId);
+		return ResponseEntity.ok(schedules);
 	}
-	
-	// detail
+
+	// 일정 상세
 	@GetMapping("/detail/{seq}")
-	public ResponseEntity<ScheduleDTO> getDetail (@PathVariable int seq) {
-		System.out.println("디테일");
+	public ResponseEntity<ScheduleDTO> getDetail(@PathVariable int seq) {
 		ScheduleDTO scheduleDTO = scheduleService.getDetail(seq);
+		if (scheduleDTO == null) {
+			return ResponseEntity.notFound().build();
+		}
 		return ResponseEntity.ok(scheduleDTO);
 	}
-	
-	// update
+
+	// 일정 수정
 	@PutMapping("/{seq}")
-	public ResponseEntity<Void> modifySchedule (@PathVariable int seq , @RequestBody ScheduleDTO scheduleDTO , HttpServletRequest request) {
-		
+	public ResponseEntity<Void> modifySchedule(@PathVariable int seq, @RequestBody ScheduleDTO scheduleDTO, HttpServletRequest request) {
 		String loginId = (String) request.getAttribute("loginID");
-		
+		ScheduleDTO existing = scheduleService.getDetail(seq);
+
+		if (existing == null) return ResponseEntity.notFound().build();
+		if (!loginId.equals(existing.getCreated_id())) return ResponseEntity.status(403).build();
+
 		scheduleService.modifySchedule(seq, scheduleDTO);
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
-	
-	// delete
+
+	// 일정 삭제
 	@DeleteMapping("/{seq}")
-	public ResponseEntity<Void> deleteSchedule (@PathVariable int seq , HttpServletRequest request) {
-		
+	public ResponseEntity<Void> deleteSchedule(@PathVariable int seq, HttpServletRequest request) {
 		String loginId = (String) request.getAttribute("loginID");
-		
+		ScheduleDTO existing = scheduleService.getDetail(seq);
+
+		if (existing == null) return ResponseEntity.notFound().build();
+		if (!loginId.equals(existing.getCreated_id())) return ResponseEntity.status(403).build();
+
 		scheduleService.deleteSchedule(seq);
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
-
-
 }

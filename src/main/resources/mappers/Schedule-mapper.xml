@@ -2,50 +2,67 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="Schedule">
 
-<insert id="insertSchedule" parameterType="com.kedu.project.dto.ScheduleDTO">
-  
-    <!--시퀀스 먼저 실행해서 DTO의 seq에 담기 -->
-  <selectKey keyProperty="seq" resultType="int" order="BEFORE">
-    SELECT SCHEDULE_SEQ.NEXTVAL FROM DUAL
-  </selectKey>
-  
-  insert into schedule (
-    seq, category, title, content, startAt, endAt, place, color, importantYn, created_id, updated_id, createdAt, updatedAt
-  )
-  values (
-    #{seq}, #{category}, #{title}, #{content}, #{startAt},#{endAt}, #{place},#{color},#{importantYn},
-     #{created_id},#{created_id}, sysdate, null
-  )
-</insert>
+  <!-- 일정 등록 -->
+  <insert id="insertSchedule" parameterType="com.kedu.project.dto.ScheduleDTO">
+    <selectKey keyProperty="seq" resultType="int" order="BEFORE">
+      SELECT SCHEDULE_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
 
-<!-- 카테고리별 일정 목록 -->
-<select id="getSchedulesByCategory" resultType="com.kedu.project.dto.ScheduleDTO">
+    INSERT INTO schedule (
+      seq, category, title, content, startAt, endAt, place, color,
+      importantYn, created_id, updated_id, createdAt, updatedAt
+    )
+    VALUES (
+      #{seq}, #{category}, #{title}, #{content}, #{startAt}, #{endAt}, #{place}, #{color},
+      #{importantYn}, #{created_id}, #{created_id}, SYSDATE, NULL
+    )
+  </insert>
+
+  <!-- 카테고리별 일정 목록 -->
+<select id="getSchedulesByCategory" parameterType="map" resultType="com.kedu.project.dto.ScheduleDTO">
   SELECT *
   FROM schedule
   WHERE category = #{category}
+    AND created_id = #{loginId}
   ORDER BY startAt ASC
 </select>
 
-<!-- 전체 일정용 -->
-<select id="getAllSchedules" resultType="com.kedu.project.dto.ScheduleDTO">
-  SELECT * FROM schedule ORDER BY startAt ASC
+  <!-- 전체 일정  -->
+<select id="getAllSchedules" parameterType="string" resultType="com.kedu.project.dto.ScheduleDTO">
+  SELECT *
+  FROM schedule
+  WHERE created_id = #{_parameter}
+  ORDER BY startAt ASC
 </select>
 
-<!-- Schedule Detail  -->
-<select id="getDetail" resultType="com.kedu.project.dto.ScheduleDTO">
-  select * from schedule where seq = #{seq}
-</select>
+  <!-- 일정 상세 -->
+  <select id="getDetail" parameterType="int" resultType="com.kedu.project.dto.ScheduleDTO">
+    SELECT * FROM schedule WHERE seq = #{seq}
+  </select>
 
-<!-- Schedule Delete  -->
-<delete id="deleteSchedule" >
-	delete from schedule where seq = #{seq}
-</delete>
+  <!-- 수정 -->
+  <update id="modifySchedule" parameterType="com.kedu.project.dto.ScheduleDTO">
+    UPDATE schedule
+    SET
+      category = #{category},
+      title = #{title},
+      content = #{content},
+      startAt = #{startAt},
+      endAt = #{endAt},
+      place = #{place},
+      color = #{color},
+      importantYn = #{importantYn},
+      updatedAt = SYSTIMESTAMP
+    WHERE seq = #{seq}
+  </update>
+  
+  <!-- 삭제 -->
+  <delete id="deleteSchedule" parameterType="int">
+    DELETE FROM schedule WHERE seq = #{seq}
+  </delete>
 
-<!-- Schedule Update  -->
-<update id="modifySchedule">
-	update schedule set title = #{title} , content = #{content} where seq = #{seq}
-</update>
-	
+
 </mapper>

@@ -1,6 +1,8 @@
 package com.kedu.project.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,35 +17,37 @@ public class ScheduleDAO {
 	@Autowired
 	private SqlSession myBatis;
 
-	// insert
-	public int insertSchedule (ScheduleDTO scheduleDTO) {
-
-		int result = myBatis.insert ("Schedule.insertSchedule",scheduleDTO);
-
-		return result;
+	// 일정 등록
+	public int insertSchedule(ScheduleDTO scheduleDTO) {
+		return myBatis.insert("Schedule.insertSchedule", scheduleDTO);
 	}
 
-	// 카테고리별 일정 목록
-	public List<ScheduleDTO> getSchedulesByCategory(String category) {
-	    return myBatis.selectList("Schedule.getSchedulesByCategory", category);
-	}
-	// 카테고리 all
-	public List<ScheduleDTO> getAllSchedules() {
-	    return myBatis.selectList("Schedule.getAllSchedules");
-	}
-
-	// detail
-	public ScheduleDTO getDetail (int seq) {
-		return myBatis.selectOne ("Schedule.getDetail", seq);
+	// 카테고리별 조회
+	public List<ScheduleDTO> getSchedulesByCategory(String category, String loginId) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("category", category);
+		param.put("loginId", loginId);
+		return myBatis.selectList("Schedule.getSchedulesByCategory", param);
 	}
 
-	// delete
-	public void deleteSchedule (int seq) {
-		myBatis.delete ("Schedule.deleteSchedule", seq);
+	// 전체 일정 조회
+	public List<ScheduleDTO> getAllSchedules(String loginId) {
+		return myBatis.selectList("Schedule.getAllSchedules", loginId);
 	}
 
-	// modify
-	public void modifySchedule (ScheduleDTO scheduleDTO) {
+	// 일정 상세
+	public ScheduleDTO getDetail(int seq) {
+		return myBatis.selectOne("Schedule.getDetail", seq);
+	}
+
+	// 일정 수정
+	public void modifySchedule(ScheduleDTO scheduleDTO) {
 		myBatis.update("Schedule.modifySchedule", scheduleDTO);
 	}
+	
+	// 일정 삭제
+	public void deleteSchedule(int seq) {
+		myBatis.delete("Schedule.deleteSchedule", seq);
+	}
+
 }
