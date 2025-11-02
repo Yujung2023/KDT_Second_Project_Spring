@@ -11,36 +11,46 @@ import com.kedu.project.dto.BoardDTO;
 @Repository
 public class BoardDAO {
 
-	 @Autowired
-	    private SqlSession myBatis;
+	@Autowired
+	private SqlSession myBatis;
 
-	    // insert
-	    public int writeBoard(BoardDTO dto) {
-	        return myBatis.insert("Board.insert", dto);
-	    }
+	// insert
+	public int writeBoard(BoardDTO dto) {
+		return myBatis.insert("Board.insert", dto);
+	}
 
-	    // list
-	    public List<BoardDTO> getBoardsByCategory(int categoryId) {
-	        return myBatis.selectList("Board.selectByCategory", categoryId);
-	    }
+	// list
+	public List<BoardDTO> getBoardsByCategory(int categoryId) {
+		return myBatis.selectList("Board.selectByCategory", categoryId);
+	}
 
-	    // detail
-	    public BoardDTO getDetail(int seq) {
-	        return myBatis.selectOne("Board.getDetail", seq);
-	    }
+	// important
+	public void toggleImportant(int seq) {
+		myBatis.update("Board.toggleImportant", seq);
+	}
+	public List<BoardDTO> selectImportant() {
+		return myBatis.selectList("Board.selectImportant");
+	}
 
-	    // delete
-	    public void deleteBoard(int seq) {
-	        myBatis.delete("Board.deleteBoard", seq);
-	    }
+	// detail
+	public BoardDTO getDetail(int seq) {
+		return myBatis.selectOne("Board.getDetail", seq);
+	}
 
-	    // modify
-	    public void modifyBoard(BoardDTO dto) {
-	        myBatis.update("Board.modifyBoard", dto);
-	    }
+	// delete
+	public void deleteBoard(int seq) {
+		myBatis.delete("Board.deleteBoard", seq);
+	}
 
-	    // hit 증가
-	    public void increaseHit(int seq) {
-	        myBatis.update("Board.hit", seq);
-	    }
+	// modify
+	public void modifyBoard(BoardDTO dto) {
+		myBatis.update("Board.modifyBoard", dto);
+	}
+
+	// hit 증가
+	public void increaseHit(int seq) {
+		myBatis.update("Board.hit", seq);
+	}
+
 }
+

@@ -13,38 +13,53 @@ import com.kedu.project.dto.BoardDTO;
 public class BoardService {
 
 
-	 @Autowired
-	    private BoardDAO boardDAO;
+	@Autowired
+	private BoardDAO boardDAO;
 
-	    public int writeBoard(BoardDTO dto) {
-	        return boardDAO.writeBoard(dto);
-	    }
+	// insert
+	public int writeBoard(BoardDTO dto) {
+		return boardDAO.writeBoard(dto);
+	}
 
-	    public List<BoardDTO> getBoardsByCategory(int categoryId) {
-	        return boardDAO.getBoardsByCategory(categoryId);
-	    }
+	// list
+	public List<BoardDTO> getBoardsByCategory(int categoryId) {
+		return boardDAO.getBoardsByCategory(categoryId);
+	}
 
-	    public BoardDTO getDetail(int seq) {
-	        boardDAO.increaseHit(seq); 
-	        return boardDAO.getDetail(seq);
-	    }
+	// important
+	public List<BoardDTO> selectImportant() {
+		return boardDAO.selectImportant();
+	}
+	public void toggleImportant(int seq) {
+		boardDAO.toggleImportant(seq);
+	}
 
-	    public boolean modifyBoard(int seq, BoardDTO dto, String loginId) {
-	        BoardDTO existing = boardDAO.getDetail(seq);
-	        if (existing == null || !existing.getWriter_id().equals(loginId)) return false;
-	        dto.setSeq(seq);
-	        boardDAO.modifyBoard(dto);
-	        return true;
-	    }
+	// detail
+	public BoardDTO getDetail(int seq) { 
+		return boardDAO.getDetail(seq);
+	}
 
-	    public boolean deleteBoard(int seq, String loginId) {
-	        BoardDTO existing = boardDAO.getDetail(seq);
-	        if (existing == null || !existing.getWriter_id().equals(loginId)) return false;
-	        boardDAO.deleteBoard(seq);
-	        return true;
-	    }
-	    
-	    public void increaseHit(int seq) {
-	    	boardDAO.increaseHit(seq);
-	    }
+	// update
+	public boolean modifyBoard(int seq, BoardDTO dto, String loginId) {
+		BoardDTO existing = boardDAO.getDetail(seq);
+		if (existing == null || !existing.getWriter_id().equals(loginId)) return false;
+		dto.setSeq(seq);
+		boardDAO.modifyBoard(dto);
+		return true;
+	}
+
+	// delete
+	public boolean deleteBoard(int seq, String loginId) {
+		BoardDTO existing = boardDAO.getDetail(seq);
+		if (existing == null || !existing.getWriter_id().equals(loginId)) return false;
+		boardDAO.deleteBoard(seq);
+		return true;
+	}
+
+	// hit
+	public void increaseHit(int seq) {
+		boardDAO.increaseHit(seq);
+	}
+
+
 }
