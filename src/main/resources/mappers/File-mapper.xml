@@ -24,4 +24,12 @@
     DELETE FROM FILE_META WHERE sysname = #{sysname}
   </delete>
 	
+	<select id="getFileBySysname" parameterType="string" resultType="com.kedu.project.dto.FilesDTO">
+    SELECT seq, module_type, module_seq, sysname, orgname, contentType
+    FROM FILE_META
+    WHERE sysname = #{sysname}
+	</select>
+	
+	
+
 </mapper>

@@ -142,5 +142,8 @@ public class FileController {
 	    List<MailFileDTO> fileList = FServ.getMailFileList(mailSeq); // DB에서 mailSeq별 파일 조회
 	    return ResponseEntity.ok(fileList);
 	}
+	
+	
+
 
 }
