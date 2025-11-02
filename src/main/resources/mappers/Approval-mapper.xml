@@ -141,7 +141,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE ROWNUM = 1
     </select>
 
-    <!-- 승인 대기 목록 -->
+    
     <select id="selectMyWaitList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
         SELECT d.*
         FROM approval_doc d
