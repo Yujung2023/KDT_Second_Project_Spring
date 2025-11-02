@@ -236,4 +236,19 @@ public class TaskController {
             return ResponseEntity.status(500).body("error");
         }
     }
+    
+    //담당 업무 불러오기
+    @GetMapping("/assigned")
+    public ResponseEntity<List<Map<String, Object>>> getAssignedTask(HttpServletRequest request) {
+        String loginId = (String) request.getAttribute("loginID");
+
+        if (loginId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 서비스 호출: loginId로 담당 업무 가져오기
+        List<Map<String, Object>> tasks = taskService.getTasksByAssignee(loginId);
+
+        return ResponseEntity.ok(tasks);
+    }
 }

@@ -159,5 +159,11 @@ public class TaskService {
 
 		return taskDAO.updateGroup(dto);
 	}
+	
+	public List<Map<String,Object>> getTasksByAssignee(String loginId)
+	{
+		return  taskDAO.getTasksByAssignee(loginId);
+	}
+
 
 }
