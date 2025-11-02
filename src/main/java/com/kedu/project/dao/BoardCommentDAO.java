@@ -1,35 +1,47 @@
 package com.kedu.project.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kedu.project.dto.BoardCommentDTO;
-import com.kedu.project.dto.BoardDTO;
 
 @Repository
 public class BoardCommentDAO {
-	
+
 	@Autowired
 	private SqlSession myBatis;
-	
-	// insert
-	public int writeComment (BoardCommentDTO boardCommentDTO) {
-		
-		int result = myBatis.insert ("BoardComment.insert",boardCommentDTO);
-		
-		return result;
-	}
-	
-	// list
-	public List<BoardCommentDTO> getComments(int parent_seq) {
-	    return myBatis.selectList ("BoardComment.getComments", parent_seq);
+
+	// 댓글 등록
+	public int writeComment(BoardCommentDTO boardCommentDTO) {
+		return myBatis.insert("BoardComment.insert", boardCommentDTO);
 	}
 
-	// delete
-	public void deleteComment (int seq) {
-	    myBatis.delete ("BoardComment.deleteComment", seq);
+	// 페이징 댓글 조회
+	public List<BoardCommentDTO> getcomments(int parentSeq, int offset, int size) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("parent_seq", parentSeq);
+		params.put("offset", offset);
+		params.put("size", size);
+		return myBatis.selectList("BoardComment.getcomments", params);
+	}
+
+	// 전체 댓글 수
+	public int getTotalCount(int parentSeq) {
+		return myBatis.selectOne("BoardComment.getTotalCount", parentSeq);
+	}
+
+	// 댓글 삭제
+	public void deleteComment(int seq) {
+		myBatis.delete("BoardComment.deleteComment", seq);
+	}
+
+	// 댓글 작성자 조회
+	public String findWriterIdByCommentSeq(int seq) {
+		return myBatis.selectOne("BoardComment.findWriterIdByCommentSeq", seq);
 	}
 }

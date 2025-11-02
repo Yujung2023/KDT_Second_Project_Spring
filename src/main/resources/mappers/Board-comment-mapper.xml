@@ -2,20 +2,44 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="BoardComment">
 
-<insert id="insert" parameterType="com.kedu.project.dto.BoardCommentDTO">
-  insert into board_comment values(board_comment_seq.nextval,#{parent_seq},#{writer_id},#{comments},sysdate)
-</insert>
+  <!-- 댓글 등록 -->
+  <insert id="insert" parameterType="com.kedu.project.dto.BoardCommentDTO">
+    INSERT INTO board_comment
+    VALUES (board_comment_seq.NEXTVAL, #{parent_seq}, #{writer_id}, #{comments}, SYSDATE)
+  </insert>
 
-<!-- BoardComment List  -->
-<select id="getComments" resultType="com.kedu.project.dto.BoardCommentDTO" parameterType="int">
-select * from board_comment where parent_seq = #{parent_seq}
-</select>
+  <!-- 페이징 댓글 조회 -->
+  <select id="getcomments" resultType="com.kedu.project.dto.BoardCommentDTO">
+    SELECT *
+    FROM (
+      SELECT a.*, ROWNUM AS rn
+      FROM (
+        SELECT *
+        FROM board_comment
+        WHERE parent_seq = #{parent_seq}
+        ORDER BY WRITEDATE DESC
+      ) a
+      WHERE ROWNUM &lt;= #{offset} + #{size}
+    )
+    WHERE rn &gt; #{offset}
+  </select>
 
-<!-- BoardComment Delete  -->
-<delete id="deleteComment" parameterType="int">
-	delete from board_comment where seq = #{seq}
-</delete>
-	
+  <!-- 전체 댓글 수 -->
+  <select id="getTotalCount" parameterType="int" resultType="int">
+    SELECT COUNT(*) FROM board_comment WHERE parent_seq = #{parent_seq}
+  </select>
+
+  <!-- 댓글 삭제 -->
+  <delete id="deleteComment" parameterType="int">
+    DELETE FROM board_comment WHERE seq = #{seq}
+  </delete>
+
+  <!-- 댓글 작성자 ID 조회 -->
+  <select id="findWriterIdByCommentSeq" parameterType="int" resultType="string">
+    SELECT writer_id FROM board_comment WHERE seq = #{seq}
+  </select>
+
 </mapper>

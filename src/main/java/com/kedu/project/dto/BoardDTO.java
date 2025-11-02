@@ -11,6 +11,7 @@ public class BoardDTO {
 	private String content;    // 본문
 	private String writer_id;   // FK: 작성자
 	private String noticeYn;   // 공지 여부
+	private String importantYn; // 중요 체크
 	private int hit;           // 조회수
 	private Timestamp createdAt; // 작성일시
 	private Timestamp updatedAt; // 수정일시
@@ -19,7 +20,7 @@ public class BoardDTO {
 	public BoardDTO() {}
 
 	public BoardDTO(int seq, int category_id, String category_name, String title, String content, String writer_id,
-			String noticeYn, int hit, Timestamp createdAt, Timestamp updatedAt) {
+			String noticeYn, String importantYn, int hit, Timestamp createdAt, Timestamp updatedAt) {
 		super();
 		this.seq = seq;
 		this.category_id = category_id;
@@ -28,6 +29,7 @@ public class BoardDTO {
 		this.content = content;
 		this.writer_id = writer_id;
 		this.noticeYn = noticeYn;
+		this.importantYn = importantYn;
 		this.hit = hit;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -89,6 +91,14 @@ public class BoardDTO {
 		this.noticeYn = noticeYn;
 	}
 
+	public String getImportantYn() {
+		return importantYn;
+	}
+
+	public void setImportantYn(String importantYn) {
+		this.importantYn = importantYn;
+	}
+
 	public int getHit() {
 		return hit;
 	}
@@ -112,6 +122,5 @@ public class BoardDTO {
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	
 
 }
