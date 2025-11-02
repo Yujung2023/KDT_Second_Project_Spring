@@ -138,15 +138,14 @@ public class ApprovalService {
 		    // 1) 해당 결재자를 반려 처리
 		    dao.rejectLine(approvalId, userId, reason);
 
-		    // 2) 문서 상태를 바로 전체 반려로 변경
+		    // 2) 문서 상태를 바로 전체 반려 상태로 변경
 		    dao.updateDocStatus(approvalId, "REJECTED");
 		}
 		
 	
+	
 		
-		
-	 //test
-	 
+	
 	
 	
 	

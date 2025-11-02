@@ -159,7 +159,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY d.writeDate DESC
     </select>
 
-    <!-- 예정 문서 목록입니다.-->
+    <!-- 예정 문서 목록.-->
     <select id="selectMyScheduledList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
         SELECT d.*
         FROM approval_doc d
