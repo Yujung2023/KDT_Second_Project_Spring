@@ -96,15 +96,18 @@
 	        AND job_code = #{job}
 	    </if>
 	
-	order by case rank_code
-        when '사원' then 7
-        when '주임' then 6
-        when '대리' then 5
-        when '과장' then 4
-        when '차장' then 3
-        when '부장' then 2
-        when '사장' then 1
-    end
+	ORDER BY CASE rank_code
+    WHEN 'J001' THEN 1
+    WHEN 'J002' THEN 2
+    WHEN 'J003' THEN 3
+    WHEN 'J004' THEN 4
+    WHEN 'J005' THEN 5
+    WHEN 'J006' THEN 6
+    WHEN 'J007' THEN 7
+    WHEN 'J008' THEN 8
+    WHEN 'J009' THEN 9
+	END desc
+   
 	</select>
 	
 	

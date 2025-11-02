@@ -142,4 +142,9 @@ public class TaskDAO {
 		System.out.println("dto.seq:"+ dto.getSeq());
 		return mybatis.delete("Task.updateGroup",dto);
 	}
+	
+	public List<Map<String,Object>> getTasksByAssignee(String loginId)
+	{
+		return  mybatis.selectList("Task.getTasksByAssignee",loginId);
+	}
 }

@@ -144,4 +144,13 @@
 		    updated_at = SYSTIMESTAMP
 		  WHERE seq = #{seq}
 		</update>
+		
+		<select id="getTasksByAssignee" parameterType="String" resultType="map">
+		SELECT t.group_seq as group_seq,g.group_name as group_name , t.title as title , t.status as status, TO_CHAR(t.created_at, 'YYYY-MM-DD HH24:MI:SS') AS created_at, m.name AS created_name,
+		m.id AS created_id , m.rank_code  AS created_rank_code
+			FROM task t
+			LEFT JOIN taskGroup g ON t.group_seq = g.seq
+			LEFT JOIN member m on t.created_id = m.id
+			WHERE t.assignee_id = #{loginId}		   
+		</select>	
 </mapper>
