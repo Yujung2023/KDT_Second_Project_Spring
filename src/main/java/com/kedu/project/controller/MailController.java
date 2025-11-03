@@ -42,13 +42,13 @@ public class MailController {
 		dto.setSenderName(senderName);
 		
 		MServ.SendMail(dto);
-		
+		  return ResponseEntity.ok(dto.getSeq() + "|" + senderName);
 		}catch(Exception e) {
 			e.printStackTrace();
 			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수신인,제목,내용을 모두 입력해주세요");
 		}
 		
-		   return ResponseEntity.ok(String.valueOf(dto.getSeq()));
+		   
 	}
 
 	@GetMapping("/recent") // 홈에서 받은 메일 리스트 출력
