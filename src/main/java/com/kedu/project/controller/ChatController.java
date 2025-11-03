@@ -50,10 +50,5 @@ public class ChatController {
         template.convertAndSend("/topic/chatroom/" + roomId, updated);
     }
 
-    /**  참여자 목록 조회 API (이름 + 직급만 반환) */
-    @GetMapping("/api/chat/members/{roomId}")
-    public ResponseEntity<List<MemberSimpleDTO>> getRoomMembers(@PathVariable String roomId) {
-        List<MemberSimpleDTO> members = chatRoomService.getRoomMembers(roomId);
-        return ResponseEntity.ok(members);
-    }
+  
 }
