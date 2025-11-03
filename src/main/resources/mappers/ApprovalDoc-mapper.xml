@@ -26,7 +26,7 @@
 </insert>
 
   <!-- 결재선 조회 -->
-  <select id="selectApprovalLine" parameterType="string" resultType="map">
+<select id="selectApprovalLine" parameterType="string" resultType="map">
     SELECT
       al.seq,
       al.approval_id AS approvalId,
@@ -34,12 +34,14 @@
       m.name AS name,
       m.rank_code AS rank_code,
       al.approver_status AS STATUS,
+      al.reject_reason AS rejectReason,
       CASE WHEN al.approver_order IS NULL THEN 1 ELSE 0 END AS referenceFlag
     FROM approval_line al
     JOIN member m ON al.approver_id = m.id
     WHERE al.approval_id = #{approvalId}
     ORDER BY referenceFlag, al.approver_order
-  </select>
+</select>
+
 
   <!-- seq -> approval_id -->
   <select id="getApprovalIdBySeq" resultType="string">
@@ -91,11 +93,12 @@
   </select>
 
   <!-- 반려 사유 기록 -->
-  <update id="updateRejectReason" parameterType="map">
-    UPDATE leave_request
-    SET reject_reason = #{reason}, reject_time = SYSTIMESTAMP
-    WHERE seq = #{seq}
-  </update>
+ <update id="updateRejectReasonOnLine" parameterType="map">
+    UPDATE approval_line
+    SET reject_reason = #{reason}
+    WHERE approval_id = #{approvalId}
+      AND approver_id = #{approverId}
+</update>
 
   <!-- 상급자 추천 리스트 -->
 <select id="selectApproverCandidates" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
