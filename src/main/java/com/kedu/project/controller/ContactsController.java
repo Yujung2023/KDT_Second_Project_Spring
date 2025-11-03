@@ -1,9 +1,9 @@
 package com.kedu.project.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,44 +54,53 @@ public class ContactsController {
 
 	}
 	
-	@GetMapping // 주소록 리스트 출력
+	//주소록 리스트 출력
+	@GetMapping
 	public ResponseEntity<List<ContactsDTO>> SelectContactsList(
-			@RequestParam(required = false) String name, @RequestParam(required = false) String type , HttpServletRequest request) {
+	        @RequestParam(required = false) String name, 
+	        @RequestParam(required = false) String type, 
+	        HttpServletRequest request) {
 
-		List<ContactsDTO> list;
-		String loginId = (String) request.getAttribute("loginID");
-		
-		if (type != null && (type.equals("solo") || type.equals("multi"))) {
-			// type이 있을 경우: solo/multi 필터 적용
-			if (name != null && !name.isEmpty()) {
-				// 이름 검색 + 타입 필터
-				list = CServ.searchByNameAndType(name, type);
-			} else {
-				// 이름 없이 타입만 필터
-				if (type.equals("solo")) {
-					
-					list = CServ.selectSoloList(type,loginId);
-				} else {
-					
-					list = CServ.selectMultiList(type);
-				}
-			}
-		} else {
-			// 타입 없을 경우 전체 검색
-			if (name != null && !name.isEmpty()) {
-				list = CServ.searchName(name);
-			} else {
-				
-				list = new ArrayList<>();
-				list.addAll(CServ.selectMultiList(type));
-				list.addAll(CServ.selectSoloList(type,loginId));
-				  
-			}
-		}
+	    String loginId = (String) request.getAttribute("loginID");
+	    List<ContactsDTO> list;
 
-		return ResponseEntity.ok(list);
+	    if (type != null && (type.equals("solo") || type.equals("multi"))) {
+	        // type이 있을 경우: solo/multi 필터 
+	        if (name != null && !name.isEmpty()) {
+	            list = CServ.searchByNameAndType(name, type);
+	        } else { // 개인주소록
+	            if (type.equals("solo")) {
+	                list = CServ.selectSoloList(type, loginId);
+	            } else { // 공용주소록
+	                list = CServ.selectMultiList(type);
+	            }
+	        }
+	    } else {
+	        // 타입 없을 경우 전체 검색
+	        if (name != null && !name.isEmpty()) {
+	            list = CServ.searchName(name);
+	        } else {
+	        	
+	            List<ContactsDTO> multiList = CServ.selectMultiList(type);
+	            List<ContactsDTO> soloList = CServ.selectSoloList(type, loginId);
 
+	            // 중복 제거: 이메일+user_id 기준
+	            Map<String, ContactsDTO> combinedMap = new LinkedHashMap<>();
+
+	            for (ContactsDTO dto : multiList) {
+	                combinedMap.put(dto.getEmail() + "_multi", dto); // 멀티는 key에 _multi
+	            }
+	            for (ContactsDTO dto : soloList) {
+	                combinedMap.put(dto.getEmail() + "_" + dto.getUser_id(), dto); // 개인 주소록은 user_id 포함
+	            }
+
+	            list = new ArrayList<>(combinedMap.values());
+	        }
+	    }
+
+	    return ResponseEntity.ok(list);
 	}
+
 	
 	@PutMapping  // 주소록 타입 변경
 	public ResponseEntity<Void> updateContactsType(@RequestBody Map<String, Object> body ,  HttpServletRequest request) {
@@ -117,20 +126,20 @@ public class ContactsController {
 	}
 
 
-//	// 개인주소록으로 복사
-//	@PutMapping("/toSoloCopy")
-//	public ResponseEntity<Void> copyToSoloContacts(@RequestBody Map<String, Object> body, HttpServletRequest request) {
-//	    String loginId = (String) request.getAttribute("loginID");
-//	    List<Integer> seqList = (List<Integer>) body.get("seqList");
-//
-//	    if (loginId == null || seqList == null || seqList.isEmpty()) {
-//	        return ResponseEntity.badRequest().build();
-//	    }
-//
-//	    CServ.copyContactsToSolo(loginId, seqList);
-//	    return ResponseEntity.ok().build();
-//	}
-//	
+	// 개인주소록으로 복사
+	@PutMapping("/toSoloCopy")
+	public ResponseEntity<Void> copyToSoloContacts(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+	    String loginId = (String) request.getAttribute("loginID");
+	    List<Integer> seqList = (List<Integer>) body.get("seqList");
+
+	    if (loginId == null || seqList == null || seqList.isEmpty()) {
+	        return ResponseEntity.badRequest().build();
+	    }
+
+	    CServ.copyContactsToSolo(loginId, seqList);
+	    return ResponseEntity.ok().build();
+	}
+	
 	
 	
 	@DeleteMapping // 주소록 삭제
