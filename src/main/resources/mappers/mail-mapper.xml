@@ -5,16 +5,13 @@
 <mapper namespace="Mail">
 	
 <insert id="SendMail" useGeneratedKeys="true" parameterType="com.kedu.project.dto.MailDTO">
-    <selectKey keyProperty="seq" resultType="long" order="BEFORE">
-        SELECT mail_seq.NEXTVAL FROM dual
+	<selectKey keyProperty="seq" resultType="long" order="BEFORE">
+    SELECT mail_seq.NEXTVAL FROM dual
     </selectKey>
-    insert into mail 
-        (seq, user_id, senderId, recipientId, title, senderName, recipientName, content) 
-    values
-        (#{seq}, #{user_id}, #{senderId}, #{recipientId}, #{title}, 
-         #{senderName,jdbcType=VARCHAR}, #{recipientName,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR})
+    insert into mail (seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
+	values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
+	#{senderName}, #{recipientName}, #{content} ) 
 </insert>
-
 	
 	<select id="getNameById" resultType="string">
     SELECT name FROM contacts  WHERE email = #{userId}
@@ -73,7 +70,6 @@
     SELECT mailSeq, sysname, orgname FROM mailFile
     WHERE mailSeq = #{mailSeq}
 	</select>
-
 
 	
 </mapper>

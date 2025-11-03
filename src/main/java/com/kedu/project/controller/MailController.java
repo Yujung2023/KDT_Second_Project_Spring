@@ -36,11 +36,13 @@ public class MailController {
 		// dto에 로그인한 아이디 넣기
 		dto.setUser_id(loginId);
 		dto.setSenderId(loginId);
+		
 		// 주소록에 있는 발신자 이름 조회
 	    String senderName = MServ.getNameById(loginId);
 		dto.setSenderName(senderName);
 		
 		MServ.SendMail(dto);
+		
 		}catch(Exception e) {
 			e.printStackTrace();
 			  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수신인,제목,내용을 모두 입력해주세요");
