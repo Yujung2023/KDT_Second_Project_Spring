@@ -143,8 +143,15 @@ public class ApprovalDAO {
         param.put("reason", reason);
         mybatis.update("approval.rejectLine", param);
     }
-
     
+    public List<ApprovalDTO> selectDocsVisibleTo(String loginId) {
+        return mybatis.selectList("approval.selectDocsVisibleTo", loginId);
+    }
+    
+    public void activateNextApprover(String approvalId) {
+        mybatis.update("approval.activateNextApprover", approvalId);
+    }
+
 	
 	
 	

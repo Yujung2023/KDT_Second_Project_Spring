@@ -77,9 +77,12 @@ public class ApprovalDocDAO {
     }
 
     // 반려 사유 기록 (선택)
-    public int insertRejectReason(int seq, String reason) {
-        Map<String, Object> param = Map.of("seq", seq, "reason", reason);
-        return sqlSession.update(NAMESPACE + "updateRejectReason", param); // 
+    public int insertRejectReasonByApprovalId(String approvalId, String reason) {
+        Map<String, Object> param = Map.of(
+            "approvalId", approvalId,
+            "reason", reason
+        );
+        return sqlSession.update(NAMESPACE + "insertRejectReasonByApprovalId", param);
     }
     
     //같은 부서 상급상사 출력

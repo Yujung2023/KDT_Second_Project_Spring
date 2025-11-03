@@ -12,7 +12,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select * from approval_doc where status=#{status} order by seq desc
     </select>
 
-    <!-- 등록 -->
     <insert id="insert" parameterType="com.kedu.project.dto.ApprovalDTO">
         <selectKey keyProperty="seq" order="BEFORE" resultType="int">
             SELECT approval_seq.NEXTVAL FROM dual
@@ -21,20 +20,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         VALUES (#{seq}, #{writer}, #{title}, #{comments}, 'WAIT', SYSDATE)
     </insert>
 
-    <!-- 결재선 INSERT -->
-    <insert id="insertApprovalLine" parameterType="map">
-        INSERT INTO approval_line (
-            seq, approval_id, approvalNumber, approval_userid,
-            approver_id, approver_order, status, writeDate
-        ) VALUES (
-            approval_line_seq.NEXTVAL,
-            #{approvalId}, #{approvalId}, #{approvalUserId},
-            #{approverId}, #{orderNo, jdbcType=INTEGER},
-            #{status}, SYSTIMESTAMP
-        )
-    </insert>
+   <insert id="insertApprovalLine" parameterType="map">
+    INSERT INTO approval_line (
+        seq,
+        approval_id,
+        approver_id,      <!-- ✅ 진짜 결재자 -->
+        approver_order,
+        status,
+        writeDate
+    ) VALUES (
+        approval_line_seq.NEXTVAL,
+        #{approvalId},
+        #{approverId},    <!-- ✅ m.getId() 가 여기 들어감 -->
+        #{orderNo, jdbcType=INTEGER},
+        #{status},
+        SYSTIMESTAMP
+    )
+</insert>
 
-    <!-- 임시 저장 -->
     <insert id="tempinsert" parameterType="com.kedu.project.dto.ApprovalDTO">
         <selectKey keyProperty="seq" order="BEFORE" resultType="int">
             SELECT approval_seq.NEXTVAL FROM dual
@@ -64,7 +67,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE id = #{id}
     </select>
 
-    <!-- 결재선 조회 -->
     <select id="selectApprovalLine" parameterType="string" resultType="map">
         SELECT
             al.seq,
@@ -81,14 +83,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY referenceFlag, al.approver_order
     </select>
 
-    <!-- 문서 상태 변경 -->
     <update id="updateDocStatus" parameterType="map">
         UPDATE approval_doc
         SET status = #{status}
         WHERE seq = #{approvalId}
     </update>
 
-    <!-- 승인 처리 -->
     <update id="approveLine" parameterType="map">
         UPDATE approval_line
         SET status = 'Y'
@@ -96,7 +96,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           AND approver_id = #{userId}
     </update>
 
-    <!-- ✅ 반려 처리 (사유 포함 / 중복 없음) -->
     <update id="rejectLine" parameterType="map">
         UPDATE approval_line
         SET status = 'R',
@@ -105,7 +104,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           AND approver_id = #{userId}
     </update>
 
-    <!-- 승인 / 반려 상태 검사 -->
     <select id="existsReject" resultType="boolean">
         SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM approval_line
@@ -141,39 +139,77 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE ROWNUM = 1
     </select>
 
-    <!-- 승인 대기 목록 -->
-    <select id="selectMyWaitList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
-        SELECT d.*
-        FROM approval_doc d
-        JOIN approval_line l ON d.seq = l.approval_id
-        WHERE d.status != 'REJECTED'
-          AND l.approver_id = #{userId}
-          AND l.status = 'N'
-          AND l.approver_order = (
-                SELECT MIN(approver_order)
-                FROM approval_line
-                WHERE approval_id = d.seq
-                  AND status = 'N'
-                  AND approver_order IS NOT NULL
-          )
-        ORDER BY d.writeDate DESC
-    </select>
+<select id="selectMyWaitList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
+    SELECT d.*
+    FROM approval_doc d
+    JOIN approval_line l ON d.seq = l.approval_id
+    WHERE d.status = 'WAIT'
+      AND LOWER(TRIM(l.approver_id)) = LOWER(TRIM(#{_parameter}))   <!-- ✅ 여기 핵심 -->
+      AND NVL(l.status, 'N') = 'N'
+      AND l.approver_order = (
+            SELECT MIN(approver_order)
+            FROM approval_line
+            WHERE approval_id = d.seq
+              AND NVL(status,'N') = 'N'
+              AND approver_order IS NOT NULL
+      )
+    ORDER BY d.writeDate DESC
+</select>
+<select id="selectMyScheduledList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
+    SELECT 
+        d.*,
+        'P' AS myStatus   <!-- ✅ 예정 상태 -->
+    FROM approval_doc d
+    JOIN approval_line l ON d.seq = l.approval_id
+    WHERE d.status IN ('WAIT','PROCESSING')
+      AND LOWER(TRIM(l.approver_id)) = LOWER(TRIM(#{_parameter}))
+      AND NVL(l.status, 'N') = 'N'
+      AND l.approver_order > (
+            SELECT MIN(approver_order)
+            FROM approval_line
+            WHERE approval_id = d.seq
+              AND NVL(status,'N') = 'N'
+              AND approver_order IS NOT NULL
+      )
+    ORDER BY d.writeDate DESC
+</select>
+    <!-- ✅ 완전히 수정된 문서 리스트 조회 -->
+<select id="selectDocsVisibleTo" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
+    SELECT DISTINCT
+        D.SEQ,
+        D.WRITER,
+        D.TITLE,
+        D.STATUS,
+        D.WRITEDATE
+    FROM approval_doc D
+    /* ✅ 기안자 정보 JOIN (writer = name) */
+    JOIN member M
+        ON D.WRITER = M.name
 
-    <!-- 예정 문서 목록 -->
-    <select id="selectMyScheduledList" parameterType="string" resultType="com.kedu.project.dto.ApprovalDTO">
-        SELECT d.*
-        FROM approval_doc d
-        JOIN approval_line l ON d.seq = l.approval_id
-        WHERE l.approver_id = #{userId}
-          AND l.status = 'N'
-          AND l.approver_order > (
-                SELECT MIN(approver_order)
-                FROM approval_line
-                WHERE approval_id = d.seq
-                  AND status = 'N'
-                  AND approver_order IS NOT NULL
-          )
-        ORDER BY d.writeDate DESC
-    </select>
+    /* ✅ 결재라인 (숫자인 결재문서만 조인) */
+    LEFT JOIN approval_line L
+        ON REGEXP_LIKE(L.APPROVAL_ID, '^[0-9]+$')
+       AND TO_NUMBER(L.APPROVAL_ID) = D.SEQ
+
+    WHERE
+           M.id = #{_parameter}          <!-- ✅ 내가 기안한 문서 -->
+        OR L.APPROVER_ID = #{_parameter} <!-- ✅ 내가 결재자인 문서 -->
+
+    ORDER BY D.SEQ DESC
+</select>
+
+<update id="activateNextApprover" parameterType="string">
+    UPDATE approval_line
+    SET status = 'N'
+    WHERE approval_id = #{approvalId}
+      AND status = 'P'
+      AND approver_order = (
+         SELECT MIN(approver_order)
+         FROM approval_line
+         WHERE approval_id = #{approvalId}
+           AND status = 'P'
+           AND approver_order IS NOT NULL
+      )
+</update>
 
 </mapper>
