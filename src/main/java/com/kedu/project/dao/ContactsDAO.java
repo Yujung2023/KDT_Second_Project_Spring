@@ -29,11 +29,7 @@ public class ContactsDAO {
 		return mybatis.selectList("Contacts.SelectContactsList",user_id);
 	}
 
-	// 개인 주소록 리스트
-	//	public List<ContactsDTO> selectSoloList(String type) {
-	//
-	//		return mybatis.selectList("Contacts.selectSoloList",type);
-	//	}
+	
 
 	// 개인 주소록 리스트
 	public List<ContactsDTO> selectSoloList(Map<String ,Object > params) {
@@ -88,15 +84,7 @@ public class ContactsDAO {
 		return mybatis.selectList("Contacts.selectOranizationList");
 	}
 
-	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
 
-		return mybatis.update("Contacts.updateOrganizationTypeMulti", param);
-	}
-
-	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
-
-		return mybatis.update("Contacts.updateOrganizationTypeSingle", param);
-	}
 
 
 	//개인주소록으로 복사
@@ -104,11 +92,7 @@ public class ContactsDAO {
 		return  mybatis.insert("Contacts.copyContactsToSolo", map);
 	}
 
-	// 주소록 개인 주소록으로 복사
-	public Object copyOrgContactsToSolo(Map<String, Object> map) {
-
-		return mybatis.insert("Contacts.copyOrgContactsToSolo", map);
-	}
+	
 
 	// 조직도 이름으로 검색
 	public List<MemberDTO> searchByOrgName(String name) {
