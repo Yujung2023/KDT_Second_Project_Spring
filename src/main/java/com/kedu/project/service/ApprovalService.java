@@ -26,35 +26,45 @@ public class ApprovalService {
 		return dao.selectByStatus(status);
 	}
 	
+	
+	@Transactional
 	public int insert(ApprovalDTO dto) {
 
-	    // 1) 문서 저장 → seq 자동 생성됨
 	    dao.insert(dto);
+	    int approvalId = dto.getSeq();
+	    String writerId = dto.getWriter_id();
 
-	    String writer = dto.getWriter(); // 작성자 ID
+	    // 결재자 저장
+	    if (dto.getApprovers() != null) {
+	        for (MemberDTO m : dto.getApprovers()) {
 
-	 // 2) 결재선 저장
-	    if(dto.getApprovers() != null) {
-	        int order = 1;
-	        for(MemberDTO m : dto.getApprovers()) {
+	            Integer orderNo = m.getApproverOrder(); // ✅ 여기만 바꾸면 해결
 
-	            String status = (order == 1) ? "N" : "P"; // ✅ 핵심 변경
-
-	            dao.insertApprovalLine(dto.getSeq(), dto.getWriter(), m.getId(), order, status);
-	            order++;
+	            dao.insertApprovalLine(
+	                approvalId,
+	                writerId,
+	                m.getId(),
+	                orderNo,
+	                (orderNo != null && orderNo == 1) ? "N" : "P"
+	            );
 	        }
 	    }
 
-	    // 3) 참조자 저장 (order = null)
-	    if(dto.getReferenceList() != null) {
-	        for(MemberDTO m : dto.getReferenceList()) {
-	            dao.insertApprovalLine(dto.getSeq(), dto.getWriter(), m.getId(), null, "N");
+	    // 참조자 저장
+	    if (dto.getReferenceList() != null) {
+	        for (MemberDTO m : dto.getReferenceList()) {
+	            dao.insertApprovalLine(
+	                approvalId,
+	                writerId,
+	                m.getId(),
+	                null,
+	                "N"
+	            );
 	        }
 	    }
 
-	    return dto.getSeq();
+	    return approvalId;
 	}
-
 	
 	public int tempinsert(ApprovalDTO dto) {
 		System.out.println("임시저장");
