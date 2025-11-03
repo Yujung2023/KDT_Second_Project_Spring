@@ -7,5 +7,10 @@
    SELECT * FROM Member
 </select>
 
+<update id="updateWorkStatus" parameterType="map">
+    UPDATE member
+    SET work_status = #{work_status}
+    WHERE id = #{id}
+</update>
 
 </mapper>

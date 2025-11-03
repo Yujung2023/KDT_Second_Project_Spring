@@ -15,4 +15,5 @@ public interface ChatFileRepository extends JpaRepository<ChatFile, Long> {
 
     /** 저장명(sysname)으로 파일 검색 */
     ChatFile findBySavedName(String savedName);
+    
 }
