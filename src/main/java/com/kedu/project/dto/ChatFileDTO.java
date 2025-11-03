@@ -17,7 +17,7 @@ public class ChatFileDTO {
     private Long id;
     private String roomId;
     private String originalName;
-    private String sysdName;
+    private String sysName;
     private long size;
     private String contentType;
     private Date uploadTime;

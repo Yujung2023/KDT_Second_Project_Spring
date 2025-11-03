@@ -30,7 +30,7 @@ public class ChatFileServiceImpl implements ChatFileService {
         ChatFile entity = ChatFile.builder()
                 .roomId(dto.getRoomId())
                 .originalName(dto.getOriginalName())
-                .savedName(dto.getSysdName())
+                .savedName(dto.getSysName())
                 .size(dto.getSize())
                 .contentType(dto.getContentType())
                 .uploadTime(LocalDateTime.now())
@@ -48,7 +48,7 @@ public class ChatFileServiceImpl implements ChatFileService {
                         .id(f.getId())
                         .roomId(f.getRoomId())
                         .originalName(f.getOriginalName())
-                        .sysdName(f.getSavedName())
+                        .sysName(f.getSavedName())
                         .size(f.getSize())
                         .contentType(f.getContentType())
                         .uploadTime(java.sql.Timestamp.valueOf(f.getUploadTime()))
@@ -67,7 +67,7 @@ public class ChatFileServiceImpl implements ChatFileService {
                 .id(f.getId())
                 .roomId(f.getRoomId())
                 .originalName(f.getOriginalName())
-                .sysdName(f.getSavedName())
+                .sysName(f.getSavedName())
                 .size(f.getSize())
                 .contentType(f.getContentType())
                 .uploadTime(java.sql.Timestamp.valueOf(f.getUploadTime()))
@@ -82,4 +82,5 @@ public class ChatFileServiceImpl implements ChatFileService {
         ChatFile file = repository.findBySavedName(savedName);
         if (file != null) repository.delete(file);
     }
+    
 }

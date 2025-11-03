@@ -57,6 +57,7 @@
 	<insert id="MailFileUpload" parameterType="list">
     INSERT INTO mailFile(seq, mailSeq, sysname, orgname)
     VALUES (mailFile_seq.NEXTVAL, #{mailSeq}, #{sysname}, #{orgname})
+
 	</insert>
 
 	
@@ -70,6 +71,7 @@
     SELECT mailSeq, sysname, orgname FROM mailFile
     WHERE mailSeq = #{mailSeq}
 	</select>
+
 
 	
 </mapper>
