@@ -10,7 +10,7 @@
     </selectKey>
     insert into mail (seq , user_id , senderId, recipientId , title, senderName , recipientName , content ) 
 	values(#{seq} , #{user_id} , #{senderId} , #{recipientId}, #{title} , 
-	#{senderName}, #{recipientName}, #{content} ) 
+	#{senderName, jdbcType=VARCHAR}, #{recipientName, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR} ) 
 </insert>
 	
 	<select id="getNameById" resultType="string">
