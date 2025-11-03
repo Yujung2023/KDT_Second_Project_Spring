@@ -89,7 +89,7 @@
               SELECT 1 FROM approval_line al
               WHERE al.approval_id = lr.approval_id
               AND al.approver_id = #{memberId}
-              AND al.approver_status = 'REFERENCE'
+           
          )
     )
 </if>

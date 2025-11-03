@@ -12,9 +12,18 @@ public class ApprovalDTO {
 	private Timestamp writeDate;
 	private List<MemberDTO> approvers;
 	private List<MemberDTO> referenceList;
+	private String myStatus; 
 
 
 	
+
+	public String getMyStatus() {
+		return myStatus;
+	}
+
+	public void setMyStatus(String myStatus) {
+		this.myStatus = myStatus;
+	}
 
 	public List<MemberDTO> getApprovers() {
 		return approvers;
@@ -37,8 +46,9 @@ public class ApprovalDTO {
 	}
 	
 	
+	
 	public ApprovalDTO(int seq, String title, String writer, String comments, String status, Timestamp writeDate,
-			List<MemberDTO> approvers, List<MemberDTO> referenceList) {
+			List<MemberDTO> approvers, List<MemberDTO> referenceList, String myStatus) {
 		super();
 		this.seq = seq;
 		this.title = title;
@@ -48,6 +58,7 @@ public class ApprovalDTO {
 		this.writeDate = writeDate;
 		this.approvers = approvers;
 		this.referenceList = referenceList;
+		this.myStatus = myStatus;
 	}
 
 	public int getSeq() {

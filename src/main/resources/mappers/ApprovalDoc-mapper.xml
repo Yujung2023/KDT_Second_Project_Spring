@@ -4,156 +4,140 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kedu.project.dao.ApprovalDocDAO">
+
+  <!-- 결재선 저장 -->
 <insert id="insertApprovalLine" parameterType="map">
-INSERT INTO approval_line (
-    seq,
-    approval_id,
-    approvalNumber,
-    approval_userid,
-    approver_id,
-    approver_order,
-    approver_status,
-    status,
-    writeDate
-) VALUES (
-    approval_line_seq.NEXTVAL,
-    #{approvalId},
-    #{approvalNumber},
-    #{approvalUserId},
-    #{approverId},
-
-    <choose>
-        <when test="orderNo != null">
-            #{orderNo}
-        </when>
-        <otherwise>
-            NULL
-        </otherwise>
-    </choose>,
-
-    #{status},       <!-- ✅ approver_status -->
-    #{docStatus},    <!-- ✅ 문서 상태는 WAITING 유지 -->
-    SYSTIMESTAMP
-)
+  INSERT INTO approval_line (
+      seq, approval_id, approvalNumber, approval_userid,
+      approver_id, approver_order, approver_status, writeDate
+  ) VALUES (
+      approval_line_seq.NEXTVAL,
+      #{approvalId},
+      #{approvalNumber},
+      #{approvalUserId},
+      #{approverId},
+      <choose>
+          <when test="orderNo != null">#{orderNo}</when>
+          <otherwise>NULL</otherwise>
+      </choose>,
+      #{status},
+      SYSTIMESTAMP
+  )
 </insert>
 
-
-
-
-    <!-- ✅ 결재선 조회 -->
-<select id="selectApprovalLine" parameterType="string" resultType="map">
+  <!-- 결재선 조회 -->
+  <select id="selectApprovalLine" parameterType="string" resultType="map">
     SELECT
-        al.seq,
-        al.approval_id AS approvalId,
-        al.approver_id AS id,
-        m.name AS name,
-        m.rank_code AS rank_code,
-        al.approver_status AS STATUS,
-        CASE 
-            WHEN al.approver_order IS NULL THEN 1 ELSE 0 
-        END AS referenceFlag
+      al.seq,
+      al.approval_id AS approvalId,
+      al.approver_id AS id,
+      m.name AS name,
+      m.rank_code AS rank_code,
+      al.approver_status AS STATUS,
+      CASE WHEN al.approver_order IS NULL THEN 1 ELSE 0 END AS referenceFlag
     FROM approval_line al
     JOIN member m ON al.approver_id = m.id
     WHERE al.approval_id = #{approvalId}
     ORDER BY referenceFlag, al.approver_order
-</select>
-    
-    <!-- ✅ 휴가 seq -> approval_id 조회 -->
-    <select id="getApprovalIdBySeq" resultType="string">
-        SELECT approval_id
-        FROM leave_request
-        WHERE seq = #{seq}
-    </select>
+  </select>
 
+  <!-- seq -> approval_id -->
+  <select id="getApprovalIdBySeq" resultType="string">
+    SELECT approval_id
+    FROM leave_request
+    WHERE seq = #{seq}
+  </select>
 
-<!--  현재 결재 담당자 -->
-<select id="getCurrentApprover" resultType="string">
-    SELECT approver_id
-    FROM (
-        SELECT approver_id
-        FROM approval_line
-        WHERE approval_id = #{approvalId}
-          AND approver_status = 'WAITING'
-        ORDER BY approver_order
-    )
-    WHERE ROWNUM = 1
+  <!-- 현재 결재자 -->
+ <select id="getCurrentApprover" resultType="string">
+  SELECT approver_id
+  FROM approval_line
+  WHERE approval_id = #{approvalId}
+    AND approver_status = 'CHECKING'
 </select>
 
-<!--  다음 결재자 -->
+  <!-- 다음 결재자 -->
 <select id="getNextApprover" parameterType="map" resultType="string">
+  SELECT approver_id
+  FROM (
     SELECT approver_id
-    FROM (
-        SELECT approver_id, approver_order
-        FROM approval_line
-        WHERE approval_id = #{approvalId}
-          AND approver_status = 'WAITING'
-        ORDER BY approver_order
-    )
-    WHERE approver_order >
-        (SELECT approver_order FROM approval_line
+    FROM approval_line
+    WHERE approval_id = #{approvalId}
+      AND approver_order >
+        (SELECT approver_order
+         FROM approval_line
          WHERE approval_id = #{approvalId}
            AND approver_id = #{approverId})
-      AND ROWNUM = 1
+      AND approver_status = 'WAITING'
+    ORDER BY approver_order
+  )
+  WHERE ROWNUM = 1
 </select>
 
-<select id="selectReferenceList" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
+  <!-- 결재자 상태 변경 -->
+  <update id="updateApproverStatus" parameterType="map">
+    UPDATE approval_line
+    SET approver_status = #{status}, writeDate = SYSTIMESTAMP
+    WHERE approval_id = #{approvalId}
+    AND approver_id = #{approverId}
+  </update>
+
+  <!-- 참조자 리스트 -->
+  <select id="selectReferenceList" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
     SELECT id, name, dept_code, rank_code
     FROM member
     WHERE dept_code = #{deptCode}
       AND id != #{memberId}
-</select>
+  </select>
 
-<update id="updateRejectReason" parameterType="map">
+  <!-- 반려 사유 기록 -->
+  <update id="updateRejectReason" parameterType="map">
     UPDATE leave_request
-    SET reject_reason = #{reason},
-        reject_time = SYSTIMESTAMP
+    SET reject_reason = #{reason}, reject_time = SYSTIMESTAMP
     WHERE seq = #{seq}
-</update>
+  </update>
 
-
-
-<!--  상급자 출력 -->
+  <!-- 상급자 추천 리스트 -->
 <select id="selectApproverCandidates" parameterType="map" resultType="com.kedu.project.dto.MemberDTO">
-SELECT 
-   id,
-   name,
-   dept_code,
-   rank_code
-FROM member
-WHERE id != #{memberId}
-  AND (
-        rank_code = '사장'                      
-     OR (dept_code = #{deptCode}                  
-         AND (
-              (#{rankCode} = '사원' AND rank_code IN ('주임','대리','과장','차장','부장','사장'))
-           OR (#{rankCode} = '주임' AND rank_code IN ('대리','과장','차장','부장','사장'))
-           OR (#{rankCode} = '대리' AND rank_code IN ('과장','차장','부장','사장'))
-           OR (#{rankCode} = '과장' AND rank_code IN ('차장','부장','사장'))
-           OR (#{rankCode} = '차장' AND rank_code IN ('부장','사장'))
-           OR (#{rankCode} = '부장' AND rank_code = '사장')
-           OR (#{rankCode} = '사장')
-        )
+    SELECT id, name, dept_code, rank_code
+    FROM member
+    WHERE id != #{memberId}
+      AND (
+            rank_code = 'J009'  -- 사장
+         OR (dept_code = #{deptCode}
+             AND (
+                (#{rankCode} = 'J001' AND rank_code IN ('J002','J003','J004','J005','J006','J007','J008','J009'))
+             OR (#{rankCode} = 'J002' AND rank_code IN ('J003','J004','J005','J006','J007','J008','J009'))
+             OR (#{rankCode} = 'J003' AND rank_code IN ('J004','J005','J006','J007','J008','J009'))
+             OR (#{rankCode} = 'J004' AND rank_code IN ('J005','J006','J007','J008','J009'))
+             OR (#{rankCode} = 'J005' AND rank_code IN ('J006','J007','J008','J009'))
+             OR (#{rankCode} = 'J006' AND rank_code IN ('J007','J008','J009'))
+             OR (#{rankCode} = 'J007' AND rank_code IN ('J008','J009'))
+             OR (#{rankCode} = 'J008' AND rank_code = 'J009')
+             OR (#{rankCode} = 'J009')
+             )
+         )
       )
-  )
-ORDER BY 
-  CASE rank_code
-    WHEN '사원' THEN 1
-    WHEN '주임' THEN 2
-    WHEN '대리' THEN 3
-    WHEN '과장' THEN 4
-    WHEN '차장' THEN 5
-    WHEN '부장' THEN 6
-    WHEN '임원' THEN 7
-    WHEN '사장' THEN 8
-  END
+    ORDER BY
+      CASE rank_code
+        WHEN 'J001' THEN 1
+        WHEN 'J002' THEN 2
+        WHEN 'J003' THEN 3
+        WHEN 'J004' THEN 4
+        WHEN 'J005' THEN 5
+        WHEN 'J006' THEN 6
+        WHEN 'J007' THEN 7
+        WHEN 'J008' THEN 8
+        WHEN 'J009' THEN 9
+      END
 </select>
-
-    
-      <update id="updateApproverStatus" parameterType="map">
-        UPDATE approval_line
-        SET approver_status = #{status}, writeDate = SYSTIMESTAMP
-        WHERE approval_id = #{approvalId}
-        AND approver_id = #{approverId}
-    </update>
+  
+    <update id="insertRejectReasonByApprovalId" parameterType="map">
+  UPDATE leave_request
+  SET reject_reason = #{reason},
+      reject_time = SYSTIMESTAMP,
+      status = 'REJECTED'
+  WHERE approval_id = #{approvalId}
+</update>
 
 </mapper>
