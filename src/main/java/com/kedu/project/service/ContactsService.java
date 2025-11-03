@@ -112,15 +112,15 @@ public class ContactsService {
 
 	
 	
-//	// 개인주소록으로 복사
-//	public Object copyContactsToSolo(String loginId, List<Integer> seqList) {
-//		Map<String, Object> map = new HashMap<>();
-//		map.put("user_id", loginId);
-//		map.put("seqList", seqList);
-//		return dao.copyContactsToSolo(map);
-//	}
-//
-//
+	// 개인주소록으로 복사
+	public Object copyContactsToSolo(String loginId, List<Integer> seqList) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("user_id", loginId);
+		map.put("seqList", seqList);
+		return dao.copyContactsToSolo(map);
+	}
+
+
 //	   // 조직도 개인 주소록으로 복사
 //    public Object copyOrgContactsToSolo(String loginId, List<String> idList) {
 //        Map<String, Object> map = new HashMap<>();
