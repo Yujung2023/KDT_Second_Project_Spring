@@ -2,6 +2,8 @@ package com.kedu.project.dto;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MemberDTO {
 	private String id;                         // 아이디
 	private String password;                   // 비밀번호
@@ -29,9 +31,18 @@ public class MemberDTO {
 	private String profileImage_oriName;       // 프로필 이미지 업로드 원본 이름
 	private Integer orderNo;       // 결재 순번
 	private String approveStatus;  // 결재 상태 (N, Y, R)
-   
-   
-   
+	
+	@JsonProperty("approver_order")
+	private Integer approverOrder;
+
+	public Integer getApproverOrder() {   // ✅ 정확한 카멜 케이스
+	    return approverOrder;
+	}
+
+	public void setApproverOrder(Integer approverOrder) { // ✅ 정확한 카멜 케이스
+	    this.approverOrder = approverOrder;
+	}
+	
    public Integer getOrderNo() {
 		return orderNo;
 	}
@@ -45,12 +56,13 @@ public class MemberDTO {
 		this.approveStatus = approveStatus;
 	}
  
+   
    public MemberDTO(String id, String password, String name, String englishName, String employmentType,
 			String zip_code, String address_line1, String address_line2, String status, String employee_no,
 			Timestamp hire_date, String dept_code, String job_code, String rank_code, Timestamp created_time,
 			String officeEmail, String personalEmail, String officePhone, String mobilePhone, Timestamp birthDate,
 			String calendarType, String work_status, String profileImage_servName, String profileImage_oriName,
-			Integer orderNo, String approveStatus) {
+			Integer orderNo, String approveStatus, Integer approverOrder) {
 		super();
 		this.id = id;
 		this.password = password;
@@ -78,6 +90,7 @@ public class MemberDTO {
 		this.profileImage_oriName = profileImage_oriName;
 		this.orderNo = orderNo;
 		this.approveStatus = approveStatus;
+		this.approverOrder = approverOrder;
 	}
    public MemberDTO() {
       super();

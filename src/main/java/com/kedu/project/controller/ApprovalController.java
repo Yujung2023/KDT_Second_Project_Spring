@@ -93,18 +93,17 @@ public class ApprovalController {
 	     return ResponseEntity.ok(list);
 	 }
 	
-	@PostMapping("/write")
-	public ResponseEntity<String> insert(@RequestBody ApprovalDTO dto) {
-	    System.out.println(" 결재 등록 요청: " + dto);
-	    try {
-	        approvalservice.insert(dto);
-	        return ResponseEntity.ok("등록 성공");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.internalServerError().body("등록 실패");
-	    }
-	}
-	
+	 @PostMapping("/write")
+	 public ResponseEntity<Map<String, Object>> insert(@RequestBody ApprovalDTO dto) {
+	     System.out.println("📌 결재 등록 요청: " + dto);
+	     try {
+	         int newSeq = approvalservice.insert(dto); // ✅ seq 반환받기
+	         return ResponseEntity.ok(Map.of("seq", newSeq)); // ✅ seq를 JSON으로 반환
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         return ResponseEntity.internalServerError().body(Map.of("error", "등록 실패"));
+	     }
+	 }
 	
 	
 	@GetMapping("/detail/{seq}")
@@ -128,7 +127,7 @@ public class ApprovalController {
 	    Integer currentOrder = lineData.stream()
 	            .filter(row -> "N".equals(((String) row.get("STATUS")))) // 아직 결재 안함
 	            .map(row -> {
-	                Object o = row.get("ORDERNO");
+	                Object o = row.get("APPROVER_ORDER");
 	                return (o == null ? null : ((Number) o).intValue());
 	            })
 	            .filter(o -> o != null)
@@ -143,7 +142,7 @@ public class ApprovalController {
 	        member.setRank_code((String) row.get("RANK_CODE"));
 	        member.setStatus((String) row.get("STATUS"));
 
-	        Object orderNo = row.get("ORDERNO");
+	        Object orderNo = row.get("APPROVER_ORDER");
 	        Integer order = (orderNo == null ? null : ((Number) orderNo).intValue());
 	        member.setOrderNo(order);
 
@@ -221,6 +220,14 @@ public class ApprovalController {
 	    System.out.println("🔥 예정 문서 요청: " + userId);
 	    return ResponseEntity.ok(approvalservice.getMyScheduledList(userId));
 	}
+	
+	@GetMapping("/line/{seq}")
+	public ResponseEntity<List<Map<String, Object>>> getApprovalLine(@PathVariable String seq) {
+	    List<Map<String, Object>> line = approvalservice.selectApprovalLine(seq);
+	    return ResponseEntity.ok(line);
+	}
+	
+
 	
 
 

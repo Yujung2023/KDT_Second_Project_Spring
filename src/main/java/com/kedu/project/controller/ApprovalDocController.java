@@ -48,7 +48,7 @@ public class ApprovalDocController {
         return approvalDocService.selectApproverCandidates(param);
     }
     
-    @GetMapping("/line/{approvalId}")
+    @GetMapping("/doc/line/{approvalId}")
     public ResponseEntity<?> getApprovalLine(@PathVariable String approvalId) {
         return ResponseEntity.ok(approvalDocService.getApprovalLine(approvalId));
     }
