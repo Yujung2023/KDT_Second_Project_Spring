@@ -39,13 +39,16 @@ public class HomeLayoutController {
     public ResponseEntity<HomeLayoutDTO> getLayout(HttpServletRequest request) {
         String loginId = (String) request.getAttribute("loginID");
         if (loginId == null) return ResponseEntity.badRequest().body(null);
-        
+
         HomeLayoutDTO dto = service.getLayout(loginId);
-        System.out.println(dto.getLayout_Json());
-        if(dto ==null) {
-        	return ResponseEntity.badRequest().body(null);
+
+        // ✅ null 먼저 확인해야 함
+        if (dto == null) {
+            System.out.println("❗ 레이아웃 정보 없음 for loginId = " + loginId);
+            return ResponseEntity.ok(null); // or 기본 레이아웃 JSON 리턴
         }
-        
+
+        System.out.println("layout json: " + dto.getLayout_Json());
         return ResponseEntity.ok(dto);
     }
 }

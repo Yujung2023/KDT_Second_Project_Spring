@@ -56,15 +56,17 @@ public class ChatFileController {
             // GCS에 파일 업로드
             storage.createFrom(blobInfo, inputStream);
 
-            // DTO 구성 및 DB 저장
+             // DTO 구성 및 DB 저장
             ChatFileDTO dto = new ChatFileDTO();
             dto.setRoomId(roomId);
             dto.setOriginalName(file.getOriginalFilename());
-            dto.setSysdName(sysname);
+            dto.setSysName(sysname);
             dto.setSize(file.getSize());
+            dto.setContentType(file.getContentType());   // ✅ 이 줄 꼭 추가해야 함!!
             dto.setUploadTime(new Date());
 
             chatFileService.saveFile(dto);
+
 
             return ResponseEntity.ok(dto);
 
