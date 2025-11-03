@@ -19,8 +19,15 @@ public class MailDAO {
 		
 		return mybatis.insert("Mail.SendMail",dto);
 	}
+	
 	public String getNameById(String userId) {
-		return mybatis.selectOne("Mail.getNameById", userId);
+	    List<String> names = mybatis.selectList("Mail.getNameById", userId);
+	    
+	    if (names == null || names.isEmpty()) {
+	        return null; // 결과 없으면 null 반환
+	    }
+	    
+	    return names.get(0); // 첫 번째 이름만 반환 (중복 있을 경우)
 	}
 	
 	public List<MailDTO> SelectrecipientMailList(String loginId) {
