@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Notification">
+
+	
+	<select id="getNotificationByLoginId" parameterType="String" resultType="com.kedu.project.dto.NotificationDTO">
+	    SELECT *
+	    FROM alarm
+	    WHERE receiver_id = #{loginId}
+	      AND is_read = 'N'
+	    ORDER BY created_at DESC
+	</select>
+
+    <insert id="insertNotice" parameterType="com.kedu.project.dto.NotificationDTO">
+    	INSERT INTO alarm (
+	        SEQ,
+	        sender_id,
+	        RECEIVER_ID,
+	        TYPE,
+	        MESSAGE,
+	        IS_READ,
+	        CREATED_AT
+	    ) VALUES (
+	        alarm_seq.NEXTVAL,
+	        #{sender_id},
+	        #{receiver_id},
+	        #{type},
+	        #{message},
+	        'N',
+	        SYSDATE
+	    )
+	</insert>
+	
+	<update id="markAsRead" parameterType="String">
+	    UPDATE alarm
+	    SET is_read = 'Y'
+	    WHERE RECEIVER_ID = #{loginId}
+	</update>
+
+</mapper>
