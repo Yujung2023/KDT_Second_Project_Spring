@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * - GCS에 업로드된 파일과 1:1 대응
  */
 @Entity
-@Table(name = "chat_file")
+@Table(name = "CHAT_FILE")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,30 +20,30 @@ public class ChatFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "FILE_ID") // ✅ 실제 컬럼명과 매핑
     private Long id;
 
-    /** 채팅방 ID */
-    @Column(nullable = false)
+    @Column(name = "ROOM_ID", nullable = false)
     private String roomId;
 
-    /** 실제 업로드된 파일명 (사용자 원본 파일명) */
-    @Column(nullable = false)
+    @Column(name = "ORIGINAL_NAME", nullable = false)
     private String originalName;
 
-    /** GCS에 저장된 시스템 파일명 (UUID_원본명) */
-    @Column(nullable = false, unique = true)
+    @Column(name = "SAVED_NAME", nullable = false, unique = true)
     private String savedName;
 
-    /** 파일 크기 (bytes) */
-    @Column(nullable = false)
+    @Column(name = "FILE_SIZE", nullable = false)
     private Long size;
 
-    /** MIME 타입 (ex: image/png, application/pdf) */
+    @Column(name = "CONTENT_TYPE")
     private String contentType;
 
-    /** 업로드 시각 */
+    @Column(name = "UPLOAD_TIME")
     private LocalDateTime uploadTime;
 
-    /** 업로더(보낸 사람) ID */
+    @Column(name = "UPLOADER_ID")
     private String uploaderId;
+
+    @Column(name = "DOWNLOAD_COUNT")
+    private Integer downloadCount;
 }
