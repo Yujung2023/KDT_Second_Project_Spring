@@ -1,20 +1,26 @@
 package com.kedu.project.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.kedu.project.dao.ApprovalDAO;
 import com.kedu.project.dao.ApprovalDocDAO;
+import com.kedu.project.dto.ApprovalDTO;
 import com.kedu.project.dto.ApprovalDocDTO;
 import com.kedu.project.dto.MemberDTO;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class ApprovalDocService {
 
     @Autowired
     private ApprovalDocDAO approvalDocDAO;
+    
+    @Autowired
+    private ApprovalDAO approvalDAO;
 
     /**
      * ❌ 전자결재 문서 생성은 지금 프로젝트에서 사용하지 않음
@@ -56,4 +62,6 @@ public class ApprovalDocService {
     public List<MemberDTO> selectReferenceList(Map<String, Object> param) {
         return  approvalDocDAO.selectReferenceList(param);
     }
+    
+  
 }
