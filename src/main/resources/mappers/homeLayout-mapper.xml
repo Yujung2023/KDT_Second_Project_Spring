@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="HomeLayout">
+
+  <!-- 사용자 존재 여부 확인 -->
+  <select id="existsByUserId" parameterType="String"  resultType="int">
+    SELECT COUNT(*) FROM HOMELAYOUT WHERE USER_ID = #{userId}
+  </select>
+
+  <!-- 신규 삽입 -->
+  <insert id="insertLayout" parameterType="com.kedu.project.dto.HomeLayoutDTO">
+    INSERT INTO HOMELAYOUT (USER_ID, LAYOUT_JSON, UPDATED_AT)
+    VALUES (#{user_Id}, #{layout_Json}, SYSTIMESTAMP)
+  </insert>
+
+  <!-- 업데이트 -->
+  <update id="updateLayout" parameterType="com.kedu.project.dto.HomeLayoutDTO">
+    UPDATE HOMELAYOUT
+    SET LAYOUT_JSON = #{layout_Json}, UPDATED_AT = SYSTIMESTAMP
+    WHERE USER_ID = #{user_Id}
+  </update>
+
+  <!-- 조회 -->
+  <select id="getLayoutByUser" parameterType="String" resultType="com.kedu.project.dto.HomeLayoutDTO">
+    SELECT
+      USER_ID,
+      LAYOUT_JSON,
+      TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS UPDATED_AT
+    FROM HOMELAYOUT
+    WHERE USER_ID = #{userId}
+  </select>
+
+</mapper>

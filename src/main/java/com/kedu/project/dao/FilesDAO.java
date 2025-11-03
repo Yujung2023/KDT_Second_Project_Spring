@@ -37,5 +37,12 @@ public class FilesDAO {
 	public int deleteFile(String sysname) {
 		return mybatis.delete("File.deleteFile", sysname);
 	}
+	// 답장용 파일
+	
+	public List<FilesDTO> getFilesBySysname(String sysname) {
+	    return mybatis.selectList("File.getFileBySysname", sysname);
+	}
+
+	
 }
 

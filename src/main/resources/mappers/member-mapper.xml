@@ -138,30 +138,29 @@
 	</select>
 	
 	<update id="updateMember" parameterType="com.kedu.project.dto.MemberDTO">
-	  UPDATE member
+	  UPDATE MEMBER
 	  SET
-	    name = #{name},
-	    englishName = #{englishName},
-	    employmentType = #{employmentType},
-	    hire_date = #{hire_date},
-	    dept_code = #{dept_code},
-	    rank_code = #{rank_code},
-	    job_code = #{job_code},
-	    personalEmail = #{personalEmail},
-	    officePhone = #{officePhone},
-	    mobilePhone = #{mobilePhone},
-	    birthdate = #{birthDate},
-	    calendarType = #{calendarType},
-	    zip_code = #{zip_code},
-	    address_line1 = #{address_line1},
-	    address_line2 = #{address_line2},
-	    profileImage_servName = #{profileImage_servName, jdbcType=VARCHAR}, 
-   		profileImage_oriName = #{profileImage_oriName, jdbcType=VARCHAR}
-	    <if test="password != null and password != ''">
-	      , password = #{password}
+	    name = #{name, jdbcType=VARCHAR},
+	    englishName = #{englishName, jdbcType=VARCHAR},
+	    employmentType = #{employmentType, jdbcType=VARCHAR},
+	    hire_date = #{hire_date, jdbcType=DATE},
+	    dept_code = #{dept_code, jdbcType=VARCHAR},
+	    rank_code = #{rank_code, jdbcType=VARCHAR},
+	    job_code = #{job_code, jdbcType=VARCHAR},
+	    personalEmail = #{personalEmail, jdbcType=VARCHAR},
+	    officePhone = #{officePhone, jdbcType=VARCHAR},
+	    mobilePhone = #{mobilePhone, jdbcType=VARCHAR},
+	    birthdate = #{birthDate, jdbcType=DATE},
+	    calendarType = #{calendarType, jdbcType=VARCHAR},
+	    zip_code = #{zip_code, jdbcType=VARCHAR},
+	    address_line1 = #{address_line1, jdbcType=VARCHAR},
+	    address_line2 = #{address_line2, jdbcType=VARCHAR},
+	    profileImage_servName = #{profileImage_servName, jdbcType=VARCHAR},
+	    profileImage_oriName = #{profileImage_oriName, jdbcType=VARCHAR}
+	    <if test="password != null and password.trim() != ''">
+	      , password = #{password, jdbcType=VARCHAR}
 	    </if>
-	    
-	  WHERE id = #{id}
+	  WHERE id = #{id, jdbcType=VARCHAR}
 	</update>
 	
 	<update id="updateMemberDelProfile" parameterType="com.kedu.project.dto.MemberDTO">

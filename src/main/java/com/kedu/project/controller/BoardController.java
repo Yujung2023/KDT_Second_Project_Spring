@@ -45,12 +45,26 @@ public class BoardController {
 	    return ResponseEntity.ok(boards);
 	}
 	
+	// important
+	@GetMapping("/important")
+	public ResponseEntity<List<BoardDTO>> getImportantBoards() {
+	    List<BoardDTO> list = boardService.selectImportant();
+	    return ResponseEntity.ok(list);
+	}
+	@PutMapping("/toggleImportant/{seq}")
+	public ResponseEntity<String> toggleImportant(@PathVariable int seq) {
+	    boardService.toggleImportant(seq);
+	    return ResponseEntity.ok("success");
+	}
+	
 	// detail
 	@GetMapping("/detail/{seq}")
 	public ResponseEntity<BoardDTO> getDetail(@PathVariable int seq) {
 	    BoardDTO board = boardService.getDetail(seq);
 	    return ResponseEntity.ok(board);
 	}
+	
+	// update
 	@PutMapping("/{seq}")
 	public ResponseEntity<Void> modifyBoard(
 	    @PathVariable int seq,
@@ -65,6 +79,7 @@ public class BoardController {
 	    return ResponseEntity.ok().build();
 	}
 
+	// delete
 	@DeleteMapping("/{seq}")
 	public ResponseEntity<Void> deleteBoard(
 	    @PathVariable int seq,
@@ -78,9 +93,11 @@ public class BoardController {
 	    return ResponseEntity.ok().build();
 	}
 
+	// hit
 	@PutMapping("/hit/{seq}")
 	public ResponseEntity<Void> increaseHit(@PathVariable int seq) {
 	    boardService.increaseHit(seq);
 	    return ResponseEntity.ok().build();
 	}
+	
 }

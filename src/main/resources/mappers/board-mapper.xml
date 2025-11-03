@@ -15,26 +15,50 @@
       seq, category_id, title, content, writer_id, noticeyn, hit, createdat, updatedat
     )
     values (
-      #{seq}, #{category_id}, #{title}, #{content}, #{writer_id}, #{noticeYn}, 0, sysdate, null
-    )
+      #{seq}, #{category_id}, #{title}, #{content}, #{writer_id}, #{noticeYn}, 0, SYSTIMESTAMP , null
+       )
   </insert>
 
-  <!-- 게시글 목록 -->
-  <select id="selectByCategory" resultType="com.kedu.project.dto.BoardDTO">
-    select 
-      b.seq,
-      b.category_id,
-      b.title,
-      b.writer_id,
-      b.noticeyn,
-      b.hit,
-      b.createdat,
-      c.categoryname
-    from board b
-    join board_category c on b.category_id = c.categoryid
-    where b.category_id = #{category_id}
-    order by b.noticeyn desc, b.seq desc
-  </select>
+<!-- 게시글 목록 -->
+<select id="selectByCategory" resultType="com.kedu.project.dto.BoardDTO">
+  SELECT
+    b.seq,
+    b.category_id,
+    b.title,
+    b.writer_id,
+    b.noticeyn,
+    b.importantyn,
+    b.hit,
+    b.createdat,
+    b.updatedat,
+    c.categoryname
+  FROM board b
+  JOIN board_category c ON b.category_id = c.categoryid
+  WHERE b.category_id = #{category_id}
+  ORDER BY
+    CASE WHEN UPPER(b.noticeyn) = 'Y' THEN 1 ELSE 0 END DESC,
+    COALESCE(b.updatedat, b.createdat) DESC,
+    b.seq DESC
+</select>
+
+<!-- 중요게시글만 조회 -->
+<select id="selectImportant" resultType="com.kedu.project.dto.BoardDTO">
+  select 
+    b.seq,
+    b.category_id,
+    b.title,
+    b.writer_id,
+    b.noticeyn,
+    b.importantyn,
+    b.hit,
+    b.createdat,
+    b.updatedat,
+    c.categoryname
+  from board b
+  join board_category c on b.category_id = c.categoryid
+  where b.importantyn = 'Y'
+  order by b.createdat desc
+</select>
 
   <!-- 게시글 상세 -->
   <select id="getDetail" resultType="com.kedu.project.dto.BoardDTO">
@@ -76,6 +100,12 @@
   update board
   set hit = hit + 1
   where seq = #{seq}
+</update>
+
+  <!-- 중요게시글 체크 -->
+<update id="toggleImportant" parameterType="int">
+ update board
+  set importantyn = case when importantyn = 'Y' then 'N' else 'Y'end where seq = #{seq}
 </update>
 
 </mapper>
