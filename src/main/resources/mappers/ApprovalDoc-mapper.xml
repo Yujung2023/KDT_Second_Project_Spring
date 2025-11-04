@@ -33,12 +33,12 @@
       al.approver_id AS id,
       m.name AS name,
       m.rank_code AS rank_code,
-      al.approver_status AS STATUS,
       al.reject_reason AS rejectReason,
+      al.approver_status AS STATUS,
       CASE WHEN al.approver_order IS NULL THEN 1 ELSE 0 END AS referenceFlag
     FROM approval_line al
     JOIN member m ON al.approver_id = m.id
-    WHERE al.approval_id = #{approvalId}
+    WHERE al.approval_id = #{_parameter}
     ORDER BY referenceFlag, al.approver_order
 </select>
 
@@ -135,12 +135,13 @@
       END
 </select>
   
-    <update id="insertRejectReasonByApprovalId" parameterType="map">
-  UPDATE leave_request
+  <update id="insertRejectReasonByApprovalId" parameterType="map">
+  UPDATE approval_line
   SET reject_reason = #{reason},
-      reject_time = SYSTIMESTAMP,
-      status = 'REJECTED'
+      approver_status = 'REJECTED',
+      writeDate = SYSTIMESTAMP
   WHERE approval_id = #{approvalId}
+    AND approver_id = #{approverId}
 </update>
 
 </mapper>

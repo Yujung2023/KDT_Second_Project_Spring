@@ -159,6 +159,7 @@ public class ApprovalService {
 		    dao.updateDocStatus(approvalId, "REJECTED");
 		}
 		
+		
 		public List<ApprovalDTO> getDocsVisibleTo(String loginId) {
 		    return dao.selectDocsVisibleTo(loginId);
 		}

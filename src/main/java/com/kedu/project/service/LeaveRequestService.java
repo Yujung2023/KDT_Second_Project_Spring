@@ -61,11 +61,12 @@ public class LeaveRequestService {
         dto.setApproval_id(approvalId);
 
         // ✅ 사장 / 부사장은 즉시 승인
-        if ("사장".equals(rank) || "부사장".equals(rank)) {
+     // ✅ 사장 / 부사장은 즉시 승인
+        if ("J009".equals(rank) || "J008".equals(rank)) {
             dto.setStatus("APPROVED");
             leaveRequestDAO.insertLeaveRequest(dto);
-            leaveRequestDAO.updateUsedLeave(memberId, useDays);
-            return;
+            leaveRequestDAO.updateUsedLeave(memberId, useDays); // ✅ 연차 즉시 차감
+            return; // ✅ 결재선 생성 없이 종료
         }
 
         dto.setStatus("WAITING");
