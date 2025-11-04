@@ -94,5 +94,12 @@ public class MemberDAO {
 
 		return mybatis.selectList("Member.getListMember");
 	}
+	
+	public int updateWorkStatus(String member_id, String status) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("member_id", member_id);
+	    param.put("status", status);
+	    return mybatis.update("Member.updateWorkStatus", param);
+	}
 }
 

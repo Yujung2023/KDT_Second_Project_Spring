@@ -80,8 +80,9 @@ public class FilesController {
 	}
 
 	// 삭제 (GCS + DB 메타)
-	@DeleteMapping("/{sysname:.+}")
-	public ResponseEntity<Void> deleteFile(@PathVariable String sysname) {
+	@DeleteMapping("")
+	public ResponseEntity<Void> deleteFile(@RequestParam  String sysname) {
+		  System.out.println("삭제 요청 sysname: " + sysname);
 		boolean ok = filesService.deleteFile(sysname);
 		return ok ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
 	}

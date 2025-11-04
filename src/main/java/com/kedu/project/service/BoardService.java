@@ -56,10 +56,4 @@ public class BoardService {
 		return true;
 	}
 
-	// hit
-	public void increaseHit(int seq) {
-		boardDAO.increaseHit(seq);
-	}
-
-
 }
