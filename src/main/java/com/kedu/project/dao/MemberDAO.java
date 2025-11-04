@@ -97,8 +97,8 @@ public class MemberDAO {
 	
 	public int updateWorkStatus(String member_id, String status) {
 	    Map<String, Object> param = new HashMap<>();
-	    param.put("member_id", member_id);
-	    param.put("status", status);
+	    param.put("id", member_id);       // ✅ mapper에서 #{id}로 받음
+	    param.put("workStatus", status);  // ✅ mapper에서 #{workStatus}로 받음
 	    return mybatis.update("Member.updateWorkStatus", param);
 	}
 }

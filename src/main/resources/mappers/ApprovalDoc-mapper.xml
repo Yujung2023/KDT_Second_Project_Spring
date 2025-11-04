@@ -34,7 +34,7 @@
       m.name AS name,
       m.rank_code AS rank_code,
       al.reject_reason AS rejectReason,
-      al.approver_status AS STATUS,
+      al.approver_status AS STATUS
       CASE WHEN al.approver_order IS NULL THEN 1 ELSE 0 END AS referenceFlag
     FROM approval_line al
     JOIN member m ON al.approver_id = m.id

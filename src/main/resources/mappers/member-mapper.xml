@@ -189,6 +189,12 @@
 	    
 	  WHERE id = #{id}
 	</update>
+	
+	<update id="updateWorkStatus" parameterType="map">
+  UPDATE member
+  SET work_status = #{workStatus}
+  WHERE id = #{id}
+</update>
 
 	
 </mapper>
