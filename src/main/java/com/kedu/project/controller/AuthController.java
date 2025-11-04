@@ -18,6 +18,7 @@ import com.kedu.project.security.JwtUtil;
 import com.kedu.project.service.AuthService;
 import com.kedu.project.service.LoginLogService;
 import com.kedu.project.service.MemberService;
+import com.kedu.project.utils.Encrypt;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -38,7 +39,6 @@ public class AuthController {
 	private LoginLogService loginLogService;
 
 	@PostMapping
-
 	public ResponseEntity<?> login(@RequestBody AuthDTO authDTO, HttpServletRequest request){
 		System.out.println("id: " + authDTO.getId() + ": pw: " + authDTO.getPw());
 
@@ -59,13 +59,13 @@ public class AuthController {
 		MemberDTO member = memberService.findById(authDTO.getId());
 		String name = (member != null) ? member.getName() : "누구세요";
 
-		//String state = (member != null && member.getPassword().equals(Encrypt.encrypt(authDTO.getPw())))
-		//		? "로그인 성공" : "로그인 실패";
+		String state = (member != null && member.getPassword().equals(Encrypt.encrypt(authDTO.getPw())))
+				? "로그인 성공" : "로그인 실패";
 		
 //		String state = (member != null && member.getPassword().equals(authDTO.getPw()))
 //				? "로그인 성공" : "로그인 실패";
 		
-		String state = (member != null)	? "로그인 성공" : "로그인 실패";
+//		String state = (member != null)	? "로그인 성공" : "로그인 실패";
 
 		LoginLogDTO loginLogDTO = new LoginLogDTO();
 		

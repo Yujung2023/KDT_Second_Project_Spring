@@ -75,6 +75,26 @@ public class NotificationController {
 			System.out.println("같은 아이디입니다.");
 		}
 	}
+	
+
+	// ✅ REST API로도 보낼 수 있음 
+	@PostMapping("/sendAll")
+	public void sendNoticeAll(@RequestBody NotificationDTO notice, HttpServletRequest request) {
+	    String loginId = (String) request.getAttribute("loginID");
+	    notice.setSender_id(loginId); //전체 send id 담음.
+
+	    System.out.println("알림 테스트: " + notice.getSender_id());
+	    System.out.println("알림 테스트: " + notice.getReceiver_id());
+		System.out.println("알림 테스트: " + notice.getType());
+		System.out.println("알림 테스트: " + notice.getMessage());
+		
+	    System.out.println("📢 전체 알림 전송");
+
+	    messagingTemplate.convertAndSend("/notice/all", notice);
+	    notificationService.insertNoticeAll(notice);
+	}
+	
+	
 	@GetMapping
 	public ResponseEntity<List<NotificationDTO>> getNotificationByLoginId(HttpServletRequest request) {
 		String loginId = (String) request.getAttribute("loginID");
