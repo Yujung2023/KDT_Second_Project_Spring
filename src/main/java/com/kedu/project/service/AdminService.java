@@ -29,4 +29,5 @@ public class AdminService {
 	public int deleteAdmin(String id){
 		return adminDAO.deleteAdmin(id);
 	}
+	//test
 }

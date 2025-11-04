@@ -121,7 +121,7 @@ public class ChatFileController {
     }
 
     /**
-     * 파일 삭제 (선택 사항)
+     * 파일 삭제중 (선택 사항)
      * - 필요시 클라이언트에서 삭제 요청 시 사용
      */
     @DeleteMapping("/file/{savedName}")

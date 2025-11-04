@@ -92,18 +92,6 @@ public class ContactsService {
 
 
 
-	public Object updateOrganizationTypeMulti(Map<String, Object> param) {
-
-		return dao.updateOrganizationTypeMulti(param);
-	}
-
-
-	public Object updateOrganizationTypeSingle(Map<String, Object> param) {
-
-		return dao.updateOrganizationTypeSingle(param);
-
-	}
-
 	// 조직도 검색
 	public List<MemberDTO> searchByOrgName(String name) {
 		
@@ -112,24 +100,16 @@ public class ContactsService {
 
 	
 	
-//	// 개인주소록으로 복사
-//	public Object copyContactsToSolo(String loginId, List<Integer> seqList) {
-//		Map<String, Object> map = new HashMap<>();
-//		map.put("user_id", loginId);
-//		map.put("seqList", seqList);
-//		return dao.copyContactsToSolo(map);
-//	}
-//
-//
-//	   // 조직도 개인 주소록으로 복사
-//    public Object copyOrgContactsToSolo(String loginId, List<String> idList) {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("user_id", loginId);
-//        map.put("idList", idList);
-//  
-//      
-//        return dao.copyOrgContactsToSolo(map);
-//    }
+	// 개인주소록으로 복사
+	public Object copyContactsToSolo(String loginId, List<Integer> seqList) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("user_id", loginId);
+		map.put("seqList", seqList);
+		return dao.copyContactsToSolo(map);
+	}
+
+
+
 
 
 

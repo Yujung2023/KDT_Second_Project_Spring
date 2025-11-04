@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MailArchive">
+    
+	<!--메일 아카이빙 내역 select문-->
+    <select id="searchArchiveLog" parameterType="map" resultType="com.kedu.project.dto.MailArchiveDTO">
+	    SELECT
+	        SEQ,
+	        MANAGER_ID as managerId,
+	        MANAGER_IP as managerIp,
+	        SENDERID,
+	        RECIPIENTID,
+	        KEYWORD,
+	        PERIOD,
+	        CREATED_AT
+	    FROM MailArchiveLog
+	    WHERE 1=1
+	      <if test="manager_id != null and manager_id != ''">
+    		AND MANAGER_ID = #{manager_id}
+		  </if>
+	      <if test="period != null and period != '' and period != '전체'">
+	          <choose>
+	              <when test="period == '최근 3개월'">
+	                  AND CREATED_AT >= ADD_MONTHS(SYSDATE, -3)
+	              </when>
+	              <when test="period == '최근 6개월'">
+	                  AND CREATED_AT >= ADD_MONTHS(SYSDATE, -6)
+	              </when>
+	              <when test="period == '최근 1년'">
+	                  AND CREATED_AT >= ADD_MONTHS(SYSDATE, -12)
+	              </when>
+	          </choose>
+	      </if>
+	    ORDER BY CREATED_AT DESC
+	</select>	
+
+    <!-- 조건 검색 -->
+    <select id="searchMails" parameterType="map" resultType="com.kedu.project.dto.MailDTO">
+        SELECT *
+        FROM mail
+        WHERE 1=1
+        <if test="target != null and target != ''">
+            AND SENDERID = #{target}
+        </if>
+        <if test="receiver != null and receiver != ''">
+            AND RECIPIENTID = #{receiver}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (TITLE LIKE '%' || #{keyword} || '%' OR CONTENT LIKE '%' || #{keyword} || '%')
+        </if>
+        <if test="period == '최근 3개월'">
+		  AND SENDDATE >= ADD_MONTHS(SYSDATE, -3)
+		</if>
+		<if test="period == '최근 6개월'">
+		  AND SENDDATE >= ADD_MONTHS(SYSDATE, -6)
+		</if>
+		<if test="period == '최근 1년'">
+		  AND SENDDATE >= ADD_MONTHS(SYSDATE, -12)
+		</if>
+        ORDER BY SENDDATE DESC
+    </select>
+	
+	<insert id="saveSearchLog" parameterType="com.kedu.project.dto.MailArchiveDTO">
+		INSERT INTO MailArchiveLog ( SEQ, MANAGER_ID, MANAGER_IP, SENDERID, RECIPIENTID,
+    		KEYWORD, PERIOD, CREATED_AT )
+    		VALUES ( MailArchiveLog_SEQ.NEXTVAL, #{managerId} , #{managerIp}, #{senderId},
+    		#{recipientId}, #{keyword}, #{period}, SYSDATE )
+	</insert>
+
+</mapper>

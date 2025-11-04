@@ -19,6 +19,8 @@ import com.kedu.project.dto.MemberDTO;
 import com.kedu.project.service.ApprovalService;
 import com.kedu.project.service.MemberService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/Eapproval")
 public class ApprovalController {
@@ -27,78 +29,90 @@ public class ApprovalController {
 	private ApprovalService approvalservice;
 	
 	 @Autowired
-	    private MemberService memberSerivce;
+	 private MemberService memberSerivce;
 
 	
-	@GetMapping("/A")
-	public ResponseEntity<List<ApprovalDTO>> getAll(){
-		System.out.println("일단왔음");
-		List<ApprovalDTO> list=approvalservice.selectAll();		
-		return ResponseEntity.ok(list);
-	}
+	 @GetMapping("/A")
+	 public ResponseEntity<List<ApprovalDTO>> getAll(HttpServletRequest request) {
+	     String loginId = (String) request.getAttribute("loginID");
+	     List<ApprovalDTO> list = approvalservice.getDocsVisibleTo(loginId);
+	     return ResponseEntity.ok(list);
+	 }
 	
 	
-	
-	@GetMapping("/{status}")
-	public ResponseEntity<List<ApprovalDTO>> getByStatus(@PathVariable String status){
-	    List<ApprovalDTO> list;
-	    String s = status.toUpperCase();
+	 @GetMapping("/{status}")
+	 public ResponseEntity<List<ApprovalDTO>> getByStatus(@PathVariable String status,
+	                                                      HttpServletRequest request) {
 
-	    switch (s) {
-	        // 진행 문서함
-	        case "SHOW":
-	            list = approvalservice.selectAll().stream()
-	                    .filter(doc -> !"TEMP".equals(doc.getStatus()))
-	                    .toList();
-	            break;
-	        case "WAIT":
-	        case "CHECKING":
-	        case "REJECTED":
-	        case "TEMP":
-	            list = approvalservice.selectByStatus(s);
-	            break;
+	     String loginId = (String) request.getAttribute("loginID");
+	     if (loginId == null) return ResponseEntity.badRequest().build();
 
-	        // 문서 보관함
-	        case "APPROVED": // 기안 완료
-	        case "PASS":
-	            list = approvalservice.selectByStatus("APPROVED");
-	            break;
-	        case "PROCESSING": // 예정
-	            list = approvalservice.selectByStatus("PROCESSING");
-	            break;
+	     System.out.println("📌 상태별 문서 조회 요청 by " + loginId + " | status=" + status);
 
-	        default:
-	            list = approvalservice.selectByStatus(s);
-	    }
+	     // ✅ 로그인 사용자가 볼 수 있는 전체 문서
+	     List<ApprovalDTO> list = approvalservice.getDocsVisibleTo(loginId);
 
-	    return ResponseEntity.ok(list);
-	}
+	     String s = status.toUpperCase();
+
+	     switch (s) {
+	         case "SHOW": // 전체 (임시 제외)
+	             list = list.stream()
+	                     .filter(doc -> !"TEMP".equals(doc.getStatus()))
+	                     .toList();
+	             break;
+
+	         case "WAIT":       // 승인 대기 (문서 상태 WAIT)
+	             list = list.stream()
+	                     .filter(doc -> "WAIT".equals(doc.getStatus()))
+	                     .toList();
+	             break;
+
+	         case "PROCESSING":   // 진행 중
+	             list = list.stream()
+	                     .filter(doc -> "PROCESSING".equals(doc.getStatus()))
+	                     .toList();
+	             break;
+
+	         case "REJECTED":   // 반려
+	             list = list.stream()
+	                     .filter(doc -> "REJECTED".equals(doc.getStatus()))
+	                     .toList();
+	             break;
+
+	         case "APPROVED":   // 기안 완료
+	             list = list.stream()
+	                     .filter(doc -> "APPROVED".equals(doc.getStatus()))
+	                     .toList();
+	             break;
+
+	         case "PENDING":  // ✅ 예정 문서 (내 차례 X)
+	            list = approvalservice.getMyScheduledList(loginId);
+	             break;
+	     }
+
+	     return ResponseEntity.ok(list);
+	 }
 	
-	@PostMapping("/write")
-	public ResponseEntity<String> insert(@RequestBody ApprovalDTO dto) {
-	    System.out.println(" 결재 등록 요청: " + dto);
-	    try {
-	        approvalservice.insert(dto);
-	        return ResponseEntity.ok("등록 성공");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.internalServerError().body("등록 실패");
-	    }
-	}
+	 @PostMapping("/write")
+	 public ResponseEntity<Map<String, Object>> insert(@RequestBody ApprovalDTO dto) {
+	     System.out.println("📌 결재 등록 요청: " + dto);
+	     try {
+	         int newSeq = approvalservice.insert(dto); // ✅ seq 반환받기
+	         return ResponseEntity.ok(Map.of("seq", newSeq)); // ✅ seq를 JSON으로 반환
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         return ResponseEntity.internalServerError().body(Map.of("error", "등록 실패"));
+	     }
+	 }
 	
-	@PostMapping("/tempSave")
-	public ResponseEntity<Void> tempSave(@RequestBody ApprovalDTO dto){
-		System.out.println("임시저장 할게용");
-		dto.setStatus("TEMP");
-		approvalservice.saveTemp(dto); //insert or update 자동 처리해줄거야 
-		return ResponseEntity.ok().build();
-	}
 	
 	@GetMapping("/detail/{seq}")
-	public ResponseEntity<ApprovalDTO> detail(@PathVariable("seq") int seq){
-		
-	    ApprovalDTO dto =  approvalservice.getDetail(seq);
-	    if(dto == null){
+	public ResponseEntity<ApprovalDTO> detail(@PathVariable("seq") int seq, HttpServletRequest request) {
+
+	    String loginId = (String) request.getAttribute("loginID"); // ✅ 로그인 사용자 ID
+
+	    ApprovalDTO dto = approvalservice.getDetail(seq);
+	    if (dto == null) {
 	        return ResponseEntity.notFound().build();
 	    }
 
@@ -107,7 +121,20 @@ public class ApprovalController {
 	    List<MemberDTO> approvers = new ArrayList<>();
 	    List<MemberDTO> references = new ArrayList<>();
 
-	    for(Map<String, Object> row : lineData){
+	    String myStatus = null;  // ✅ 로그인한 사람의 개인 상태
+
+	    // ✅ 현재 아직 처리 안된 사람 중 가장 낮은 순번 = 지금 결재할 차례인 사람
+	    Integer currentOrder = lineData.stream()
+	            .filter(row -> "N".equals(((String) row.get("STATUS")))) // 아직 결재 안함
+	            .map(row -> {
+	                Object o = row.get("APPROVER_ORDER");
+	                return (o == null ? null : ((Number) o).intValue());
+	            })
+	            .filter(o -> o != null)
+	            .min(Integer::compareTo)
+	            .orElse(null);
+
+	    for (Map<String, Object> row : lineData) {
 
 	        MemberDTO member = new MemberDTO();
 	        member.setId((String) row.get("ID"));
@@ -115,18 +142,32 @@ public class ApprovalController {
 	        member.setRank_code((String) row.get("RANK_CODE"));
 	        member.setStatus((String) row.get("STATUS"));
 
-	        Object orderNo = row.get("ORDERNO");
-	        member.setOrderNo(orderNo == null ? null : ((Number)orderNo).intValue()); // ✅ 추가된 줄
+	        Object orderNo = row.get("APPROVER_ORDER");
+	        Integer order = (orderNo == null ? null : ((Number) orderNo).intValue());
+	        member.setOrderNo(order);
 
-	        if(orderNo != null) {
-	            approvers.add(member);   // 순번 존재 → 결재자
-	        } else {
-	            references.add(member);  // 순번 없음 → 참조자
+	        // ✅ 현재 로그인한 사용자의 상태 판단
+	        if (member.getId().equals(loginId)) {
+	            String st = member.getStatus(); // N / Y / R
+
+	            if ("Y".equals(st)) myStatus = "APPROVED";       // 승인 완료
+	            else if ("R".equals(st)) myStatus = "REJECTED";  // 반려됨
+	            else if ("N".equals(st)) {
+	                if (order != null && order.equals(currentOrder)) {
+	                    myStatus = "WAITING";   // ✅ 지금 결재해야 하는 내 차례
+	                } else {
+	                    myStatus = "PENDING";   // ✅ 앞으로 내 차례 (예정)
+	                }
+	            }
 	        }
+
+	        if (order != null) approvers.add(member);
+	        else references.add(member);
 	    }
 
 	    dto.setApprovers(approvers);
 	    dto.setReferenceList(references);
+	    dto.setMyStatus(myStatus); // ✅ 개인 상태 DTO에 반영
 
 	    return ResponseEntity.ok(dto);
 	}
@@ -179,6 +220,16 @@ public class ApprovalController {
 	    System.out.println("🔥 예정 문서 요청: " + userId);
 	    return ResponseEntity.ok(approvalservice.getMyScheduledList(userId));
 	}
+	
+	@GetMapping("/line/{seq}")
+	public ResponseEntity<List<Map<String, Object>>> getApprovalLine(@PathVariable String seq) {
+	    List<Map<String, Object>> line = approvalservice.selectApprovalLine(seq);
+	    return ResponseEntity.ok(line);
+	}
+	
+
+	
+
 
 	
 

@@ -1,4 +1,5 @@
 package com.kedu.project.service;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,32 +26,45 @@ public class ApprovalService {
 		return dao.selectByStatus(status);
 	}
 	
+	
+	@Transactional
 	public int insert(ApprovalDTO dto) {
 
-	    // 1) 문서 저장 → seq 자동 생성됨
 	    dao.insert(dto);
+	    int approvalId = dto.getSeq();
+	    String writerId = dto.getWriter_id();
 
-	    String writer = dto.getWriter(); // 작성자 ID
+	    // 결재자 저장
+	    if (dto.getApprovers() != null) {
+	        for (MemberDTO m : dto.getApprovers()) {
 
-	 // 2) 결재선 저장
-	    if(dto.getApprovers() != null) {
-	        int order = 1;
-	        for(MemberDTO m : dto.getApprovers()) {
-	            dao.insertApprovalLine(dto.getSeq(), dto.getWriter(), m.getId(), order, "N");
-	            order++;
+	            Integer orderNo = m.getApproverOrder(); // ✅ 여기만 바꾸면 해결
+
+	            dao.insertApprovalLine(
+	                approvalId,
+	                writerId,
+	                m.getId(),
+	                orderNo,
+	                (orderNo != null && orderNo == 1) ? "N" : "P"
+	            );
 	        }
 	    }
 
-	    // 3) 참조자 저장 (order = null)
-	    if(dto.getReferenceList() != null) {
-	        for(MemberDTO m : dto.getReferenceList()) {
-	            dao.insertApprovalLine(dto.getSeq(), dto.getWriter(), m.getId(), null, "N");
+	    // 참조자 저장
+	    if (dto.getReferenceList() != null) {
+	        for (MemberDTO m : dto.getReferenceList()) {
+	            dao.insertApprovalLine(
+	                approvalId,
+	                writerId,
+	                m.getId(),
+	                null,
+	                "N"
+	            );
 	        }
 	    }
 
-	    return dto.getSeq();
+	    return approvalId;
 	}
-
 	
 	public int tempinsert(ApprovalDTO dto) {
 		System.out.println("임시저장");
@@ -94,36 +108,39 @@ public class ApprovalService {
 		    return dao.selectReferenceList(seq);
 		}
 		
+	
 		@Transactional
 		public void approve(String approvalId, String userId) {
 
-		    // 1) 승인 처리 (해당 결재자만 Y 로 변경)
+		    // 1) 현재 결재자 승인 처리
 		    dao.approveLine(approvalId, userId);
 
-		    // 2) 반려자가 있는지 먼저 체크
-		    boolean rejectedExists = dao.existsReject(approvalId);
-		    if(rejectedExists){
+		    // ✅ 2) 다음 결재자 자동 활성화 (P → N)
+		    dao.activateNextApprover(approvalId);
+
+		    // 3) 반려자가 있는지 먼저 확인 → 문서 전체 상태 즉시 반려
+		    if (dao.existsReject(approvalId)) {
 		        dao.updateDocStatus(approvalId, "REJECTED");
 		        return;
 		    }
 
-		    // 3) 모든 결재자가 승인됐는지 체크
-		    boolean allApproved = dao.isAllApproved(approvalId);
-		    if(allApproved){
+		    // 4) 모든 결재자가 승인 완료 상태인지 확인 → 기안 완료
+		    if (dao.isAllApproved(approvalId)) {
 		        dao.updateDocStatus(approvalId, "APPROVED");
 		        return;
 		    }
 
-		    // 4) 승인된 사람이 한 명이라도 있고, 아직 남은 결재자가 있다 → 진행중
-		    boolean anyApproved = dao.existsApproved(approvalId);
-		    if(anyApproved){
-		        dao.updateDocStatus(approvalId, "CHECKING");
+		    // 5) 승인한 사람이 있고 + 결재자가 남았을 경우 → 결재 진행 중
+		    if (dao.existsApproved(approvalId)) {
+		        dao.updateDocStatus(approvalId, "PROCESSING");
 		        return;
 		    }
 
-		    // 5) 결재자만 존재하고 아직 아무도 승인X → 예정(PENDING)
-		    dao.updateDocStatus(approvalId, "PENDING");
+		    // 6) 첫 결재 전 → 대기 상태
+		    dao.updateDocStatus(approvalId, "WAIT");
 		}
+
+
 		
 		public List<ApprovalDTO> getMyWaitList(String userId){
 		    return dao.selectMyWaitList(userId);
@@ -138,15 +155,18 @@ public class ApprovalService {
 		    // 1) 해당 결재자를 반려 처리
 		    dao.rejectLine(approvalId, userId, reason);
 
-		    // 2) 문서 상태를 바로 전체 반려로 변경
+		    // 2) 문서 상태를 바로 전체 반려 상태로 변경
 		    dao.updateDocStatus(approvalId, "REJECTED");
 		}
 		
+		public List<ApprovalDTO> getDocsVisibleTo(String loginId) {
+		    return dao.selectDocsVisibleTo(loginId);
+		}
+		
+	
 	
 		
-		
-	 
-	 
+	
 	
 	
 	

@@ -110,22 +110,7 @@
    
 	</select>
 	
-	
-	<update id="updateOrganizationTypeSingle" parameterType="map">
-    UPDATE contacts SET type = #{type} , user_id = #{user_id} WHERE user_id IN
-    <foreach collection="idList" item="id" open="(" separator="," close=")">
-        #{id,jdbcType=VARCHAR}
-    </foreach>
-	</update>
 
-	<update id="updateOrganizationTypeMulti" parameterType="map">
-    UPDATE contacts SET type = #{type} WHERE user_id IN
-    <foreach collection="idList" item="id" open="(" separator="," close=")">
-        #{id,jdbcType=VARCHAR}
-    </foreach>
-	</update>
-
-	
 	<insert id="copyContactsToSolo" parameterType="map">
     INSERT INTO contacts (seq, user_id, name, phone, email, type, job_code, rank_code)
     SELECT contacts_seq.NEXTVAL, #{user_id}, name, phone, email, 'solo', job_code, rank_code
@@ -136,14 +121,6 @@
     </foreach>
 	</insert>
 
-	<insert id="copyOrgContactsToSolo"  parameterType="map">
-    INSERT INTO contacts (seq, user_id, name, phone, email, type, job_code, rank_code)
-    SELECT contacts_seq.nextval, user_id, name, phone, email, 'solo', job_code, rank_code
-    FROM contacts
-    WHERE user_id IN
-    <foreach collection="idList" item="id" open="(" separator="," close=")">
-        #{id}
-    </foreach>
-	</insert>
+	
 
 </mapper>
