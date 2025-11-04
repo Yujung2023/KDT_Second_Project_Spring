@@ -93,11 +93,4 @@ public class BoardController {
 	    return ResponseEntity.ok().build();
 	}
 
-	// hit
-	@PutMapping("/hit/{seq}")
-	public ResponseEntity<Void> increaseHit(@PathVariable int seq) {
-	    boardService.increaseHit(seq);
-	    return ResponseEntity.ok().build();
-	}
-	
 }

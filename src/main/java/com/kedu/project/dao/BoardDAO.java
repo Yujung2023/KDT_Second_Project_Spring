@@ -46,11 +46,5 @@ public class BoardDAO {
 	public void modifyBoard(BoardDTO dto) {
 		myBatis.update("Board.modifyBoard", dto);
 	}
-
-	// hit 증가
-	public void increaseHit(int seq) {
-		myBatis.update("Board.hit", seq);
-	}
-
 }
 
