@@ -57,7 +57,7 @@
   from board b
   join board_category c on b.category_id = c.categoryid
   where b.importantyn = 'Y'
-  order by b.createdat desc
+  order by b.noticeYn desc , b.createdat desc
 </select>
 
   <!-- 게시글 상세 -->

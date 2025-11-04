@@ -9,7 +9,7 @@ public class BoardDTO {
 	private String category_name;
 	private String title;      // 제목
 	private String content;    // 본문
-	private String writer_id;   // FK: 작성자
+	private String writer_id;   // 작성자
 	private String noticeYn;   // 공지 여부
 	private String importantYn; // 중요 체크
 	private int hit;           // 조회수
