@@ -10,10 +10,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kedu.project.dto.ChatMessageDTO;
 import com.kedu.project.dto.MemberSimpleDTO;
+import com.kedu.project.entity.ChatMessage;
 import com.kedu.project.entity.ChatRoom;
 import com.kedu.project.entity.ChatRoomMember;
 import com.kedu.project.entity.ChatRoomMemberId;
@@ -24,6 +27,8 @@ import com.kedu.project.repository.ChatRoomMemberRepository;
 import com.kedu.project.repository.ChatRoomRepository;
 import com.kedu.project.repository.MemberRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,8 +41,13 @@ public class ChatRoomService {
     private final ChatMessageRepository msgRepo;
     private final ChatMessageReadRepository readRepo;
     private final MemberRepository memberRepo;
-
-    /** A 선택: 1:1 방은 있으면 재사용, 없으면 생성 */
+    private final SimpMessagingTemplate template; // ✅ STOMP 메시지 전송용
+    /* 멤버 추가 (중복 방지) */
+    @PersistenceContext
+    private EntityManager em;
+    
+    
+    /**  1:1 방 있으면 재사용, 없으면 새로 생성 */
     public ChatRoom getOrCreateDmRoom(String userA, String userB) {
         String u1 = Objects.requireNonNull(userA).trim();
         String u2 = Objects.requireNonNull(userB).trim();
@@ -65,10 +75,17 @@ public class ChatRoomService {
         addMember(room, u1);
         addMember(room, u2);
 
+        //  상대방에게 새 방 생성 알림 전송
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "NEW_ROOM");
+        payload.put("roomId", room.getRoomId());
+        payload.put("from", u1);
+
+     
         return room;
     }
 
-    /** 그룹 채팅방 생성 */
+    /** ✅ 그룹 채팅방 생성 */
     public ChatRoom createGroupRoom(String roomName, List<String> memberIds) {
         if (memberIds == null || memberIds.size() < 2)
             throw new IllegalArgumentException("at least 2 members");
@@ -87,7 +104,24 @@ public class ChatRoomService {
         return room;
     }
 
-    /** 멤버 초대 (이미 있으면 무시) */
+    /** ✅ 공통 시스템 메시지 생성 및 STOMP 브로드캐스트 */
+    public void sendSystemMessage(String roomId, String content) {
+        ChatRoom room = roomRepo.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("room not found: " + roomId));
+
+        ChatMessage msg = ChatMessage.builder()
+                .room(room)
+                .sender("system")
+                .content(content)
+                .type(ChatMessage.MessageType.SYSTEM)
+                .sendTime(LocalDateTime.now())
+                .build();
+
+        msgRepo.save(msg);
+        template.convertAndSend("/topic/chatroom/" + roomId, msg); // ✅ 실시간 전송
+    }
+
+    /** ✅ 초대 시 시스템 메시지 추가 */
     public void inviteMembers(String roomId, List<String> memberIds) {
         ChatRoom room = roomRepo.findById(roomId).orElseThrow();
         boolean added = false;
@@ -99,21 +133,68 @@ public class ChatRoomService {
             added = true;
         }
 
-        //  방 이름 업데이트 (단체방이 된 경우)
         if (added) {
-            List<String> names = room.getMembers().stream()
-                    .map(m -> m.getMember().getName())
-                    .toList();
+            List<Member> addedMembers = memberRepo.findAllById(memberIds);
+            String joinedNames = addedMembers.stream()
+                    .map(m -> m.getName() + " " + convertRankCode(m.getRank_code()))
+                    .collect(Collectors.joining(", "));
 
-            if (names.size() > 2) {
-                room.setRoomName(String.join(", ", names));
-            }
-            room.setLastUpdatedAt(LocalDateTime.now());
-            roomRepo.save(room);
+            sendSystemMessage(roomId, joinedNames + " 님을 초대하였습니다."); // ✅ 시스템메시지
         }
     }
 
-    /** 내 방 목록 조회 */
+    
+    /** ✅ 방 나가기 (SYSTEM 메시지 자동 추가 및 방송) */
+    @Transactional
+    public boolean leaveRoom(String roomId, String memberId) {
+
+        // 1️⃣ 내가 속한 멤버 관계 삭제
+        roomMemberRepo.deleteByRoomIdAndMemberId(roomId, memberId);
+
+        // 2️⃣ 남은 인원 수 확인
+        int remaining = roomMemberRepo.countMembers(roomId);
+
+        // ✅ 퇴장자 정보 조회
+        Member leaver = memberRepo.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("member not found: " + memberId));
+        String leaverName = leaver.getName() + " " + convertRankCode(leaver.getRank_code());
+
+        // ✅ 방 정보 조회
+        ChatRoom room = roomRepo.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("room not found: " + roomId));
+
+        // ✅ 시스템 메시지 생성
+        ChatMessage leaveMsg = ChatMessage.builder()
+                .room(room)
+                .sender("system")
+                .content(leaverName + " 님이 나가셨습니다.")
+                .type(ChatMessage.MessageType.SYSTEM)
+                .sendTime(LocalDateTime.now())
+                .build();
+
+        msgRepo.save(leaveMsg);
+
+        // ✅ STOMP 브로드캐스트 (남은 사람에게 표시)
+        template.convertAndSend("/topic/chatroom/" + roomId, leaveMsg);
+
+        // 3️⃣ 남은 인원 없으면 → 방 관련 전부 삭제
+        if (remaining == 0) {
+            try {
+                readRepo.deleteByMessage_Room_RoomId(roomId);
+                msgRepo.deleteByRoom_RoomId(roomId);
+                roomRepo.deleteById(roomId);
+            } catch (Exception e) {
+                throw new RuntimeException("채팅방 삭제 중 오류 발생: " + e.getMessage(), e);
+            }
+            return true; // 마지막 참여자 → 방 완전 삭제됨
+        }
+
+        return false; // 나만 나가고 방은 유지
+    }
+
+
+
+    /** ✅ 내 방 목록 조회 */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getMyChatRooms(String userId) {
         List<ChatRoom> rooms = roomRepo.findRoomsOf(userId);
@@ -150,8 +231,7 @@ public class ChatRoomService {
         }).toList();
     }
 
-    // ==================================================
-    /**  특정 방의 모든 참여자 이름/직급 조회 */
+    /** ✅ 특정 방의 모든 참여자 이름/직급 조회 */
     @Transactional(readOnly = true)
     public List<MemberSimpleDTO> getRoomMembers(String roomId) {
         ChatRoom room = roomRepo.findById(roomId)
@@ -169,7 +249,7 @@ public class ChatRoomService {
                 .toList();
     }
 
-    /** 직급 코드 → 직급명 변환 */
+    /** ✅ 직급 코드 → 직급명 */
     private String convertRankCode(String code) {
         return switch (code) {
             case "J001" -> "사원";
@@ -180,21 +260,21 @@ public class ChatRoomService {
             case "J006" -> "부장";
             case "J007" -> "이사";
             case "J008" -> "부사장";
+            case "J009" -> "사장";
             default -> "";
         };
     }
 
-    // ==================================================
+  
 
+    @Transactional
     private void addMember(ChatRoom room, String memberId) {
-        ChatRoomMemberId id = new ChatRoomMemberId(room.getRoomId(), memberId);
-        ChatRoomMember existing = roomMemberRepo.findById(id).orElse(null);
-        if (existing != null) {
-            if (!room.getMembers().contains(existing)) {
-                room.getMembers().add(existing);
-            }
+        if (room.getMembers().stream()
+                .anyMatch(m -> m.getMember().getId().equals(memberId)))
             return;
-        }
+
+        ChatRoomMemberId id = new ChatRoomMemberId(room.getRoomId(), memberId);
+        if (roomMemberRepo.existsById(id)) return;
 
         Member member = memberRepo.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not found: " + memberId));
@@ -204,54 +284,43 @@ public class ChatRoomService {
                 .room(room)
                 .member(member)
                 .joinedAt(LocalDateTime.now())
-                .lastReadMessageId(null)
                 .build();
 
-        crm = roomMemberRepo.save(crm);
-
-        if (!room.getMembers().contains(crm)) {
-            room.getMembers().add(crm);
-        }
+        room.getMembers().add(crm); // ✅ CascadeType.ALL 이면 persist 자동됨
     }
 
-    /** 안 읽은 메시지 수 계산 */
+
+
+    /**  안 읽은 메시지 수 계산 */
     private int countUnreadRoomMessages(String roomId, Long lastReadId, String me) {
         try {
-            // ✅ 내가 마지막으로 읽은 메시지 이후, 내가 보낸 게 아닌 메시지만 카운트
             return msgRepo.countByRoom_RoomIdAndIdGreaterThanAndSenderNot(
                 roomId,
                 lastReadId == null ? 0L : lastReadId,
                 me
             );
         } catch (Throwable t) {
-            // ✅ 예외 fallback 시에도 내가 보낸 건 제외
             return (int) msgRepo.findByRoom_RoomIdOrderBySendTimeAsc(roomId).stream()
-                .filter(m ->
-                    m.getId() != null &&
-                    m.getId() > (lastReadId == null ? 0L : lastReadId) &&
-                    !m.getSender().equals(me)
-                )
+                .filter(m -> m.getId() != null &&
+                             m.getId() > (lastReadId == null ? 0L : lastReadId) &&
+                             !m.getSender().equals(me))
                 .count();
         }
-        
     }
-    /** 방 나가기 (내 멤버 삭제 후, 인원 없으면 방 삭제) */
-    public boolean leaveRoom(String roomId, String memberId) {
-        // 1️⃣ 내 멤버십 삭제
-        roomMemberRepo.deleteByRoomIdAndMemberId(roomId, memberId);
 
-        // 2️⃣ 남은 인원 수 확인
-        int remaining = roomMemberRepo.countMembers(roomId);
+    /** ✅ 직접 호출용 시스템 메시지 저장 (Controller에서 API 호출용) */
+    public ChatMessage saveSystemMessage(ChatMessageDTO dto) {
+        ChatRoom room = roomRepo.findById(dto.getRoomId())
+                .orElseThrow(() -> new IllegalArgumentException("room not found: " + dto.getRoomId()));
 
-        // 3️⃣ 남은 인원 없으면 메시지/읽음기록/방 삭제
-        if (remaining == 0) {
-            msgRepo.deleteByRoom_RoomId(roomId);
-            readRepo.deleteByMessage_Room_RoomId(roomId);
-            roomRepo.deleteById(roomId);
-            return true; // 마지막 참여자 → 방 삭제됨
-        }
+        ChatMessage msg = ChatMessage.builder()
+                .room(room)
+                .sender("system")
+                .content(dto.getContent())
+                .type(ChatMessage.MessageType.SYSTEM)
+                .sendTime(LocalDateTime.now())
+                .build();
 
-        return false; // 단순 나가기만 수행
+        return msgRepo.save(msg);
     }
-    
 }
