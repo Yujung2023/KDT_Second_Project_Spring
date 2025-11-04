@@ -34,6 +34,7 @@ public class BoardDAO {
 
 	// detail
 	public BoardDTO getDetail(int seq) {
+		myBatis.update("Board.hit",seq);
 		return myBatis.selectOne("Board.getDetail", seq);
 	}
 
