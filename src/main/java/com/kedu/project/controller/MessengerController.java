@@ -30,8 +30,9 @@ public class MessengerController {
 	
 	@GetMapping("/member")
 	public ResponseEntity<List<MemberDTO>> getAllMembers(){
+	
 		List<MemberDTO> members = messengerService.getAllMembers();
-        return ResponseEntity.ok(members);
+		return ResponseEntity.ok(members);
 
 	}
 	
