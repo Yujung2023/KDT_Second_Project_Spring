@@ -28,7 +28,7 @@ public class ChatController {
     private final SimpMessagingTemplate template;
 
     /**
-     * ✅ 일반 채팅 메시지 송신
+     *   일반 채팅 메시지 송신
      * - /app/chat/{roomId} 로 들어온 메시지를 저장 후
      *   /topic/chatroom/{roomId} 로 브로드캐스트
      * - 동시에 상대방에게 개인 알림(/topic/user/{id})을 전송
@@ -39,12 +39,12 @@ public class ChatController {
             @DestinationVariable String roomId,
             ChatMessageDTO message
     ) {
-        // 1️⃣ 메시지 기본 세팅 및 저장
+        //  메시지 기본 세팅 및 저장
         message.setRoomId(roomId);
         if (message.getType() == null) message.setType("TALK");
         ChatMessageDTO saved = chatService.saveMessage(roomId, message);
 
-        // 2️⃣ 방 참여자 조회 (보낸 사람 제외)
+        //  방 참여자 조회 (보낸 사람 제외)
         try {
             List<MemberSimpleDTO> members = chatRoomService.getRoomMembers(roomId);
             List<String> targetIds = members.stream()
@@ -74,7 +74,7 @@ public class ChatController {
     }
 
     /**
-     * ✅ 읽음 이벤트
+     *  읽음 이벤트
      * - /app/chat/read/{roomId} 로 들어온 읽음 상태를 업데이트 후
      *   /topic/chatroom/{roomId} 로 반영
      */

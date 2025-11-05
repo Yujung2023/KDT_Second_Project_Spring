@@ -12,7 +12,7 @@ import com.kedu.project.entity.ChatMessageReadId;
 public interface ChatMessageReadRepository
         extends JpaRepository<ChatMessageRead, ChatMessageReadId> {
 
-    /** ✅ 읽은 사람 수 계산 → readCount = (총 멤버 수 - 이거) */
+    /**  읽은 사람 수 계산 → readCount = (총 멤버 수 - 이거) */
     @Query("SELECT COUNT(r) FROM ChatMessageRead r WHERE r.message.id = :messageId")
     int countReaders(@Param("messageId") Long messageId);
     void deleteByMessage_Room_RoomId(String roomId);

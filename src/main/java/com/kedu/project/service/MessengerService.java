@@ -18,6 +18,7 @@ public class MessengerService {
 		
 		return dao.getAllMembers();
 	}
+	
 	public int updateWorkStatus(String id, String workStatus) {
 	    return dao.updateWorkStatus(id, workStatus);
 	}

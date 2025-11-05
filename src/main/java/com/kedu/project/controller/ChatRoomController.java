@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/chat")
-public class ChatRoomController {  //  기존 이름 유지
+public class ChatRoomController {  
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageRepository chatMessageRepo;
@@ -37,36 +37,55 @@ public class ChatRoomController {  //  기존 이름 유지
 
     private final SimpMessagingTemplate template; //  추가
 
+ 
     @PostMapping("/room")
     public ResponseEntity<?> createOrGetRoom(@RequestParam("key") String key) {
+        
+        // key 파라미터를 받아 "_" 기준으로 분리 (예: "user01_user02" → ["user01", "user02"])
+        // Optional.ofNullable(key).orElse("") : key가 null일 경우 빈 문자열로 대체하여 NPE 방지
         String[] arr = Optional.ofNullable(key).orElse("").split("_");
+
+        // 두 명의 ID가 모두 포함되어 있지 않으면 잘못된 요청으로 간주 (예외 처리)
         if (arr.length != 2)
             return ResponseEntity.badRequest().body("key must be 'userA_userB'");
 
+        // 첫 번째 사용자 ID (보낸 사람)
         String userA = arr[0];
+        // 두 번째 사용자 ID (받는 사람)
         String userB = arr[1];
 
+        // chatRoomService를 통해 기존 DM 채팅방을 찾거나 없으면 새로 생성
+        // getOrCreateDmRoom(userA, userB) 내부에서는 DB에서 userA, userB 조합으로 방을 찾고 없으면 생성
         var room = chatRoomService.getOrCreateDmRoom(userA, userB);
 
-        //  상대방에게 STOMP로 실시간 새 방 알림 전송
+        // 채팅방 생성 후, 상대방들에게 실시간 알림(STOMP) 전송
         try {
+            // 상대방 userB에게 새 방 생성 알림 전송
+            // 목적지: /topic/user/{userB}
+            // payload: JSON 형태 {type:"NEW_ROOM", roomId:방ID, from:userA}
             template.convertAndSend(
                 "/topic/user/" + userB,
                 Map.of("type", "NEW_ROOM", "roomId", room.getRoomId(), "from", userA)
             );
+
+            // userA 자신에게도 동일한 NEW_ROOM 알림 전송
+            // 이렇게 해야 양쪽 UI 모두 실시간으로 방 목록 갱신 가능
             template.convertAndSend(
                 "/topic/user/" + userA,
                 Map.of("type", "NEW_ROOM", "roomId", room.getRoomId(), "from", userB)
             );
+
         } catch (Exception e) {
+            // STOMP 메시지 전송 중 예외가 발생할 경우 콘솔에 스택 트레이스 출력
             e.printStackTrace();
         }
 
+        // 방 생성 또는 조회 성공 시, room 정보를 HTTP 응답 본문으로 반환 (상태 코드 200)
         return ResponseEntity.ok(room);
     }
 
 
-    /**  내 방 목록 */
+    /*  내 방 목록 */
     @GetMapping("/rooms")
     public ResponseEntity<?> getMyRooms(HttpServletRequest request) {
         String userId = (String) request.getAttribute("loginID");
@@ -127,7 +146,7 @@ public class ChatRoomController {  //  기존 이름 유지
         }
     }
 
-    /** ✅ 시스템 메시지 저장 (초대, 퇴장 등) */
+    /**  시스템 메시지 저장 (초대, 퇴장 등) */
     @PostMapping("/systemMessage")
     public ResponseEntity<?> postSystemMessage(@RequestBody ChatMessageDTO dto) {
         try {
