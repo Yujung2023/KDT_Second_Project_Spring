@@ -90,9 +90,13 @@ public class LeaveController {
     
     @PostMapping("/reject")
     public ResponseEntity<?> reject(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+    	System.out.println("왔어용");
+  
         int seq = (int) data.get("seq");
         String reason = (String) data.get("reason");
         String loginId = (String) request.getAttribute("loginID"); 
+        
+        System.out.println(seq+reason+loginId);
         leaveService.rejectLeave(seq, loginId, reason);
         return ResponseEntity.ok().build();
     }
