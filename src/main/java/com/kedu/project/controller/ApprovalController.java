@@ -199,6 +199,7 @@ public class ApprovalController {
 	
 	@PostMapping("/reject")
 	public ResponseEntity<Void> reject(@RequestBody Map<String, Object> req){
+		System.out.println("여기와썽용");
 	    String approvalId = req.get("seq").toString();
 	    String userId = req.get("userId").toString();
 	    String reason = req.get("reason").toString();

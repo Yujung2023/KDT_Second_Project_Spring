@@ -80,8 +80,13 @@ public class ApprovalDocDAO {
     public int insertRejectReasonByApprovalId(String approvalId, String reason) {
         Map<String, Object> param = Map.of(
             "approvalId", approvalId,
+ 
             "reason", reason
         );
+        
+        
+     
+
         return sqlSession.update(NAMESPACE + "insertRejectReasonByApprovalId", param);
     }
     

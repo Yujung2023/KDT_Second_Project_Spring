@@ -56,8 +56,8 @@
     name = #{dto.name},
     phone = #{dto.phone},
     email = #{dto.email},
-    job_code = #{dto.job_code},
-    rank_code = #{dto.rank_code}
+    job_code = #{dto.job_code,jdbcType=VARCHAR},
+    rank_code = #{dto.rank_code,jdbcType=VARCHAR}
     WHERE seq = #{seq}
 	</update>
 	
