@@ -44,7 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <select id="selectMonthWorkDays" parameterType="string" resultType="int">
     SELECT 
         (
-            -- 출근한 날
+            
             SELECT COUNT(DISTINCT TRUNC(start_time))
             FROM attendance
             WHERE member_id = #{value}
@@ -53,7 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         )
         +
         (
-            -- 승인된 휴가일
+            
             SELECT COUNT(*)
             FROM (
                 SELECT TRUNC(start_leave_time + LEVEL - 1)

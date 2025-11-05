@@ -64,6 +64,13 @@ public class BoardController {
 	    return ResponseEntity.ok(board);
 	}
 	
+	// 조회수 증가용 post
+	@PostMapping("/detail/{seq}/increment-view")
+	public ResponseEntity<Void> incrementView(@PathVariable int seq) {
+	    boardService.incrementView(seq);
+	    return ResponseEntity.ok().build();
+	}
+	
 	// update
 	@PutMapping("/{seq}")
 	public ResponseEntity<Void> modifyBoard(

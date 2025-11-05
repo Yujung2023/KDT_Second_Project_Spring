@@ -34,10 +34,16 @@ public class BoardDAO {
 
 	// detail
 	public BoardDTO getDetail(int seq) {
-		myBatis.update("Board.hit",seq);
+		
 		return myBatis.selectOne("Board.getDetail", seq);
 	}
 
+
+	// 조회수 증가용 post
+	public void incrementView(int seq) { 
+		myBatis.update("Board.hit",seq);
+	}
+	
 	// delete
 	public void deleteBoard(int seq) {
 		myBatis.delete("Board.deleteBoard", seq);
