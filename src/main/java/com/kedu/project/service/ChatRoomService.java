@@ -85,7 +85,7 @@ public class ChatRoomService {
         return room;
     }
 
-    /** ✅ 그룹 채팅방 생성 */
+    /**  그룹 채팅방 생성 */
     public ChatRoom createGroupRoom(String roomName, List<String> memberIds) {
         if (memberIds == null || memberIds.size() < 2)
             throw new IllegalArgumentException("at least 2 members");
@@ -104,7 +104,7 @@ public class ChatRoomService {
         return room;
     }
 
-    /** ✅ 공통 시스템 메시지 생성 및 STOMP 브로드캐스트 */
+    /**  공통 시스템 메시지 생성 및 STOMP 브로드캐스트 */
     public void sendSystemMessage(String roomId, String content) {
         ChatRoom room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("room not found: " + roomId));
@@ -121,7 +121,7 @@ public class ChatRoomService {
         template.convertAndSend("/topic/chatroom/" + roomId, msg); // ✅ 실시간 전송
     }
 
-    /** ✅ 초대 시 시스템 메시지 추가 */
+    /**  초대 시 시스템 메시지 추가 */
     public void inviteMembers(String roomId, List<String> memberIds) {
         ChatRoom room = roomRepo.findById(roomId).orElseThrow();
         boolean added = false;
@@ -144,26 +144,26 @@ public class ChatRoomService {
     }
 
     
-    /** ✅ 방 나가기 (SYSTEM 메시지 자동 추가 및 방송) */
+    /**  방 나가기 (SYSTEM 메시지 자동 추가 및 방송) */
     @Transactional
     public boolean leaveRoom(String roomId, String memberId) {
 
-        // 1️⃣ 내가 속한 멤버 관계 삭제
+        //  내가 속한 멤버 관계 삭제
         roomMemberRepo.deleteByRoomIdAndMemberId(roomId, memberId);
 
-        // 2️⃣ 남은 인원 수 확인
+        //  남은 인원 수 확인
         int remaining = roomMemberRepo.countMembers(roomId);
 
-        // ✅ 퇴장자 정보 조회
+        //  퇴장자 정보 조회
         Member leaver = memberRepo.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not found: " + memberId));
         String leaverName = leaver.getName() + " " + convertRankCode(leaver.getRank_code());
 
-        // ✅ 방 정보 조회
+        //  방 정보 조회
         ChatRoom room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("room not found: " + roomId));
 
-        // ✅ 시스템 메시지 생성
+        //  시스템 메시지 생성
         ChatMessage leaveMsg = ChatMessage.builder()
                 .room(room)
                 .sender("system")
@@ -174,7 +174,7 @@ public class ChatRoomService {
 
         msgRepo.save(leaveMsg);
 
-        // ✅ STOMP 브로드캐스트 (남은 사람에게 표시)
+        //  STOMP 브로드캐스트 (남은 사람에게 표시)
         template.convertAndSend("/topic/chatroom/" + roomId, leaveMsg);
 
         // 3️⃣ 남은 인원 없으면 → 방 관련 전부 삭제
@@ -194,7 +194,7 @@ public class ChatRoomService {
 
 
 
-    /** ✅ 내 방 목록 조회 */
+    /**  내 방 목록 조회 */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getMyChatRooms(String userId) {
         List<ChatRoom> rooms = roomRepo.findRoomsOf(userId);
@@ -231,7 +231,7 @@ public class ChatRoomService {
         }).toList();
     }
 
-    /** ✅ 특정 방의 모든 참여자 이름/직급 조회 */
+    /**  특정 방의 모든 참여자 이름/직급 조회 */
     @Transactional(readOnly = true)
     public List<MemberSimpleDTO> getRoomMembers(String roomId) {
         ChatRoom room = roomRepo.findById(roomId)
@@ -249,7 +249,7 @@ public class ChatRoomService {
                 .toList();
     }
 
-    /** ✅ 직급 코드 → 직급명 */
+    /**  직급 코드 → 직급명 */
     private String convertRankCode(String code) {
         return switch (code) {
             case "J001" -> "사원";
@@ -291,24 +291,61 @@ public class ChatRoomService {
 
 
 
-    /**  안 읽은 메시지 수 계산 */
+    /**
+     * 채팅방별로 "내가 아직 읽지 않은 메시지 수"를 계산하는 메서드
+     *
+     * @param roomId     방 ID (채팅방 식별자)
+     * @param lastReadId 마지막으로 읽은 메시지의 ID (null이면 아직 아무 것도 안 읽음)
+     * @param me         현재 로그인한 사용자 ID
+     * @return 내가 아직 읽지 않은 메시지 개수 (int)
+     */
     private int countUnreadRoomMessages(String roomId, Long lastReadId, String me) {
         try {
+            // ✅ (1) Repository(JPA) 기반 쿼리를 통해 unread 메시지 개수를 빠르게 계산
+            // countByRoom_RoomIdAndIdGreaterThanAndSenderNot(...) 은 JPA 메서드 네이밍 쿼리 규칙을 사용한 메서드.
+            // 즉, SQL로 치면 아래와 같은 쿼리가 자동 생성됨:
+            //
+            // SELECT COUNT(*)
+            // FROM chat_message
+            // WHERE room_id = :roomId
+            //   AND id > :lastReadId
+            //   AND sender <> :me;
+            //
+            // → 즉, "해당 방의 메시지 중 내가 읽은 마지막 메시지 ID보다 큰(=이후에 온) 메시지 중 내가 보낸 게 아닌 것" 개수를 셈
+            //
+            // 마지막으로 읽은 메시지가 없다면 (lastReadId == null) → 0L로 대체하여 모든 메시지를 기준으로 계산함
             return msgRepo.countByRoom_RoomIdAndIdGreaterThanAndSenderNot(
                 roomId,
                 lastReadId == null ? 0L : lastReadId,
                 me
             );
+
         } catch (Throwable t) {
+            // ⚠ (2) 위 JPA 쿼리에서 예외가 발생했을 경우 (예: DB 연결 오류, Repository 문제 등)
+            // 예외를 삼키지 않고 "백업 로직"으로 자바 스트림을 사용해 수동으로 계산 수행
+
+            // msgRepo.findByRoom_RoomIdOrderBySendTimeAsc(roomId)
+            // → 해당 방의 모든 메시지를 시간순으로 전부 가져옴 (List<ChatMessage>)
             return (int) msgRepo.findByRoom_RoomIdOrderBySendTimeAsc(roomId).stream()
-                .filter(m -> m.getId() != null &&
-                             m.getId() > (lastReadId == null ? 0L : lastReadId) &&
-                             !m.getSender().equals(me))
+
+                // filter(): 조건에 맞는 메시지만 필터링
+                .filter(m ->
+                    // (a) 메시지 ID가 null이 아닌 것만
+                    m.getId() != null &&
+
+                    // (b) 내가 마지막으로 읽은 메시지 ID보다 큰 (즉, 이후에 온 메시지)
+                    m.getId() > (lastReadId == null ? 0L : lastReadId) &&
+
+                    // (c) 내가 보낸 메시지가 아닌 (상대방이 보낸 메시지만)
+                    !m.getSender().equals(me)
+                )
+
+                // count(): 필터 조건을 만족하는 메시지 개수 반환
                 .count();
         }
     }
 
-    /** ✅ 직접 호출용 시스템 메시지 저장 (Controller에서 API 호출용) */
+    /**  직접 호출용 시스템 메시지 저장 (Controller에서 API 호출용) */
     public ChatMessage saveSystemMessage(ChatMessageDTO dto) {
         ChatRoom room = roomRepo.findById(dto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("room not found: " + dto.getRoomId()));

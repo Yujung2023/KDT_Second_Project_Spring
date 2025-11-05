@@ -32,13 +32,13 @@ public class NotificationController {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
-	// ✅ STOMP를 통한 직접 메시지 전송 (/app/notice.send)
+	//  STOMP를 통한 직접 메시지 전송 (/app/notice.send)
 	@MessageMapping("/notice.send")
 	public void sendNotice(NotificationDTO notice) {
 		messagingTemplate.convertAndSend("/notice/" + notice.getReceiver_id(), notice);
 	}
 
-	// ✅ REST API로도 보낼 수 있음 
+	//  REST API로도 보낼 수 있음 
 	@PostMapping("/send")
 	public void sendNoticeRest(@RequestBody NotificationDTO notice, HttpServletRequest request) {
 		String loginId = (String) request.getAttribute("loginID");
@@ -49,7 +49,7 @@ public class NotificationController {
 		System.out.println("알림 테스트: " + notice.getType());
 		System.out.println("알림 테스트: " + notice.getMessage());
 
-		// 📦 JSON으로 직렬화되었는지 확인 로그
+		//  JSON으로 직렬화되었는지 확인 로그
 		System.out.println("보내는 데이터: " + notice);
 
 
@@ -77,7 +77,7 @@ public class NotificationController {
 	}
 	
 
-	// ✅ REST API로도 보낼 수 있음 
+	//  REST API로도 보낼 수 있음 
 	@PostMapping("/sendAll")
 	public void sendNoticeAll(@RequestBody NotificationDTO notice, HttpServletRequest request) {
 	    String loginId = (String) request.getAttribute("loginID");
@@ -88,7 +88,7 @@ public class NotificationController {
 		System.out.println("알림 테스트: " + notice.getType());
 		System.out.println("알림 테스트: " + notice.getMessage());
 		
-	    System.out.println("📢 전체 알림 전송");
+	    System.out.println(" 전체 알림 전송");
 
 	    messagingTemplate.convertAndSend("/notice/all", notice);
 	    notificationService.insertNoticeAll(notice);
